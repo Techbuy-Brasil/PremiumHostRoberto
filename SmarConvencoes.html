@@ -8,11 +8,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
 </head>
 <body class="imovel-page">
 
-  <!-- ===== HEADER / NAV ===== -->
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">PremiumHost<span> Roberto</span></a>
@@ -27,70 +25,116 @@
     </div>
   </header>
 
-  <!-- ===== PAGE HEADER ===== -->
   <div class="page-header">
-    <h1>Smart Convenções, 509</h1>
-    <p class="page-location">Smart Convenções, Salvador</p>
+    <div class="container">
+      <h1>Smart Convenções, 509</h1>
+      <p class="page-location">&#128205; Armação, Salvador — BA</p>
+    </div>
   </div>
 
   <div class="page-content">
 
-    <!-- ===== INFO BAR ===== -->
-    <div class="imovel-info-bar">
-      <span>&#128101; <strong>2 hóspedes</strong></span>
-      <span>&#128716; <strong>Studio</strong></span>
-      <span>&#128703; <strong>1 banheiro</strong></span>
-    </div>
-
-    <!-- ===== GALERIA ===== -->
     <div class="galeria-airbnb">
       <div class="foto-principal">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/1d8a9acb-6f2b-40ed-b3ef-040a8c6fd3fd.jpeg?im_w=720" alt="Smart Convenções">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/1d8a9acb-6f2b-40ed-b3ef-040a8c6fd3fd.jpeg?im_w=1200" alt="Smart Convenções, 509 - Principal">
       </div>
       <div class="fotos-laterais">
-        <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/25ea6416-ed74-4d28-8ce2-f81b151229b6.jpeg?im_w=720">
-        <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/d339f40e-d72f-4b11-8d88-4ea1816caac4.jpeg?im_w=720">
-        <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/7117d0c6-5b7c-4b68-bf5a-04d38a9f9e50.jpeg?im_w=1200">
-        <div class="foto-com-overlay">
-          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/b4ad32a2-8059-443e-84ad-fc64c081c9ea.jpeg?im_w=1200">
-          <div class="overlay-text">Mostrar mais fotos</div>
+        <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/25ea6416-ed74-4d28-8ce2-f81b151229b6.jpeg?im_w=720" alt="Smart Convenções, 509">
+        <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/d339f40e-d72f-4b11-8d88-4ea1816caac4.jpeg?im_w=720" alt="Smart Convenções, 509">
+        <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/7117d0c6-5b7c-4b68-bf5a-04d38a9f9e50.jpeg?im_w=720" alt="Smart Convenções, 509">
+        <div class="foto-com-overlay" onclick="abrirModal()">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/b4ad32a2-8059-443e-84ad-fc64c081c9ea.jpeg?im_w=720" alt="Smart Convenções, 509">
+          <div class="overlay-text">+ Mostrar todas as fotos</div>
         </div>
       </div>
     </div>
 
-    <!-- ===== MODAL ===== -->
-    <div id="modal" class="modal">
-      <span class="fechar">&times;</span>
-      <div class="modal-conteudo">
-        <div id="imagens-categoria"></div>
-      </div>
+    <div class="imovel-info-bar">
+      <span>&#128101; <strong>2</strong> hóspedes</span>
+      <span>&#128716; <strong>Studio</strong></span>
+      <span>&#128703; <strong>1</strong> banheiro</span>
+      <span>&#127958; Armação, Salvador</span>
     </div>
 
-    <!-- ===== CALENDÁRIO ===== -->
+    <div style="max-width:800px;margin:0 auto 40px;text-align:center">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;margin-bottom:16px;color:#1a1a1a">Sobre o apartamento</h2>
+      <p style="color:#555;line-height:1.8;font-weight:300">
+        Studio completo no Smart Convenções, na Armação, próximo à praia e ao comércio local.
+        Ideal para casais ou até 2 pessoas. Conta com cozinha equipada, ar condicionado, wi-fi
+        e área de lazer do condomínio com piscina.
+      </p>
+    </div>
+
     <div id="calendar"></div>
+    <a href="https://wa.me/5571992900979?text=Ol%C3%A1!%20Gostaria%20de%20reservar%20o%20Smart%20Conven%C3%A7%C3%B5es%2C%20509." target="_blank" class="reserva-btn">Reservar via WhatsApp</a>
+    <a href="index.html" class="voltar-btn">&larr; Voltar</a>
 
-    <!-- ===== BOTÕES ===== -->
-    <button class="reserva-btn">Reservar imóvel</button>
-    <a href="index.html" class="voltar-btn">&larr; Voltar para Home</a>
-
-    <!-- ===== MAPA ===== -->
     <div class="map-container">
       <h2>Localização</h2>
       <p>Avenida Simon Bolívar, 407, Armação, Salvador, Bahia</p>
       <iframe
         src="https://www.google.com/maps?q=-12.9844,-38.4413&z=15&output=embed"
-        width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade">
+        width="100%" height="400" style="border:0;border-radius:4px" allowfullscreen loading="lazy">
       </iframe>
+    </div>
+
+  </div>
+
+  <div class="modal" id="modalGaleria">
+    <span class="fechar" onclick="fecharModal()">&times;</span>
+    <div class="modal-conteudo">
+
+      <div class="categoria-bloco">
+        <h3>Cozinha</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/40215603-6df3-4aad-89db-6f4f2042ec36.jpeg?im_w=720" alt="Cozinha">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/b4ad32a2-8059-443e-84ad-fc64c081c9ea.jpeg?im_w=720" alt="Cozinha">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/fbfbb8ea-44bc-4c65-a55d-ad558d882db9.jpeg?im_w=720" alt="Cozinha">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Quarto</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/25ea6416-ed74-4d28-8ce2-f81b151229b6.jpeg?im_w=720" alt="Quarto">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/636161af-1573-4302-b6b7-70bd913aed76.jpeg?im_w=720" alt="Quarto">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/73ec8d45-002c-4ab5-aa44-69932946675e.jpeg?im_w=720" alt="Quarto">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/0cdcfc2a-45b4-47a9-b30c-f58c5c5f0e45.jpeg?im_w=720" alt="Quarto">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Banheiro</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/d339f40e-d72f-4b11-8d88-4ea1816caac4.jpeg?im_w=720" alt="Banheiro">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/d5561b7c-9e1e-45b3-946f-9595278dfb7a.jpeg?im_w=720" alt="Banheiro">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Piscina</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/1d8a9acb-6f2b-40ed-b3ef-040a8c6fd3fd.jpeg?im_w=720" alt="Piscina">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/0421e2d1-da6f-4f2b-9ef0-d26aac5d559d.jpeg?im_w=720" alt="Piscina">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/5f8f7bf0-611d-4c3e-90a8-0b81f21f6998.jpeg?im_w=720" alt="Piscina">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Exterior</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/7117d0c6-5b7c-4b68-bf5a-04d38a9f9e50.jpeg?im_w=720" alt="Exterior">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/bd787157-7ac5-47d7-a81f-1459c637e204.jpeg?im_w=720" alt="Exterior">
+        </div>
+      </div>
+
     </div>
   </div>
 
-  <!-- ===== SEPARADOR ===== -->
   <div class="separator">
     <span>&#9670;</span>
   </div>
 
-  <!-- ===== CTA ===== -->
   <section class="cta">
     <div class="cta-overlay"></div>
     <div class="container">
@@ -105,7 +149,6 @@
     </div>
   </section>
 
-  <!-- ===== FOOTER ===== -->
   <footer class="footer" id="contato">
     <div class="container">
       <div class="footer-grid">
@@ -122,6 +165,7 @@
         </div>
         <div class="footer-links">
           <h4>Links</h4>
+          <a href="index.html">Início</a>
           <a href="index.html#apartamentos">Apartamentos</a>
           <a href="index.html#sobre">Sobre</a>
           <a href="index.html#contato">Contato</a>
@@ -141,7 +185,6 @@
     </div>
   </footer>
 
-  <!-- ===== CHAT WIDGET ===== -->
   <div class="chat-widget" id="chatWidget">
     <button class="chat-toggle" id="chatToggle" aria-label="Abrir chat">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -275,82 +318,108 @@
     }
   </style>
 
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script src="js/calendar.js"></script>
-  <script src="js/galeria.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
 
   <script>
-    const API_URL = '';
-    const WHATSAPP_NUM = '5571992900979';
+    const hamburger = document.getElementById('hamburger');
+    const nav = document.getElementById('nav');
+    if (hamburger) {
+      hamburger.addEventListener('click', () => nav.classList.toggle('nav-open'));
+    }
 
-    criarCalendario({
-      elementId: 'calendar',
-      endpoint: '/disponibilidade/smartConvencoes',
-      whatsapp: WHATSAPP_NUM
+    function abrirModal() {
+      document.getElementById('modalGaleria').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+    function fecharModal() {
+      document.getElementById('modalGaleria').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    window.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modalGaleria')) fecharModal();
     });
 
-    iniciarGaleria({
-      Cozinha: [
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/40215603-6df3-4aad-89db-6f4f2042ec36.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/b4ad32a2-8059-443e-84ad-fc64c081c9ea.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/fbfbb8ea-44bc-4c65-a55d-ad558d882db9.jpeg?im_w=720"
-      ],
-      Quarto: [
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/25ea6416-ed74-4d28-8ce2-f81b151229b6.jpeg?im_w=1200",
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/636161af-1573-4302-b6b7-70bd913aed76.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/73ec8d45-002c-4ab5-aa44-69932946675e.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/0cdcfc2a-45b4-47a9-b30c-f58c5c5f0e45.jpeg?im_w=720"
-      ],
-      Banheiro: [
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/d339f40e-d72f-4b11-8d88-4ea1816caac4.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/d5561b7c-9e1e-45b3-946f-9595278dfb7a.jpeg?im_w=720"
-      ],
-      Piscina: [
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/1d8a9acb-6f2b-40ed-b3ef-040a8c6fd3fd.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/0421e2d1-da6f-4f2b-9ef0-d26aac5d559d.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/5f8f7bf0-611d-4c3e-90a8-0b81f21f6998.jpeg?im_w=720"
-      ],
-      Exterior: [
-        "https://a0.muscache.com/im/pictures/miso/Hosting-1320242268460204756/original/7117d0c6-5b7c-4b68-bf5a-04d38a9f9e50.jpeg?im_w=1200",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/bd787157-7ac5-47d7-a81f-1459c637e204.jpeg?im_w=1200"
-      ]
+    document.addEventListener('DOMContentLoaded', function() {
+      const calendarEl = document.getElementById('calendar');
+      if (!calendarEl) return;
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        firstDay: 1,
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,dayGridWeek'
+        },
+        events: 'https://im-veis-salvador.vercel.app/disponibilidade/smartConvencoes',
+        eventColor: '#c8a96a',
+        eventDisplay: 'background',
+        displayEventTime: false,
+        datesSet: function(info) {
+          const view = info.view;
+          if (view.type === 'dayGridWeek') {
+            view.calendar.setOption('headerToolbar', {
+              left: 'prev,next today',
+              center: 'title',
+              right: 'dayGridMonth,dayGridWeek'
+            });
+          }
+        }
+      });
+      calendar.render();
     });
 
-    configurarReserva({
-      telefone: WHATSAPP_NUM,
-      mensagem: 'Smart Convenções, 509'
-    });
-
-    // Chat widget
     (function() {
+      const API_URL = '';
+      const WHATSAPP_NUM = '5571992900979';
       const toggle = document.getElementById('chatToggle');
+      const panel = document.getElementById('chatPanel');
       const widget = document.getElementById('chatWidget');
       const closeBtn = document.getElementById('chatClose');
       const messages = document.getElementById('chatMessages');
       const input = document.getElementById('chatInput');
       const sendBtn = document.getElementById('chatSend');
+
       let guestId = localStorage.getItem('ph_guest_id');
       if (!guestId) {
         guestId = 'web_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
         localStorage.setItem('ph_guest_id', guestId);
       }
-      function toggleChat() { widget.classList.toggle('open'); if (widget.classList.contains('open')) { setTimeout(function() { input.focus(); }, 300); } }
-      function closeChat() { widget.classList.remove('open'); }
+
+      function toggleChat() {
+        widget.classList.toggle('open');
+        if (widget.classList.contains('open')) {
+          setTimeout(() => input.focus(), 300);
+        }
+      }
+
+      function closeChat() {
+        widget.classList.remove('open');
+      }
+
       toggle.addEventListener('click', toggleChat);
       closeBtn.addEventListener('click', closeChat);
-      function scrollToBottom() { messages.scrollTop = messages.scrollHeight; }
+
+      function scrollToBottom() {
+        messages.scrollTop = messages.scrollHeight;
+      }
+
       function addMessage(text, type) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.className = 'chat-msg ' + type;
-        var content = document.createElement('div');
+        const content = document.createElement('div');
         content.className = 'msg-content';
         content.innerHTML = text.replace(/\n/g, '<br>');
         div.appendChild(content);
         messages.appendChild(div);
         scrollToBottom();
       }
+
       function showTyping() {
-        var typing = document.querySelector('.chat-typing');
+        let typing = document.querySelector('.chat-typing');
         if (!typing) {
           typing = document.createElement('div');
           typing.className = 'chat-typing';
@@ -360,22 +429,31 @@
         typing.classList.add('active');
         scrollToBottom();
       }
-      function hideTyping() { var typing = document.querySelector('.chat-typing'); if (typing) typing.classList.remove('active'); }
+
+      function hideTyping() {
+        const typing = document.querySelector('.chat-typing');
+        if (typing) typing.classList.remove('active');
+      }
+
       async function sendMessage() {
-        var text = input.value.trim();
+        const text = input.value.trim();
         if (!text) return;
         input.value = '';
         sendBtn.disabled = true;
         addMessage(text, 'user');
         showTyping();
         try {
-          var res = await fetch(API_URL + '/api/chat', {
+          const res = await fetch(API_URL + '/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, guest_id: guestId, platform: 'web' })
+            body: JSON.stringify({
+              message: text,
+              guest_id: guestId,
+              platform: 'web'
+            })
           });
           if (!res.ok) throw new Error('Erro ' + res.status);
-          var data = await res.json();
+          const data = await res.json();
           hideTyping();
           addMessage(data.response, 'bot');
         } catch (err) {
@@ -386,17 +464,11 @@
           input.focus();
         }
       }
-      sendBtn.addEventListener('click', sendMessage);
-      input.addEventListener('keydown', function(e) { if (e.key === 'Enter') sendMessage(); });
-    })();
 
-    // Hamburger
-    (function() {
-      var hamburger = document.getElementById('hamburger');
-      var nav = document.getElementById('nav');
-      if (hamburger) {
-        hamburger.addEventListener('click', function() { nav.classList.toggle('nav-open'); });
-      }
+      sendBtn.addEventListener('click', sendMessage);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
     })();
   </script>
 

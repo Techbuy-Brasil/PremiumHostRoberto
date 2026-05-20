@@ -3,16 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Studio Moderno em Salvador – PremiumHost Roberto</title>
+  <title>Ondina Apart Hotel, 305 – PremiumHost Roberto</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
 </head>
 <body class="imovel-page">
 
-  <!-- ===== HEADER / NAV ===== -->
   <header class="header">
     <div class="header-inner">
       <a href="index.html" class="logo">PremiumHost<span> Roberto</span></a>
@@ -27,85 +25,110 @@
     </div>
   </header>
 
-  <!-- ===== PAGE HEADER ===== -->
   <div class="page-header">
-    <h1>Studio Moderno em Salvador</h1>
-    <p class="page-location">Ondina, Salvador · Apart Hotel 305</p>
+    <div class="container">
+      <h1>Ondina Apart Hotel, 305</h1>
+      <p class="page-location">&#128205; Ondina, Salvador — BA</p>
+    </div>
   </div>
 
   <div class="page-content">
 
-    <!-- ===== INFO BAR ===== -->
-    <div class="imovel-info-bar">
-      <span>&#128101; <strong>4 hóspedes</strong></span>
-      <span>&#128716; <strong>1 quarto</strong></span>
-      <span>&#128703; <strong>1 banheiro</strong></span>
-    </div>
-
-    <!-- ===== GALERIA ===== -->
     <div class="galeria-airbnb">
       <div class="foto-principal">
-        <img src="https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=720" alt="Studio Salvador" data-categoria="Sala">
+        <img src="https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=720" alt="Ondina Apart Hotel, 305 - Principal">
       </div>
       <div class="fotos-laterais">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/3611ba6b-83f1-476b-a0dc-884c7a67779b.jpeg?im_w=720" data-categoria="Quarto">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e87f2139-c567-4455-a1c0-8b7b6fa1f4d2.jpeg?im_w=720" data-categoria="Sala">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/9ddceefb-8eda-4f09-9d47-8754e1916661.jpeg?im_w=720" data-categoria="Cozinha">
-        <div class="foto-com-overlay" data-categoria="Sala">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e6b19adf-3b27-401c-8c27-9bfbd2bd0681.jpeg?im_w=720">
-          <div class="overlay-text">Mostrar mais fotos</div>
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/3611ba6b-83f1-476b-a0dc-884c7a67779b.jpeg?im_w=720" alt="Ondina Apart Hotel, 305">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e87f2139-c567-4455-a1c0-8b7b6fa1f4d2.jpeg?im_w=720" alt="Ondina Apart Hotel, 305">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/9ddceefb-8eda-4f09-9d47-8754e1916661.jpeg?im_w=720" alt="Ondina Apart Hotel, 305">
+        <div class="foto-com-overlay" onclick="abrirModal()">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e6b19adf-3b27-401c-8c27-9bfbd2bd0681.jpeg?im_w=720" alt="Ondina Apart Hotel, 305">
+          <div class="overlay-text">+ Mostrar todas as fotos</div>
         </div>
       </div>
     </div>
 
-    <!-- ===== MODAL ===== -->
-    <div id="modal" class="modal">
-      <span class="fechar">&times;</span>
-      <div class="modal-conteudo">
-        <div id="imagens-categoria"></div>
-      </div>
+    <div class="imovel-info-bar">
+      <span>&#128101; <strong>4</strong> hóspedes</span>
+      <span>&#128716; <strong>1</strong> quarto</span>
+      <span>&#128703; <strong>1</strong> banheiro</span>
+      <span>&#127958; Ondina, Salvador</span>
     </div>
 
-    <!-- ===== CALENDÁRIO ===== -->
+    <div style="max-width:800px;margin:0 auto 40px;text-align:center">
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;margin-bottom:16px;color:#1a1a1a">Sobre o apartamento</h2>
+      <p style="color:#555;line-height:1.8;font-weight:300">
+        Studio moderno e confortável no Ondina Apart Hotel, ideal para casais ou pequenos grupos.
+        Próximo à praia, com academia, piscina e área de lazer. Conta com 1 quarto, 1 banheiro,
+        cozinha equipada, ar condicionado e wi-fi.
+      </p>
+    </div>
+
     <div id="calendar"></div>
+    <a href="https://wa.me/5571992900979?text=Ol%C3%A1!%20Gostaria%20de%20reservar%20o%20Ondina%20Apart%20Hotel%2C%20305." target="_blank" class="reserva-btn">Reservar via WhatsApp</a>
+    <a href="index.html" class="voltar-btn">&larr; Voltar</a>
 
-    <!-- ===== BOTÕES ===== -->
-    <button class="reserva-btn">Reservar imóvel</button>
-    <a href="index.html" class="voltar-btn">&larr; Voltar para Home</a>
-
-    <!-- ===== MAPA ===== -->
     <div class="map-container">
       <h2>Localização</h2>
       <p>Avenida Oceânica, 2400, Ondina, Salvador, Bahia</p>
       <iframe
         src="https://www.google.com/maps?q=-13.0104,-38.5121&z=15&output=embed"
-        width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade">
+        width="100%" height="400" style="border:0;border-radius:4px" allowfullscreen loading="lazy">
       </iframe>
     </div>
+
   </div>
 
-  <!-- ===== SEPARADOR ===== -->
-  <div class="separator">
-    <span>&#9670;</span>
-  </div>
+  <div class="modal" id="modalGaleria">
+    <span class="fechar" onclick="fecharModal()">&times;</span>
+    <div class="modal-conteudo">
 
-  <!-- ===== CTA ===== -->
-  <section class="cta">
-    <div class="cta-overlay"></div>
-    <div class="container">
-      <div class="cta-content">
-        <h2>Venha viver o melhor de Salvador</h2>
-        <div class="separator cta-sep">
-          <span>&#9670;</span>
+      <div class="categoria-bloco">
+        <h3>Sala</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e87f2139-c567-4455-a1c0-8b7b6fa1f4d2.jpeg?im_w=720" alt="Sala">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/d66ad49d-bd80-4b01-a046-30c07821ffc7.jpeg?im_w=720" alt="Sala">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/1325aa1b-fd5e-4b0d-92fd-6a3df8e07f29.jpeg?im_w=720" alt="Sala">
         </div>
-        <p>Reserve agora seu apartamento e tenha uma experiência inesquecível</p>
-        <a href="https://wa.me/5571992900979" target="_blank" class="btn-whatsapp btn-large">Fale conosco no WhatsApp</a>
       </div>
-    </div>
-  </section>
 
-  <!-- ===== FOOTER ===== -->
+      <div class="categoria-bloco">
+        <h3>Quarto</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/7abd651e-d434-4ccb-ae70-82eb369be093.jpeg?im_w=720" alt="Quarto">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/51ebb16c-de4f-4f16-9e19-7f222fb09b43.jpeg?im_w=720" alt="Quarto">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/3611ba6b-83f1-476b-a0dc-884c7a67779b.jpeg?im_w=720" alt="Quarto">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Cozinha</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/aab48f09-8c41-45c0-9a51-3cdc7d216cc2.jpeg?im_w=720" alt="Cozinha">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/7c852685-11c7-4784-bbe1-cf402f3f11e4.jpeg?im_w=720" alt="Cozinha">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/9ddceefb-8eda-4f09-9d47-8754e1916661.jpeg?im_w=720" alt="Cozinha">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Banheiro</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e6b19adf-3b27-401c-8c27-9bfbd2bd0681.jpeg?im_w=720" alt="Banheiro">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/6ab7315a-63e0-4e2e-a22d-2259f98fe080.jpeg?im_w=720" alt="Banheiro">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Piscina</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e1dca031-dad0-4b0e-b97c-5971a01041bc.jpeg?im_w=720" alt="Piscina">
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <footer class="footer" id="contato">
     <div class="container">
       <div class="footer-grid">
@@ -122,6 +145,7 @@
         </div>
         <div class="footer-links">
           <h4>Links</h4>
+          <a href="index.html">Início</a>
           <a href="index.html#apartamentos">Apartamentos</a>
           <a href="index.html#sobre">Sobre</a>
           <a href="index.html#contato">Contato</a>
@@ -141,7 +165,6 @@
     </div>
   </footer>
 
-  <!-- ===== CHAT WIDGET ===== -->
   <div class="chat-widget" id="chatWidget">
     <button class="chat-toggle" id="chatToggle" aria-label="Abrir chat">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -197,158 +220,95 @@
     </div>
   </div>
 
-  <style>
-    .chat-widget {
-      position: fixed;
-      bottom: 24px;
-      right: 24px;
-      z-index: 9999;
-      font-family: 'Inter', sans-serif;
-    }
-    .chat-toggle {
-      width: 60px; height: 60px; border-radius: 50%; background: #c8a96a;
-      border: none; cursor: pointer; display: flex; align-items: center;
-      justify-content: center; color: #1a1a1a;
-      box-shadow: 0 4px 20px rgba(200,169,106,0.4); transition: all 0.3s;
-      position: relative;
-    }
-    .chat-toggle:hover { transform: scale(1.05); box-shadow: 0 6px 28px rgba(200,169,106,0.5); }
-    .chat-toggle svg { width: 26px; height: 26px; }
-    .chat-toggle-close { display: none; }
-    .chat-widget.open .chat-toggle svg:not(.chat-toggle-close) { display: none; }
-    .chat-widget.open .chat-toggle-close { display: block; }
-    .chat-toggle-close svg { width: 22px; height: 22px; }
-    .chat-panel {
-      position: absolute; bottom: 76px; right: 0; width: 380px; height: 540px;
-      background: #fff; border-radius: 16px; box-shadow: 0 12px 60px rgba(0,0,0,0.18);
-      display: none; flex-direction: column; overflow: hidden;
-      border: 1px solid rgba(200,169,106,0.15); animation: slideUp 0.3s ease;
-    }
-    .chat-widget.open .chat-panel { display: flex; }
-    @keyframes slideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-    .chat-header {
-      background: #1a1a1a; padding: 16px 20px; display: flex; align-items: center;
-      justify-content: space-between; border-bottom: 1px solid rgba(200,169,106,0.2);
-    }
-    .chat-header-info { display: flex; align-items: center; gap: 12px; }
-    .chat-avatar {
-      width: 36px; height: 36px; border-radius: 50%;
-      background: rgba(200,169,106,0.12); display: flex; align-items: center; justify-content: center;
-    }
-    .chat-avatar svg { width: 20px; height: 20px; }
-    .chat-header-title { color: #fff; font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-weight: 600; }
-    .chat-header-sub { color: #c8a96a; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; }
-    .chat-close { background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; transition: color 0.3s; }
-    .chat-close:hover { color: #fff; }
-    .chat-close svg { width: 18px; height: 18px; }
-    .chat-messages {
-      flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column;
-      gap: 12px; background: #fafaf8; scroll-behavior: smooth;
-    }
-    .chat-messages::-webkit-scrollbar { width: 5px; }
-    .chat-messages::-webkit-scrollbar-track { background: transparent; }
-    .chat-messages::-webkit-scrollbar-thumb { background: #d4d4d4; border-radius: 3px; }
-    .chat-msg { display: flex; max-width: 85%; animation: msgIn 0.3s ease; }
-    @keyframes msgIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-    .chat-msg.bot { align-self: flex-start; }
-    .chat-msg.user { align-self: flex-end; }
-    .msg-content { padding: 12px 16px; border-radius: 16px; font-size: 0.9rem; line-height: 1.55; }
-    .chat-msg.bot .msg-content { background: #fff; color: #333; border: 1px solid #eee; border-bottom-left-radius: 4px; }
-    .chat-msg.user .msg-content { background: #1a1a1a; color: #fff; border-bottom-right-radius: 4px; }
-    .chat-typing { display: none; align-self: flex-start; padding: 12px 16px; background: #fff; border: 1px solid #eee; border-radius: 16px; border-bottom-left-radius: 4px; }
-    .chat-typing.active { display: flex; gap: 5px; }
-    .chat-typing span { width: 8px; height: 8px; border-radius: 50%; background: #c8a96a; animation: typingBounce 1.4s infinite; }
-    .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
-    .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
-    @keyframes typingBounce { 0%, 60%, 100% { transform: translateY(0); opacity: 0.4; } 30% { transform: translateY(-6px); opacity: 1; } }
-    .chat-input-area { display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-top: 1px solid #eee; background: #fff; }
-    .chat-input { flex: 1; border: 1px solid #e0e0e0; border-radius: 24px; padding: 10px 16px; font-size: 0.9rem; font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.3s; }
-    .chat-input:focus { border-color: #c8a96a; }
-    .chat-input::placeholder { color: #aaa; }
-    .chat-send { width: 40px; height: 40px; border-radius: 50%; background: #c8a96a; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; color: #1a1a1a; transition: all 0.3s; flex-shrink: 0; }
-    .chat-send:hover { background: #b89655; }
-    .chat-send svg { width: 18px; height: 18px; }
-    .chat-send:disabled { opacity: 0.5; cursor: not-allowed; }
-    @media (max-width: 480px) {
-      .chat-panel { position: fixed; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; border-radius: 0; }
-      .chat-widget { bottom: 16px; right: 16px; }
-    }
-  </style>
-
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-  <script src="js/calendar.js"></script>
-  <script src="js/galeria.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
 
   <script>
-    const API_URL = '';
-    const WHATSAPP_NUM = '5571992900979';
+    const hamburger = document.getElementById('hamburger');
+    const nav = document.getElementById('nav');
+    if (hamburger) {
+      hamburger.addEventListener('click', () => nav.classList.toggle('nav-open'));
+    }
 
-    criarCalendario({
-      elementId: 'calendar',
-      endpoint: '/disponibilidade/studioModernoSalvador',
-      whatsapp: WHATSAPP_NUM
+    function abrirModal() {
+      document.getElementById('modalGaleria').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+    }
+    function fecharModal() {
+      document.getElementById('modalGaleria').style.display = 'none';
+      document.body.style.overflow = '';
+    }
+    window.addEventListener('click', (e) => {
+      if (e.target === document.getElementById('modalGaleria')) fecharModal();
     });
 
-    iniciarGaleria({
-      Sala: [
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e87f2139-c567-4455-a1c0-8b7b6fa1f4d2.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/d66ad49d-bd80-4b01-a046-30c07821ffc7.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/1325aa1b-fd5e-4b0d-92fd-6a3df8e07f29.jpeg?im_w=720"
-      ],
-      Quarto: [
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/7abd651e-d434-4ccb-ae70-82eb369be093.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/51ebb16c-de4f-4f16-9e19-7f222fb09b43.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/3611ba6b-83f1-476b-a0dc-884c7a67779b.jpeg?im_w=720"
-      ],
-      Cozinha: [
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/aab48f09-8c41-45c0-9a51-3cdc7d216cc2.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/7c852685-11c7-4784-bbe1-cf402f3f11e4.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/9ddceefb-8eda-4f09-9d47-8754e1916661.jpeg?im_w=720"
-      ],
-      Banheiro: [
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e6b19adf-3b27-401c-8c27-9bfbd2bd0681.jpeg?im_w=720",
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/6ab7315a-63e0-4e2e-a22d-2259f98fe080.jpeg?im_w=720"
-      ],
-      Piscina: [
-        "https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e1dca031-dad0-4b0e-b97c-5971a01041bc.jpeg?im_w=720"
-      ]
+    document.addEventListener('DOMContentLoaded', function() {
+      const calendarEl = document.getElementById('calendar');
+      if (!calendarEl) return;
+
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        firstDay: 1,
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth'
+        },
+        events: '/disponibilidade/studioModernoSalvador'
+      });
+      calendar.render();
     });
 
-    configurarReserva({
-      telefone: WHATSAPP_NUM,
-      mensagem: 'Studio Moderno em Salvador'
-    });
-
-    // Chat widget
     (function() {
+      const API_URL = '';
+      const WHATSAPP_NUM = '5571992900979';
       const toggle = document.getElementById('chatToggle');
+      const panel = document.getElementById('chatPanel');
       const widget = document.getElementById('chatWidget');
       const closeBtn = document.getElementById('chatClose');
       const messages = document.getElementById('chatMessages');
       const input = document.getElementById('chatInput');
       const sendBtn = document.getElementById('chatSend');
+
       let guestId = localStorage.getItem('ph_guest_id');
       if (!guestId) {
         guestId = 'web_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
         localStorage.setItem('ph_guest_id', guestId);
       }
-      function toggleChat() { widget.classList.toggle('open'); if (widget.classList.contains('open')) { setTimeout(function() { input.focus(); }, 300); } }
-      function closeChat() { widget.classList.remove('open'); }
+
+      function toggleChat() {
+        widget.classList.toggle('open');
+        if (widget.classList.contains('open')) {
+          setTimeout(() => input.focus(), 300);
+        }
+      }
+
+      function closeChat() {
+        widget.classList.remove('open');
+      }
+
       toggle.addEventListener('click', toggleChat);
       closeBtn.addEventListener('click', closeChat);
-      function scrollToBottom() { messages.scrollTop = messages.scrollHeight; }
+
+      function scrollToBottom() {
+        messages.scrollTop = messages.scrollHeight;
+      }
+
       function addMessage(text, type) {
-        var div = document.createElement('div');
+        const div = document.createElement('div');
         div.className = 'chat-msg ' + type;
-        var content = document.createElement('div');
+        const content = document.createElement('div');
         content.className = 'msg-content';
         content.innerHTML = text.replace(/\n/g, '<br>');
         div.appendChild(content);
         messages.appendChild(div);
         scrollToBottom();
       }
+
       function showTyping() {
-        var typing = document.querySelector('.chat-typing');
+        let typing = document.querySelector('.chat-typing');
         if (!typing) {
           typing = document.createElement('div');
           typing.className = 'chat-typing';
@@ -358,22 +318,31 @@
         typing.classList.add('active');
         scrollToBottom();
       }
-      function hideTyping() { var typing = document.querySelector('.chat-typing'); if (typing) typing.classList.remove('active'); }
+
+      function hideTyping() {
+        const typing = document.querySelector('.chat-typing');
+        if (typing) typing.classList.remove('active');
+      }
+
       async function sendMessage() {
-        var text = input.value.trim();
+        const text = input.value.trim();
         if (!text) return;
         input.value = '';
         sendBtn.disabled = true;
         addMessage(text, 'user');
         showTyping();
         try {
-          var res = await fetch(API_URL + '/api/chat', {
+          const res = await fetch(API_URL + '/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: text, guest_id: guestId, platform: 'web' })
+            body: JSON.stringify({
+              message: text,
+              guest_id: guestId,
+              platform: 'web'
+            })
           });
           if (!res.ok) throw new Error('Erro ' + res.status);
-          var data = await res.json();
+          const data = await res.json();
           hideTyping();
           addMessage(data.response, 'bot');
         } catch (err) {
@@ -384,17 +353,11 @@
           input.focus();
         }
       }
-      sendBtn.addEventListener('click', sendMessage);
-      input.addEventListener('keydown', function(e) { if (e.key === 'Enter') sendMessage(); });
-    })();
 
-    // Hamburger
-    (function() {
-      var hamburger = document.getElementById('hamburger');
-      var nav = document.getElementById('nav');
-      if (hamburger) {
-        hamburger.addEventListener('click', function() { nav.classList.toggle('nav-open'); });
-      }
+      sendBtn.addEventListener('click', sendMessage);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
     })();
   </script>
 
