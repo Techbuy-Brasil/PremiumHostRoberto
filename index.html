@@ -696,26 +696,20 @@
   </style>
 
   <script>
+    // Shared config
+    const API_URL = '';
+    const WHATSAPP_NUM = '5571992900979';
+    const CALENDAR_PROPERTIES = [
+      { key: 'farol_barra_flat_214', name: 'Farol Barra Flat, 214', img: 'https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720', tag: 'Farol da Barra', info: '2 quartos · 1 banheiro · 6 hóspedes máx', endpoint: 'https://im-veis-salvador.vercel.app/disponibilidade/farolBarraFlat' },
+      { key: 'ondina_apt_hotel_441', name: 'Ondina Apart Hotel, 441', img: 'https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=1200', tag: 'Ondina', info: '2 quartos · 1 banheiro · 6 hóspedes máx', endpoint: 'https://im-veis-salvador.vercel.app/disponibilidade/ondinaApartHotel' },
+      { key: 'ondina_apt_hotel_305', name: 'Ondina Apart Hotel, 305', img: 'https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=1200', tag: 'Ondina', info: '1 quarto · 1 banheiro · 4 hóspedes máx', endpoint: null },
+      { key: 'smart_convencoes_509', name: 'Smart Convenções, 509', img: 'https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/1d8a9acb-6f2b-40ed-b3ef-040a8c6fd3fd.jpeg?im_w=1200', tag: 'Smart Convenções', info: 'Studio · 1 banheiro · 2 hóspedes máx', endpoint: null },
+      { key: 'the_plaza_407', name: 'The Plaza Ondina', img: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/c43c0e8e-a42f-4293-9b87-99e835a9df42.jpeg?im_w=1200', tag: 'Ondina', info: '1 quarto · 1 banheiro · 4 hóspedes máx', endpoint: null },
+      { key: 'farol_barra_flat_304', name: 'Farol Barra Flat, 304 – Vista Mar', img: 'https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720', tag: 'Farol da Barra', info: 'Studio · 1 banheiro · 4 hóspedes máx', endpoint: null }
+    ];
+
     // === CHAT WIDGET ===
     (function() {
-      const API_URL = '';
-      const WHATSAPP_NUM = '5571992900979';
-
-      // Availability endpoints (original site)
-      const CALENDAR_ENDPOINTS = {
-        'farol_barra_flat_214': 'https://im-veis-salvador.vercel.app/disponibilidade/farolBarraFlat',
-        'ondina_apt_hotel_441': 'https://im-veis-salvador.vercel.app/disponibilidade/ondinaApartHotel'
-      };
-
-      // Property mapping for calendar endpoints
-      const CALENDAR_PROPERTIES = [
-        { key: 'farol_barra_flat_214', name: 'Farol Barra Flat, 214', img: 'https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720', tag: 'Farol da Barra', info: '2 quartos · 1 banheiro · 6 hóspedes máx', endpoint: 'https://im-veis-salvador.vercel.app/disponibilidade/farolBarraFlat' },
-        { key: 'ondina_apt_hotel_441', name: 'Ondina Apart Hotel, 441', img: 'https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=1200', tag: 'Ondina', info: '2 quartos · 1 banheiro · 6 hóspedes máx', endpoint: 'https://im-veis-salvador.vercel.app/disponibilidade/ondinaApartHotel' },
-        { key: 'ondina_apt_hotel_305', name: 'Ondina Apart Hotel, 305', img: 'https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=1200', tag: 'Ondina', info: '1 quarto · 1 banheiro · 4 hóspedes máx', endpoint: null },
-        { key: 'smart_convencoes_509', name: 'Smart Convenções, 509', img: 'https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/1d8a9acb-6f2b-40ed-b3ef-040a8c6fd3fd.jpeg?im_w=1200', tag: 'Smart Convenções', info: 'Studio · 1 banheiro · 2 hóspedes máx', endpoint: null },
-        { key: 'the_plaza_ondina', name: 'The Plaza Ondina', img: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/c43c0e8e-a42f-4293-9b87-99e835a9df42.jpeg?im_w=1200', tag: 'Ondina', info: '1 quarto · 1 banheiro · 4 hóspedes máx', endpoint: null },
-        { key: 'farol_barra_flat_304', name: 'Farol Barra Flat, 304 – Vista Mar', img: 'https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720', tag: 'Farol da Barra', info: 'Studio · 1 banheiro · 4 hóspedes máx', endpoint: null }
-      ];
 
       const toggle = document.getElementById('chatToggle');
       const panel = document.getElementById('chatPanel');
