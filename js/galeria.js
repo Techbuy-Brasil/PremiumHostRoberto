@@ -21,8 +21,8 @@ function iniciarGaleria(fotosPorCategoria) {
   function abrirModal() { montarModal(); modal.style.display = 'block'; }
   function fecharModal() { modal.style.display = 'none'; }
 
-  document.querySelectorAll('.galeria-airbnb img').forEach(function(img) {
-    img.addEventListener('click', abrirModal);
+  document.querySelectorAll('.galeria-airbnb img, .foto-com-overlay, .laterais-overlay').forEach(function(el) {
+    el.addEventListener('click', abrirModal);
   });
   fechar.addEventListener('click', fecharModal);
   window.addEventListener('click', function(e) { if (e.target === modal) fecharModal(); });
