@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Calendário 2</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+</head>
+<body>
+  <h2 style="text-align:center;font-family:sans-serif;">Teste Calendário v6</h2>
+  <div id="calendar" style="max-width:900px;margin:0 auto;padding:20px;"></div>
+  <script>
+    var el = document.getElementById('calendar');
+    var c = new FullCalendar.Calendar(el, {
+      initialView: 'dayGridMonth',
+      locale: 'pt-br',
+      height: 'auto',
+      headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth' }
+    });
+    c.render();
+    fetch('/api/calendar/farol_barra_flat_214')
+      .then(function(r) { return r.json(); })
+      .then(function(ocupados) {
+        var hoje = new Date(), dias = [], i, d, data;
+        for (i = 0; i < 180; i++) {
+          d = new Date(hoje.getTime() + i * 86400000);
+          data = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+          dias.push(data);
+        }
+        var ids = ocupados.filter(function(o) { return typeof o === 'string'; });
+        var disp = dias.filter(function(dd) { return !ids.includes(dd); }).map(function(dd) { return { title: 'Dispon\u00edvel', start: dd, color: '#28a745' }; });
+        var ocup = ids.map(function(dd) { return { title: 'Ocupado', start: dd, color: '#dc3545', display: 'background' }; });
+        c.addEventSource(disp.concat(ocup));
+      });
+  </script>
+</body>
+</html>

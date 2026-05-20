@@ -3,6 +3,8 @@
     "farol_barra_flat_214": {
       "id": 41662018,
       "name": "Farol Barra Flat 214",
+      "ical_url": "https://www.airbnb.com.br/calendar/ical/41662018.ics?t=fcee27b2bd7246138dad7fb4a86b0474",
+      "blocked_dates": [],
       "short_name": "Farol Barra Flat",
       "location": "Barra, Salvador - Bahia",
       "address": "Avenida Oceânica, Barra, Salvador",
@@ -43,6 +45,8 @@
     "ondina_apt_hotel_441": {
       "id": 986288391373272410,
       "name": "Ondina Apart Hotel 441",
+      "ical_url": "https://www.airbnb.com.br/calendar/ical/986288391373272410.ics?t=cc4351d9d0fe477582dfcaf0eb6d6678",
+      "blocked_dates": [],
       "short_name": "Ondina Apt Hotel",
       "location": "Ondina, Salvador - Bahia",
       "address": "Av. Oceânica, 2400, Ondina, Salvador",
@@ -83,9 +87,50 @@
         }
       }
     },
-    "the_plaza_470": {
+    "ondina_apt_hotel_305": {
+      "id": 1661744394111052827,
+      "name": "Ondina Apart Hotel 305",
+      "ical_url": "https://www.airbnb.com.br/calendar/ical/1661744394111052827.ics?t=b116e10321f7427898eb76d0c4c4771f",
+      "blocked_dates": [],
+      "short_name": "Ondina Apt Hotel 305",
+      "location": "Ondina, Salvador - Bahia",
+      "address": "Av. Oceânica, 2400, Ondina, Salvador",
+      "capacity": 4,
+      "bedrooms": 1,
+      "beds": 2,
+      "bathrooms": 1,
+      "base_price": 219,
+      "base_guests": 2,
+      "extra_guest_fee": 75,
+      "cleaning_fee": 0,
+      "amenities": [
+        "Próximo à Praia de Ondina",
+        "Piscina",
+        "Academia",
+        "Ar-condicionado",
+        "Wi-Fi",
+        "Cozinha equipada",
+        "TV"
+      ],
+      "description": "Studio moderno e confortável no Ondina Apart Hotel, ideal para casais ou pequenos grupos. Próximo à praia, com academia, piscina e área de lazer.",
+      "holiday_packages": {
+        "ano_novo_3diarias": {
+          "price": 2600,
+          "min_nights": 3,
+          "description": "Réveillon - pacote de 3 diárias"
+        },
+        "carnaval_7diarias": {
+          "price": 14600,
+          "min_nights": 7,
+          "description": "Carnaval - pacote de 7 diárias"
+        }
+      }
+    },
+"the_plaza_407": {
       "id": 1544328946353777106,
-      "name": "The Plaza 470",
+      "name": "The Plaza 407",
+      "ical_url": "https://www.airbnb.com.br/calendar/ical/1544328946353777106.ics?t=311c06c0f8854ad9abfc306706a0994b",
+      "blocked_dates": [],
       "short_name": "The Plaza",
       "location": "Ondina, Salvador - Bahia",
       "address": "Av. Milton Santos, 58, Ondina, Salvador",
@@ -123,6 +168,8 @@
     "smart_convencoes_509": {
       "id": 1320242268460204756,
       "name": "Smart Convenções 509",
+      "ical_url": "https://www.airbnb.com.br/calendar/ical/1320242268460204756.ics?t=e5b640cb9c234cf8bb622353c9a640e8",
+      "blocked_dates": [],
       "short_name": "Smart Convenções",
       "location": "Armação, Salvador - Bahia",
       "address": "Próximo ao Centro de Convenções, Armação, Salvador",
@@ -160,6 +207,33 @@
           "description": "Carnaval - pacote de 7 diárias"
         }
       }
+    },
+    "farol_barra_flat_304": {
+      "id": null,
+      "name": "Farol Barra Flat 304",
+      "ical_url": null,
+      "blocked_dates": [],
+      "short_name": "Farol Barra Flat 304",
+      "location": "Barra, Salvador - Bahia",
+      "address": "Av. Oceânica, 409, Barra, Salvador",
+      "capacity": 4,
+      "bedrooms": 1,
+      "beds": 3,
+      "bathrooms": 1,
+      "base_price": 249,
+      "base_guests": 2,
+      "extra_guest_fee": 75,
+      "cleaning_fee": 0,
+      "amenities": [
+        "Vista para o mar",
+        "Piscina na cobertura",
+        "Ar-condicionado",
+        "Wi-Fi",
+        "Cozinha compacta",
+        "Segurança 24h"
+      ],
+      "description": "Studio completo com vista para o mar no coração do Farol da Barra.",
+      "holiday_packages": {}
     }
   },
   "pricing_rules": {
@@ -199,5 +273,6 @@
     "sexta_feira_santa": "2026-04-03",
     "sao_joao": "2026-06-24",
     "dia_cidade": "2026-03-29"
-  }
+  },
+  "admin_password": "phadmin2026"
 }

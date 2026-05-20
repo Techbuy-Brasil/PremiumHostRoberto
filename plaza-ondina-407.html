@@ -1,19 +1,52 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  <!-- V3 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Farol Barra Flat, 214 – PremiumHost Roberto</title>
+  <title>The Plaza 407 – PremiumHost Roberto</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script>
+    function criarCalendario(e) {
+      var el = document.getElementById(e.elementId);
+      if (!el) return;
+      var c = new FullCalendar.Calendar(el, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        height: 'auto',
+        eventClick: function(info) {
+          if (info.event.title === 'Dispon\u00edvel' && e.whatsapp) {
+            var msg = 'Ol\u00e1! Tenho interesse em reservar o dia ' + info.event.startStr + '.';
+            window.open('https://wa.me/' + e.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
+          }
+        }
+      });
+      c.render();
+      fetch(e.endpoint).then(function(r) { return r.json(); }).then(function(ocupados) {
+        var hoje = new Date(), dias = [], i, d, data, ids, disp, ocup;
+        for (i = 0; i < 180; i++) {
+          d = new Date(hoje.getTime() + i * 86400000);
+          data = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+          dias.push(data);
+        }
+        ids = ocupados.filter(function(o) { return typeof o === 'string'; });
+        disp = dias.filter(function(d) { return !ids.includes(d); }).map(function(d) { return { title: 'Dispon\u00edvel', start: d, color: '#28a745' }; });
+        ocup = ids.map(function(d) { return { title: 'Ocupado', start: d, color: '#dc3545', display: 'background' }; });
+        c.addEventSource(disp.concat(ocup));
+      });
+    }
+  </script>
 </head>
 <body class="imovel-page">
 
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">PremiumHost<span> Roberto</span></a>
+      <a href="index.html" class="logo"><img src="/logo-white.png" alt="PremiumHost" class="logo-img">PremiumHost<span> Roberto</span></a>
       <nav class="nav" id="nav">
         <a href="index.html#apartamentos">Apartamentos</a>
         <a href="index.html#consulta">Disponibilidade</a>
@@ -27,8 +60,8 @@
 
   <div class="page-header">
     <div class="container">
-      <h1>Farol Barra Flat, 214</h1>
-      <p class="page-location">&#128205; Barra, Salvador — BA</p>
+      <h1>The Plaza 407</h1>
+      <p class="page-location">&#128205; Ondina, Salvador — BA</p>
     </div>
   </div>
 
@@ -36,45 +69,45 @@
 
     <div class="galeria-airbnb">
       <div class="foto-principal">
-        <img src="https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=1200" alt="Farol Barra Flat, 214 - Principal">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/37d184a6-0d79-4f63-aecf-b3a647b85cb1.jpeg?im_w=1200" alt="The Plaza 407 - Principal">
       </div>
       <div class="fotos-laterais">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/7d325dcd-8166-4ff7-9e3c-5b911928fa59.jpeg?im_w=720" alt="Farol Barra Flat, 214">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/484e16b2-0873-499d-abb6-6b0b6de2510b.jpeg?im_w=720" alt="Farol Barra Flat, 214">
-        <img src="https://a0.muscache.com/im/pictures/d55eb1ee-7e43-4a8f-8796-a7445e978814.jpg?im_w=720" alt="Farol Barra Flat, 214">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/8b18a0a9-6016-4cd3-a1b7-a9ff038cd836.jpeg?im_w=720" alt="The Plaza 407">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/4593ed4a-3e9e-43e6-91fe-cd24aecb5432.jpeg?im_w=720" alt="The Plaza 407">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/e6f185f0-2b51-4ebd-94c7-0a2413ed2070.jpeg?im_w=1200" alt="The Plaza 407">
         <div class="foto-com-overlay" onclick="abrirModal()">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/dbdff849-79c1-4948-ae39-ab97781ab529.jpeg?im_w=720" alt="Farol Barra Flat, 214">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/10c87f2d-c380-44a9-bdec-3c51b9ad7184.jpeg?im_w=720" alt="The Plaza 407">
           <div class="overlay-text">+ Mostrar todas as fotos</div>
         </div>
       </div>
     </div>
 
     <div class="imovel-info-bar">
-      <span>&#128101; <strong>6</strong> hóspedes</span>
-      <span>&#128716; <strong>2</strong> quartos</span>
+      <span>&#128101; <strong>4</strong> hóspedes</span>
+      <span>&#128716; <strong>1</strong> quarto</span>
       <span>&#128703; <strong>1</strong> banheiro</span>
-      <span>&#128719; <strong>2</strong> camas de casal</span>
-      <span>&#127958; Barra, Salvador</span>
+      <span>&#127958; Ondina, Salvador</span>
     </div>
 
     <div style="max-width:800px;margin:0 auto 40px;text-align:center">
       <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;margin-bottom:16px;color:#1a1a1a">Sobre o apartamento</h2>
       <p style="color:#555;line-height:1.8;font-weight:300">
-        Apartamento completo no coração do Farol da Barra, a poucos passos da praia e do circuito gastronômico.
-        Ideal para famílias ou grupos de até 6 pessoas. Conta com 2 quartos, 1 banheiro,
+        Apartamento completo no bairro de Ondina, próximo à praia e ao centro de Salvador.
+        Ideal para casais ou pequenos grupos de até 4 pessoas. Conta com 1 quarto, 1 banheiro,
         cozinha equipada, ar condicionado, wi-fi e área de lazer do condomínio com piscina.
       </p>
     </div>
 
     <div id="calendar"></div>
-    <a href="https://wa.me/5571992900979?text=Ol%C3%A1!%20Gostaria%20de%20reservar%20o%20Farol%20Barra%20Flat%2C%20214." target="_blank" class="reserva-btn">Reservar via WhatsApp</a>
+    <script>criarCalendario({elementId:'calendar',endpoint:'/api/calendar/the_plaza_407',whatsapp:'5571992900979'});</script>
+    <a href="https://wa.me/5571992900979?text=Ol%C3%A1!%20Gostaria%20de%20reservar%20o%20The%20Plaza%20407." target="_blank" class="reserva-btn">Reservar via WhatsApp</a>
     <a href="index.html" class="voltar-btn">&larr; Voltar</a>
 
     <div class="map-container">
       <h2>Localização</h2>
-      <p>Avenida Oceânica, 409, Barra, Salvador, Bahia</p>
+      <p>Avenida Milton Santos, 58, Ondina, Salvador, Bahia</p>
       <iframe
-        src="https://www.google.com/maps?q=-13.0098,-38.5308&z=15&output=embed"
+        src="https://www.google.com/maps?q=-13.0101,-38.5114&z=15&output=embed"
         width="100%" height="400" style="border:0;border-radius:4px" allowfullscreen loading="lazy">
       </iframe>
     </div>
@@ -86,62 +119,41 @@
     <div class="modal-conteudo">
 
       <div class="categoria-bloco">
-        <h3>Sala / Cozinha</h3>
+        <h3>Sala</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/7d325dcd-8166-4ff7-9e3c-5b911928fa59.jpeg?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/484e16b2-0873-499d-abb6-6b0b6de2510b.jpeg?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/dbdff849-79c1-4948-ae39-ab97781ab529.jpeg?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/d2e33da5-649d-4b1a-8ce5-800ec4322a4b.jpeg?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/00153a37-1665-4119-8fb0-b7609968c82b.png?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/9e03994b-2df8-4aaf-9772-5031de27e684.jpeg?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/7cf64d62-b900-43b4-acfb-5d6e85a9dc8b.png?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/cff2f1ba-339f-4878-93b1-a0e5ec727ede.png?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6NDE2NjIwMTg%3D/original/b13162a0-80cc-4d03-85bb-7ea1b89da673.jpeg?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/d55eb1ee-7e43-4a8f-8796-a7445e978814.jpg?im_w=720" alt="Sala/Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/99773841-a46f-48be-b598-0dfe7057cc7c.jpg?im_w=720" alt="Sala/Cozinha">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/8b18a0a9-6016-4cd3-a1b7-a9ff038cd836.jpeg?im_w=720" alt="Sala">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/d82b3263-5e36-42be-8d24-9f527b5edcf2.jpeg?im_w=720" alt="Sala">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/eaa5564d-926f-41ec-8999-421c3be861f1.jpeg?im_w=720" alt="Sala">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/80e76741-f0e9-45b6-8767-72fe45d1ac5c.jpeg?im_w=1200" alt="Sala">
         </div>
       </div>
 
       <div class="categoria-bloco">
-        <h3>Quarto Maior</h3>
+        <h3>Quarto</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/7d325dcd-8166-4ff7-9e3c-5b911928fa59.jpeg?im_w=720" alt="Quarto Maior">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/00153a37-1665-4119-8fb0-b7609968c82b.png?im_w=720" alt="Quarto Maior">
-        </div>
-      </div>
-
-      <div class="categoria-bloco">
-        <h3>Quarto Menor</h3>
-        <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/9e03994b-2df8-4aaf-9772-5031de27e684.jpeg?im_w=720" alt="Quarto Menor">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/7cf64d62-b900-43b4-acfb-5d6e85a9dc8b.png?im_w=720" alt="Quarto Menor">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/cff2f1ba-339f-4878-93b1-a0e5ec727ede.png?im_w=720" alt="Quarto Menor">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/4593ed4a-3e9e-43e6-91fe-cd24aecb5432.jpeg?im_w=720" alt="Quarto">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/e34901c8-cd17-4142-bab5-cdbdbc007ceb.jpeg?im_w=720" alt="Quarto">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/01d733af-9fa2-4f11-be52-52b7dfc7559a.jpeg?im_w=720" alt="Quarto">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/1b3c75c6-16e5-4a86-8670-8cc73dcca05a.jpeg?im_w=720" alt="Quarto">
         </div>
       </div>
 
       <div class="categoria-bloco">
         <h3>Banheiro</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6NDE2NjIwMTg%3D/original/b13162a0-80cc-4d03-85bb-7ea1b89da673.jpeg?im_w=720" alt="Banheiro">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6NDE2NjIwMTg%3D/original/cf53b66e-b573-45ae-9101-3f1f0a23942e.jpeg?im_w=720" alt="Banheiro">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/e6f185f0-2b51-4ebd-94c7-0a2413ed2070.jpeg?im_w=1200" alt="Banheiro">
         </div>
       </div>
 
       <div class="categoria-bloco">
-        <h3>Cozinha</h3>
+        <h3>Exterior</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-41662018/original/d2e33da5-649d-4b1a-8ce5-800ec4322a4b.jpeg?im_w=720" alt="Cozinha">
-        </div>
-      </div>
-
-      <div class="categoria-bloco">
-        <h3>Piscina</h3>
-        <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/d55eb1ee-7e43-4a8f-8796-a7445e978814.jpg?im_w=1200" alt="Piscina">
-          <img src="https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720" alt="Piscina">
-          <img src="https://a0.muscache.com/im/pictures/99773841-a46f-48be-b598-0dfe7057cc7c.jpg?im_w=720" alt="Piscina">
-          <img src="https://a0.muscache.com/im/pictures/e945b04b-2032-4a4b-af2c-b7db8cdffe46.jpg?im_w=1200" alt="Piscina">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/0465a487-6bf1-4ee5-ad9e-9b5104f1d997.jpeg?im_w=1200" alt="Exterior">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/10c87f2d-c380-44a9-bdec-3c51b9ad7184.jpeg?im_w=720" alt="Exterior">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/25d30c3f-6b62-47d1-a187-6f378a9edd18.jpeg?im_w=720" alt="Exterior">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/c43c0e8e-a42f-4293-9b87-99e835a9df42.jpeg?im_w=1200" alt="Exterior">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/37d184a6-0d79-4f63-aecf-b3a647b85cb1.jpeg?im_w=720" alt="Exterior">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/e3409008-d7a4-483b-9388-51f5dbf8017c.jpeg?im_w=720" alt="Exterior">
         </div>
       </div>
 
@@ -239,10 +251,6 @@
     </div>
   </div>
 
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
-
   <script>
     const hamburger = document.getElementById('hamburger');
     const nav = document.getElementById('nav');
@@ -260,37 +268,6 @@
     }
     window.addEventListener('click', (e) => {
       if (e.target === document.getElementById('modalGaleria')) fecharModal();
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const calendarEl = document.getElementById('calendar');
-      if (!calendarEl) return;
-
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'pt-br',
-        firstDay: 1,
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,dayGridWeek'
-        },
-        events: 'https://im-veis-salvador.vercel.app/disponibilidade/farolBarraFlat',
-        eventColor: '#c8a96a',
-        eventDisplay: 'background',
-        displayEventTime: false,
-        datesSet: function(info) {
-          const view = info.view;
-          if (view.type === 'dayGridWeek') {
-            view.calendar.setOption('headerToolbar', {
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,dayGridWeek'
-            });
-          }
-        }
-      });
-      calendar.render();
     });
 
     (function() {

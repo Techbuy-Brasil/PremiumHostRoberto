@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  <!-- V3 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Convenções, 509 – PremiumHost Roberto</title>
@@ -8,12 +9,44 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script>
+    function criarCalendario(e) {
+      var el = document.getElementById(e.elementId);
+      if (!el) return;
+      var c = new FullCalendar.Calendar(el, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        height: 'auto',
+        eventClick: function(info) {
+          if (info.event.title === 'Dispon\u00edvel' && e.whatsapp) {
+            var msg = 'Ol\u00e1! Tenho interesse em reservar o dia ' + info.event.startStr + '.';
+            window.open('https://wa.me/' + e.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
+          }
+        }
+      });
+      c.render();
+      fetch(e.endpoint).then(function(r) { return r.json(); }).then(function(ocupados) {
+        var hoje = new Date(), dias = [], i, d, data, ids, disp, ocup;
+        for (i = 0; i < 180; i++) {
+          d = new Date(hoje.getTime() + i * 86400000);
+          data = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+          dias.push(data);
+        }
+        ids = ocupados.filter(function(o) { return typeof o === 'string'; });
+        disp = dias.filter(function(d) { return !ids.includes(d); }).map(function(d) { return { title: 'Dispon\u00edvel', start: d, color: '#28a745' }; });
+        ocup = ids.map(function(d) { return { title: 'Ocupado', start: d, color: '#dc3545', display: 'background' }; });
+        c.addEventSource(disp.concat(ocup));
+      });
+    }
+  </script>
 </head>
 <body class="imovel-page">
 
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">PremiumHost<span> Roberto</span></a>
+      <a href="index.html" class="logo"><img src="/logo-white.png" alt="PremiumHost" class="logo-img">PremiumHost<span> Roberto</span></a>
       <nav class="nav" id="nav">
         <a href="index.html#apartamentos">Apartamentos</a>
         <a href="index.html#consulta">Disponibilidade</a>
@@ -66,6 +99,7 @@
     </div>
 
     <div id="calendar"></div>
+    <script>criarCalendario({elementId:'calendar',endpoint:'/api/calendar/smart_convencoes_509',whatsapp:'5571992900979'});</script>
     <a href="https://wa.me/5571992900979?text=Ol%C3%A1!%20Gostaria%20de%20reservar%20o%20Smart%20Conven%C3%A7%C3%B5es%2C%20509." target="_blank" class="reserva-btn">Reservar via WhatsApp</a>
     <a href="index.html" class="voltar-btn">&larr; Voltar</a>
 
@@ -318,10 +352,6 @@
     }
   </style>
 
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
-
   <script>
     const hamburger = document.getElementById('hamburger');
     const nav = document.getElementById('nav');
@@ -339,37 +369,6 @@
     }
     window.addEventListener('click', (e) => {
       if (e.target === document.getElementById('modalGaleria')) fecharModal();
-    });
-
-    document.addEventListener('DOMContentLoaded', function() {
-      const calendarEl = document.getElementById('calendar');
-      if (!calendarEl) return;
-
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'pt-br',
-        firstDay: 1,
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth,dayGridWeek'
-        },
-        events: 'https://im-veis-salvador.vercel.app/disponibilidade/smartConvencoes',
-        eventColor: '#c8a96a',
-        eventDisplay: 'background',
-        displayEventTime: false,
-        datesSet: function(info) {
-          const view = info.view;
-          if (view.type === 'dayGridWeek') {
-            view.calendar.setOption('headerToolbar', {
-              left: 'prev,next today',
-              center: 'title',
-              right: 'dayGridMonth,dayGridWeek'
-            });
-          }
-        }
-      });
-      calendar.render();
     });
 
     (function() {

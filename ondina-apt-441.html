@@ -1,19 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  <!-- V3 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ondina Apart Hotel, 305 – PremiumHost Roberto</title>
+  <title>Ondina Apart Hotel, 441 – PremiumHost Roberto</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script>
+    function criarCalendario(e) {
+      var el = document.getElementById(e.elementId);
+      if (!el) return;
+      var c = new FullCalendar.Calendar(el, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        height: 'auto',
+        eventClick: function(info) {
+          if (info.event.title === 'Dispon\u00edvel' && e.whatsapp) {
+            var msg = 'Ol\u00e1! Tenho interesse em reservar o dia ' + info.event.startStr + '.';
+            window.open('https://wa.me/' + e.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
+          }
+        }
+      });
+      c.render();
+      fetch(e.endpoint).then(function(r) { return r.json(); }).then(function(ocupados) {
+        var hoje = new Date(), dias = [], i, d, data, ids, disp, ocup;
+        for (i = 0; i < 180; i++) {
+          d = new Date(hoje.getTime() + i * 86400000);
+          data = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+          dias.push(data);
+        }
+        ids = ocupados.filter(function(o) { return typeof o === 'string'; });
+        disp = dias.filter(function(d) { return !ids.includes(d); }).map(function(d) { return { title: 'Dispon\u00edvel', start: d, color: '#28a745' }; });
+        ocup = ids.map(function(d) { return { title: 'Ocupado', start: d, color: '#dc3545', display: 'background' }; });
+        c.addEventSource(disp.concat(ocup));
+      });
+    }
+  </script>
 </head>
 <body class="imovel-page">
 
+  <!-- ===== HEADER / NAV ===== -->
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">PremiumHost<span> Roberto</span></a>
+      <a href="index.html" class="logo"><img src="/logo-white.png" alt="PremiumHost" class="logo-img">PremiumHost<span> Roberto</span></a>
       <nav class="nav" id="nav">
         <a href="index.html#apartamentos">Apartamentos</a>
         <a href="index.html#consulta">Disponibilidade</a>
@@ -25,50 +59,59 @@
     </div>
   </header>
 
+  <!-- ===== PAGE HEADER ===== -->
   <div class="page-header">
     <div class="container">
-      <h1>Ondina Apart Hotel, 305</h1>
+      <h1>Ondina Apart Hotel, 441</h1>
       <p class="page-location">&#128205; Ondina, Salvador — BA</p>
     </div>
   </div>
 
+  <!-- ===== PAGE CONTENT ===== -->
   <div class="page-content">
 
+    <!-- GALERIA -->
     <div class="galeria-airbnb">
       <div class="foto-principal">
-        <img src="https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=720" alt="Ondina Apart Hotel, 305 - Principal">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/bf5b78ca-c7db-46f5-bd03-01aecfa25e13.jpeg?im_w=1200" alt="Ondina Apart Hotel 441 - Principal">
       </div>
       <div class="fotos-laterais">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/3611ba6b-83f1-476b-a0dc-884c7a67779b.jpeg?im_w=720" alt="Ondina Apart Hotel, 305">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e87f2139-c567-4455-a1c0-8b7b6fa1f4d2.jpeg?im_w=720" alt="Ondina Apart Hotel, 305">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/9ddceefb-8eda-4f09-9d47-8754e1916661.jpeg?im_w=720" alt="Ondina Apart Hotel, 305">
+        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/0ab79201-2663-4576-a5f8-04e723abaa62.jpeg?im_w=720" alt="Ondina Apart Hotel 441">
+        <img src="https://a0.muscache.com/im/pictures/5cddfebc-127e-461e-9aaf-ad9ac8d1e0fe.jpg?im_w=720" alt="Ondina Apart Hotel 441">
+        <img src="https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=720" alt="Ondina Apart Hotel 441">
         <div class="foto-com-overlay" onclick="abrirModal()">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e6b19adf-3b27-401c-8c27-9bfbd2bd0681.jpeg?im_w=720" alt="Ondina Apart Hotel, 305">
+          <img src="https://a0.muscache.com/im/pictures/4866633d-8200-4753-8d94-7b2181d562a4.jpg?im_w=720" alt="Ondina Apart Hotel 441">
           <div class="overlay-text">+ Mostrar todas as fotos</div>
         </div>
       </div>
     </div>
 
+    <!-- INFO BAR -->
     <div class="imovel-info-bar">
-      <span>&#128101; <strong>4</strong> hóspedes</span>
-      <span>&#128716; <strong>1</strong> quarto</span>
+      <span>&#128101; <strong>6</strong> hóspedes</span>
+      <span>&#128716; <strong>2</strong> quartos</span>
       <span>&#128703; <strong>1</strong> banheiro</span>
+      <span>&#128719; <strong>2</strong> camas de casal</span>
       <span>&#127958; Ondina, Salvador</span>
     </div>
 
+    <!-- DESCRIÇÃO -->
     <div style="max-width:800px;margin:0 auto 40px;text-align:center">
       <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;margin-bottom:16px;color:#1a1a1a">Sobre o apartamento</h2>
       <p style="color:#555;line-height:1.8;font-weight:300">
-        Studio moderno e confortável no Ondina Apart Hotel, ideal para casais ou pequenos grupos.
-        Próximo à praia, com academia, piscina e área de lazer. Conta com 1 quarto, 1 banheiro,
-        cozinha equipada, ar condicionado e wi-fi.
+        Apartamento completo em Ondina, a poucos passos da praia e do Farol da Barra. 
+        Ideal para famílias ou grupos de até 6 pessoas. Conta com 2 quartos, 1 banheiro, 
+        cozinha equipada, ar condicionado, wi-fi e área de lazer do condomínio com piscina e academia.
       </p>
     </div>
 
+    <!-- CALENDÁRIO -->
     <div id="calendar"></div>
-    <a href="https://wa.me/5571992900979?text=Ol%C3%A1!%20Gostaria%20de%20reservar%20o%20Ondina%20Apart%20Hotel%2C%20305." target="_blank" class="reserva-btn">Reservar via WhatsApp</a>
+    <script>criarCalendario({elementId:'calendar',endpoint:'/api/calendar/ondina_apt_hotel_441',whatsapp:'5571992900979'});</script>
+    <a href="https://wa.me/5571992900979?text=Ol%C3%A1!%20Gostaria%20de%20reservar%20o%20Ondina%20Apart%20Hotel%2C%20441." target="_blank" class="reserva-btn">Reservar via WhatsApp</a>
     <a href="index.html" class="voltar-btn">&larr; Voltar</a>
 
+    <!-- MAPA -->
     <div class="map-container">
       <h2>Localização</h2>
       <p>Avenida Oceânica, 2400, Ondina, Salvador, Bahia</p>
@@ -80,55 +123,73 @@
 
   </div>
 
+  <!-- ===== MODAL GALERIA ===== -->
   <div class="modal" id="modalGaleria">
     <span class="fechar" onclick="fecharModal()">&times;</span>
     <div class="modal-conteudo">
 
       <div class="categoria-bloco">
-        <h3>Sala</h3>
-        <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e87f2139-c567-4455-a1c0-8b7b6fa1f4d2.jpeg?im_w=720" alt="Sala">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/d66ad49d-bd80-4b01-a046-30c07821ffc7.jpeg?im_w=720" alt="Sala">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/1325aa1b-fd5e-4b0d-92fd-6a3df8e07f29.jpeg?im_w=720" alt="Sala">
-        </div>
-      </div>
-
-      <div class="categoria-bloco">
-        <h3>Quarto</h3>
-        <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/7abd651e-d434-4ccb-ae70-82eb369be093.jpeg?im_w=720" alt="Quarto">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/51ebb16c-de4f-4f16-9e19-7f222fb09b43.jpeg?im_w=720" alt="Quarto">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/3611ba6b-83f1-476b-a0dc-884c7a67779b.jpeg?im_w=720" alt="Quarto">
-        </div>
-      </div>
-
-      <div class="categoria-bloco">
         <h3>Cozinha</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/aab48f09-8c41-45c0-9a51-3cdc7d216cc2.jpeg?im_w=720" alt="Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/7c852685-11c7-4784-bbe1-cf402f3f11e4.jpeg?im_w=720" alt="Cozinha">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/9ddceefb-8eda-4f09-9d47-8754e1916661.jpeg?im_w=720" alt="Cozinha">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/0df4259e-5e5b-4ebf-888e-3030e40e1d10.jpeg?im_w=720" alt="Cozinha">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/3eb42af6-d1e3-4d4b-838d-27f69a5df6ef.jpeg?im_w=720" alt="Cozinha">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/47bc7ac4-ea62-4d58-a6fc-8d6ddcd088f5.jpeg?im_w=720" alt="Cozinha">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/157c915c-c41e-48f0-8688-a5e301d7a576.jpeg?im_w=720" alt="Cozinha">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Quarto 1</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/baf3827a-4103-4de9-92ef-69e49fecdc65.jpeg?im_w=720" alt="Quarto 1">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/e6c8c169-af15-4c60-8609-c97f9c284be9.jpeg?im_w=720" alt="Quarto 1">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/0b04f8b1-80f0-41a2-9bb1-5a5e1f21b194.jpeg?im_w=720" alt="Quarto 1">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/3341e87f-0196-4a43-9de3-faa0f32e95c2.jpeg?im_w=720" alt="Quarto 1">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Quarto 2</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/0104e77e-d21c-4400-8cfa-a0b2f18c1c9b.jpeg?im_w=720" alt="Quarto 2">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/f3912a49-268b-4ec1-95d4-2f3e9722d877.jpeg?im_w=720" alt="Quarto 2">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/2a5d8762-da2b-4b11-9b10-56d86a0f38e9.jpeg?im_w=720" alt="Quarto 2">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/49830f6b-20ee-451c-a02a-a4a3a09da11f.jpeg?im_w=720" alt="Quarto 2">
         </div>
       </div>
 
       <div class="categoria-bloco">
         <h3>Banheiro</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e6b19adf-3b27-401c-8c27-9bfbd2bd0681.jpeg?im_w=720" alt="Banheiro">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/6ab7315a-63e0-4e2e-a22d-2259f98fe080.jpeg?im_w=720" alt="Banheiro">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/e471f6a4-0a67-43b4-b8c8-d1f1eefb1e3b.jpeg?im_w=720" alt="Banheiro">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/3558450a-d731-46d3-99f2-1df30cbb03a4.jpeg?im_w=720" alt="Banheiro">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-986288391373272410/original/154b7037-5c0e-4571-9193-24b2fa25feec.jpeg?im_w=720" alt="Banheiro">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/87e8a851-a757-4802-89cc-abfbf3ad6cc9.jpeg?im_w=720" alt="Banheiro">
         </div>
       </div>
 
       <div class="categoria-bloco">
         <h3>Piscina</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1661744394111052827/original/e1dca031-dad0-4b0e-b97c-5971a01041bc.jpeg?im_w=720" alt="Piscina">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/ac3a79c4-25b8-4de4-8ad3-f24c02cc009c.jpeg?im_w=720" alt="Piscina">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/1848a5f5-4de7-4feb-91df-6df2b18603c6.jpeg?im_w=720" alt="Piscina">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/2e0b6e4d-f3ed-48e8-9399-e185ef8a4b8f.jpeg?im_w=720" alt="Piscina">
+          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6OTg2Mjg4MzkxMzczMjcyNDEw/original/7b8c58cc-5e00-4cd1-b72b-a10a7cafb02d.jpeg?im_w=720" alt="Piscina">
+        </div>
+      </div>
+
+      <div class="categoria-bloco">
+        <h3>Academia</h3>
+        <div class="categoria-imagens">
+          <img src="https://a0.muscache.com/im/pictures/2cb62f7f-3ce1-4ac1-acb9-8ee37c7f9fbb.jpg?im_w=720" alt="Academia">
+          <img src="https://a0.muscache.com/im/pictures/e7ea8c6a-efc8-4ae7-9d13-4c26f8c88eab.jpg?im_w=720" alt="Academia">
         </div>
       </div>
 
     </div>
   </div>
 
+  <!-- ===== FOOTER ===== -->
   <footer class="footer" id="contato">
     <div class="container">
       <div class="footer-grid">
@@ -165,6 +226,7 @@
     </div>
   </footer>
 
+  <!-- ===== CHAT WIDGET ===== -->
   <div class="chat-widget" id="chatWidget">
     <button class="chat-toggle" id="chatToggle" aria-label="Abrir chat">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -220,17 +282,17 @@
     </div>
   </div>
 
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
+  <!-- FullCalendar -->
 
   <script>
+    // === MOBILE NAV ===
     const hamburger = document.getElementById('hamburger');
     const nav = document.getElementById('nav');
     if (hamburger) {
       hamburger.addEventListener('click', () => nav.classList.toggle('nav-open'));
     }
 
+    // === MODAL ===
     function abrirModal() {
       document.getElementById('modalGaleria').style.display = 'block';
       document.body.style.overflow = 'hidden';
@@ -243,24 +305,7 @@
       if (e.target === document.getElementById('modalGaleria')) fecharModal();
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-      const calendarEl = document.getElementById('calendar');
-      if (!calendarEl) return;
-
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'pt-br',
-        firstDay: 1,
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth'
-        },
-        events: '/disponibilidade/studioModernoSalvador'
-      });
-      calendar.render();
-    });
-
+    // === CHAT WIDGET ===
     (function() {
       const API_URL = '';
       const WHATSAPP_NUM = '5571992900979';

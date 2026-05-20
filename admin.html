@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - PremiumHost Roberto</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; color: #333; padding: 20px; }
+    .container { max-width: 600px; margin: 0 auto; background: #fff; border-radius: 8px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    h1 { font-size: 1.3rem; margin-bottom: 20px; color: #1a1a1a; }
+    label { display: block; font-weight: 600; margin-top: 14px; margin-bottom: 4px; font-size: 0.9rem; }
+    select, input[type="password"], input[type="date"], input[type="text"] { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.95rem; }
+    .row { display: flex; gap: 8px; margin-top: 8px; }
+    .row input { flex: 1; }
+    button { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+    .btn-primary { background: #c8a96a; color: #fff; }
+    .btn-primary:hover { background: #b89655; }
+    .btn-danger { background: #dc3545; color: #fff; }
+    .btn-danger:hover { background: #c82333; }
+    .btn-sm { padding: 4px 8px; font-size: 0.8rem; }
+    .msg { margin-top: 10px; padding: 8px 12px; border-radius: 4px; font-size: 0.85rem; display: none; }
+    .msg.success { display: block; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .msg.error { display: block; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    ul { margin-top: 8px; list-style: none; }
+    li { display: inline-block; background: #e9ecef; padding: 4px 10px; border-radius: 20px; margin: 3px; font-size: 0.85rem; }
+    li button { margin-left: 6px; background: none; border: none; color: #dc3545; cursor: pointer; font-size: 0.85rem; }
+    .section { margin-top: 20px; padding-top: 16px; border-top: 1px solid #eee; }
+    .hint { font-size: 0.8rem; color: #888; margin-top: 4px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Painel Administrativo</h1>
+    <label>Senha</label>
+    <input type="password" id="senha" placeholder="Digite a senha administrativa">
+
+    <label>Imóvel</label>
+    <select id="imovel"></select>
+
+    <div class="section">
+      <label>Bloquear data(s)</label>
+      <div class="row">
+        <input type="date" id="dataInicio">
+        <input type="date" id="dataFim">
+        <button class="btn-primary" onclick="bloquear()">+</button>
+      </div>
+      <div class="hint">Preencha só "Início" para uma data, ou ambas para um intervalo.</div>
+    </div>
+
+    <div>
+      <label>Datas bloqueadas (admin)</label>
+      <div id="listaDatas">
+        <p style="color:#888;font-size:0.85rem">Carregue os imóveis primeiro.</p>
+      </div>
+    </div>
+
+    <div id="msg" class="msg"></div>
+
+    <div class="section" style="text-align:center;font-size:0.8rem;color:#aaa">
+      <p>As datas bloqueadas aqui persistem enquanto o servidor estiver aquecido.</p>
+      <p style="margin-top:4px">Para datas permanentes, edite o <code>config.json</code> e faça deploy.</p>
+      <p style="margin-top:8px"><a href="index.html" style="color:#c8a96a">&larr; Voltar ao site</a></p>
+    </div>
+  </div>
+
+  <script>
+    var SENHA = 'phadmin2026';
+    var PROP_KEYS = {};
+
+    function msg(text, type) {
+      var el = document.getElementById('msg');
+      el.textContent = text;
+      el.className = 'msg ' + type;
+    }
+
+    async function api(method, url, body) {
+      try {
+        var res = await fetch(url, {
+          method: method,
+          headers: { 'Content-Type': 'application/json' },
+          body: body ? JSON.stringify(body) : undefined
+        });
+        if (!res.ok) {
+          var err = await res.text();
+          throw new Error(err);
+        }
+        return await res.json();
+      } catch (e) {
+        msg('Erro: ' + e.message, 'error');
+        return null;
+      }
+    }
+
+    async function carregarImoveis() {
+      var d = await api('GET', '/api/imoveis');
+      if (!d) return;
+      var sel = document.getElementById('imovel');
+      sel.innerHTML = '';
+      for (var key in d) {
+        PROP_KEYS[key] = d[key].nome;
+        var opt = document.createElement('option');
+        opt.value = key;
+        opt.textContent = d[key].nome;
+        sel.appendChild(opt);
+      }
+      carregarBloqueadas();
+    }
+
+    async function carregarBloqueadas() {
+      var pwd = document.getElementById('senha').value || SENHA;
+      var data = await api('GET', '/api/admin/blocked?password=' + encodeURIComponent(pwd));
+      if (!data) {
+        document.getElementById('listaDatas').innerHTML = '<p style="color:#888;font-size:0.85rem">Nenhuma data bloqueada via admin.</p>';
+        return;
+      }
+      renderDatas(data);
+    }
+
+    function renderDatas(data) {
+      var el = document.getElementById('listaDatas');
+      var keys = Object.keys(data);
+      if (keys.length === 0) {
+        el.innerHTML = '<p style="color:#888;font-size:0.85rem">Nenhuma data bloqueada via admin.</p>';
+        return;
+      }
+      var html = '';
+      keys.forEach(function(key) {
+        if (data[key].length === 0) return;
+        html += '<div style="margin-bottom:8px"><strong>' + (PROP_KEYS[key] || key) + '</strong><ul>';
+        data[key].forEach(function(d) {
+          html += '<li>' + d + ' <button onclick="desbloquear(\'' + key + '\',\'' + d + '\')" title="Remover">&times;</button></li>';
+        });
+        html += '</ul></div>';
+      });
+      el.innerHTML = html || '<p style="color:#888;font-size:0.85rem">Nenhuma data bloqueada via admin.</p>';
+    }
+
+    async function bloquear() {
+      var pwd = document.getElementById('senha').value || SENHA;
+      var key = document.getElementById('imovel').value;
+      var inicio = document.getElementById('dataInicio').value;
+      var fim = document.getElementById('dataFim').value || inicio;
+      if (!key || !inicio) { msg('Selecione im\u00f3vel e data de in\u00edcio.', 'error'); return; }
+      if (inicio > fim) { msg('Data final precisa ser depois da inicial.', 'error'); return; }
+      var dates = [];
+      var d = new Date(inicio + 'T12:00:00');
+      var end = new Date(fim + 'T12:00:00');
+      while (d <= end) {
+        dates.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'));
+        d.setDate(d.getDate() + 1);
+      }
+      var res = await api('POST', '/api/admin/block', { property_key: key, dates: dates, password: pwd });
+      if (res) {
+        msg(dates.length + ' data(s) bloqueada(s) com sucesso!', 'success');
+        document.getElementById('dataInicio').value = '';
+        document.getElementById('dataFim').value = '';
+        carregarBloqueadas();
+      }
+    }
+
+    async function desbloquear(key, date) {
+      var pwd = document.getElementById('senha').value || SENHA;
+      var res = await api('POST', '/api/admin/unblock', { property_key: key, dates: [date], password: pwd });
+      if (res) {
+        msg('Data ' + date + ' desbloqueada.', 'success');
+        carregarBloqueadas();
+      }
+    }
+
+    carregarImoveis();
+  </script>
+</body>
+</html>

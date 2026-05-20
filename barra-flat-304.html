@@ -1,19 +1,53 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
+  <!-- V3 -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Plaza 470 – PremiumHost Roberto</title>
+  <title>Farol Barra Flat, 304 – Vista Mar | PremiumHost Roberto</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+  <script>
+    function criarCalendario(e) {
+      var el = document.getElementById(e.elementId);
+      if (!el) return;
+      var c = new FullCalendar.Calendar(el, {
+        initialView: 'dayGridMonth',
+        locale: 'pt-br',
+        height: 'auto',
+        eventClick: function(info) {
+          if (info.event.title === 'Dispon\u00edvel' && e.whatsapp) {
+            var msg = 'Ol\u00e1! Tenho interesse em reservar o dia ' + info.event.startStr + '.';
+            window.open('https://wa.me/' + e.whatsapp + '?text=' + encodeURIComponent(msg), '_blank');
+          }
+        }
+      });
+      c.render();
+      fetch(e.endpoint).then(function(r) { return r.json(); }).then(function(ocupados) {
+        var hoje = new Date(), dias = [], i, d, data, ids, disp, ocup;
+        for (i = 0; i < 180; i++) {
+          d = new Date(hoje.getTime() + i * 86400000);
+          data = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+          dias.push(data);
+        }
+        ids = ocupados.filter(function(o) { return typeof o === 'string'; });
+        disp = dias.filter(function(d) { return !ids.includes(d); }).map(function(d) { return { title: 'Dispon\u00edvel', start: d, color: '#28a745' }; });
+        ocup = ids.map(function(d) { return { title: 'Ocupado', start: d, color: '#dc3545', display: 'background' }; });
+        c.addEventSource(disp.concat(ocup));
+      });
+    }
+  </script>
 </head>
 <body class="imovel-page">
 
+  <!-- ===== HEADER / NAV ===== -->
   <header class="header">
     <div class="header-inner">
-      <a href="index.html" class="logo">PremiumHost<span> Roberto</span></a>
+      <a href="index.html" class="logo"><img src="/logo-white.png" alt="PremiumHost" class="logo-img">PremiumHost<span> Roberto</span></a>
       <nav class="nav" id="nav">
         <a href="index.html#apartamentos">Apartamentos</a>
         <a href="index.html#consulta">Disponibilidade</a>
@@ -25,107 +59,107 @@
     </div>
   </header>
 
+  <!-- ===== PAGE HEADER ===== -->
   <div class="page-header">
     <div class="container">
-      <h1>The Plaza 470</h1>
-      <p class="page-location">&#128205; Ondina, Salvador — BA</p>
+      <h1>Farol Barra Flat, 304 – Vista Mar</h1>
+      <p class="page-location">&#128205; Barra, Salvador — BA</p>
     </div>
   </div>
 
+  <!-- ===== PAGE CONTENT ===== -->
   <div class="page-content">
 
+    <!-- GALERIA -->
     <div class="galeria-airbnb">
       <div class="foto-principal">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/37d184a6-0d79-4f63-aecf-b3a647b85cb1.jpeg?im_w=1200" alt="The Plaza 470 - Principal">
+        <img src="https://a0.muscache.com/im/pictures/283efa62-8081-4257-97b0-a3c7031eb399.jpg?im_w=720" alt="Farol Barra Flat, 304 - Principal">
       </div>
       <div class="fotos-laterais">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/8b18a0a9-6016-4cd3-a1b7-a9ff038cd836.jpeg?im_w=720" alt="The Plaza 470">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/4593ed4a-3e9e-43e6-91fe-cd24aecb5432.jpeg?im_w=720" alt="The Plaza 470">
-        <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/e6f185f0-2b51-4ebd-94c7-0a2413ed2070.jpeg?im_w=1200" alt="The Plaza 470">
+        <img src="https://a0.muscache.com/im/pictures/5f974a84-a52f-4792-8974-0bd854f7f089.jpg?im_w=1200" alt="Farol Barra Flat, 304">
+        <img src="https://a0.muscache.com/im/pictures/12fac575-e5fe-416d-89df-2e2b5bd7bc2f.jpg?im_w=720" alt="Farol Barra Flat, 304">
+        <img src="https://a0.muscache.com/im/pictures/88d2f154-1b59-424c-8cac-cac7dbd122ce.jpg?im_w=720" alt="Farol Barra Flat, 304">
         <div class="foto-com-overlay" onclick="abrirModal()">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/10c87f2d-c380-44a9-bdec-3c51b9ad7184.jpeg?im_w=720" alt="The Plaza 470">
+          <img src="https://a0.muscache.com/im/pictures/d55eb1ee-7e43-4a8f-8796-a7445e978814.jpg?im_w=720" alt="Farol Barra Flat, 304">
           <div class="overlay-text">+ Mostrar todas as fotos</div>
         </div>
       </div>
     </div>
 
+    <!-- INFO BAR -->
     <div class="imovel-info-bar">
       <span>&#128101; <strong>4</strong> hóspedes</span>
-      <span>&#128716; <strong>1</strong> quarto</span>
+      <span>&#128716; <strong>Studio</strong></span>
       <span>&#128703; <strong>1</strong> banheiro</span>
-      <span>&#127958; Ondina, Salvador</span>
+      <span>&#127958; Farol da Barra</span>
     </div>
 
+    <!-- DESCRIÇÃO -->
     <div style="max-width:800px;margin:0 auto 40px;text-align:center">
       <h2 style="font-family:'Cormorant Garamond',serif;font-size:1.8rem;margin-bottom:16px;color:#1a1a1a">Sobre o apartamento</h2>
       <p style="color:#555;line-height:1.8;font-weight:300">
-        Apartamento completo no bairro de Ondina, próximo à praia e ao centro de Salvador.
-        Ideal para casais ou pequenos grupos de até 4 pessoas. Conta com 1 quarto, 1 banheiro,
-        cozinha equipada, ar condicionado, wi-fi e área de lazer do condomínio com piscina.
+        Studio completo com vista para o mar no coração do Farol da Barra. 
+        1 Cama de Casal, 1 Cama de Solteiro, 1 Sofá cama. Ar condicionado, cozinha equipada. 
+        Ideal para até 4 hóspedes.
       </p>
     </div>
 
+    <!-- CALENDÁRIO -->
     <div id="calendar"></div>
-    <a href="https://wa.me/5571992900979?text=Ol%C3%A1!%20Gostaria%20de%20reservar%20o%20The%20Plaza%20470." target="_blank" class="reserva-btn">Reservar via WhatsApp</a>
+    <script>criarCalendario({elementId:'calendar',endpoint:'/api/calendar/farol_barra_flat_304',whatsapp:'5571992900979'});</script>
+    <a href="https://wa.me/5571992900979?text=Ol%C3%A1!%20Gostaria%20de%20reservar%20o%20Farol%20Barra%20Flat%2C%20304%20%E2%80%93%20Vista%20Mar." target="_blank" class="reserva-btn">Reservar via WhatsApp</a>
     <a href="index.html" class="voltar-btn">&larr; Voltar</a>
 
+    <!-- MAPA -->
     <div class="map-container">
       <h2>Localização</h2>
-      <p>Avenida Milton Santos, 58, Ondina, Salvador, Bahia</p>
+      <p>Avenida Oceânica, 409, Barra, Salvador, Bahia</p>
       <iframe
-        src="https://www.google.com/maps?q=-13.0101,-38.5114&z=15&output=embed"
+        src="https://www.google.com/maps?q=-13.0098,-38.5308&z=15&output=embed"
         width="100%" height="400" style="border:0;border-radius:4px" allowfullscreen loading="lazy">
       </iframe>
     </div>
 
   </div>
 
+  <!-- ===== MODAL GALERIA ===== -->
   <div class="modal" id="modalGaleria">
     <span class="fechar" onclick="fecharModal()">&times;</span>
     <div class="modal-conteudo">
 
       <div class="categoria-bloco">
-        <h3>Sala</h3>
+        <h3>Sala de Estar</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/8b18a0a9-6016-4cd3-a1b7-a9ff038cd836.jpeg?im_w=720" alt="Sala">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/d82b3263-5e36-42be-8d24-9f527b5edcf2.jpeg?im_w=720" alt="Sala">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/eaa5564d-926f-41ec-8999-421c3be861f1.jpeg?im_w=720" alt="Sala">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/80e76741-f0e9-45b6-8767-72fe45d1ac5c.jpeg?im_w=1200" alt="Sala">
+          <img src="https://a0.muscache.com/im/pictures/283efa62-8081-4257-97b0-a3c7031eb399.jpg?im_w=720" alt="Sala">
+          <img src="https://a0.muscache.com/im/pictures/5f974a84-a52f-4792-8974-0bd854f7f089.jpg?im_w=1200" alt="Sala">
         </div>
       </div>
 
       <div class="categoria-bloco">
         <h3>Quarto</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/4593ed4a-3e9e-43e6-91fe-cd24aecb5432.jpeg?im_w=720" alt="Quarto">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/e34901c8-cd17-4142-bab5-cdbdbc007ceb.jpeg?im_w=720" alt="Quarto">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/01d733af-9fa2-4f11-be52-52b7dfc7559a.jpeg?im_w=720" alt="Quarto">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/1b3c75c6-16e5-4a86-8670-8cc73dcca05a.jpeg?im_w=720" alt="Quarto">
+          <img src="https://a0.muscache.com/im/pictures/12fac575-e5fe-416d-89df-2e2b5bd7bc2f.jpg?im_w=720" alt="Quarto">
         </div>
       </div>
 
       <div class="categoria-bloco">
-        <h3>Banheiro</h3>
+        <h3>Cozinha</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/e6f185f0-2b51-4ebd-94c7-0a2413ed2070.jpeg?im_w=1200" alt="Banheiro">
+          <img src="https://a0.muscache.com/im/pictures/88d2f154-1b59-424c-8cac-cac7dbd122ce.jpg?im_w=720" alt="Cozinha">
         </div>
       </div>
 
       <div class="categoria-bloco">
-        <h3>Exterior</h3>
+        <h3>Vista da Janela</h3>
         <div class="categoria-imagens">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/0465a487-6bf1-4ee5-ad9e-9b5104f1d997.jpeg?im_w=1200" alt="Exterior">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/10c87f2d-c380-44a9-bdec-3c51b9ad7184.jpeg?im_w=720" alt="Exterior">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/25d30c3f-6b62-47d1-a187-6f378a9edd18.jpeg?im_w=720" alt="Exterior">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/c43c0e8e-a42f-4293-9b87-99e835a9df42.jpeg?im_w=1200" alt="Exterior">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/37d184a6-0d79-4f63-aecf-b3a647b85cb1.jpeg?im_w=720" alt="Exterior">
-          <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/e3409008-d7a4-483b-9388-51f5dbf8017c.jpeg?im_w=720" alt="Exterior">
+          <img src="https://a0.muscache.com/im/pictures/d55eb1ee-7e43-4a8f-8796-a7445e978814.jpg?im_w=720" alt="Vista">
         </div>
       </div>
 
     </div>
   </div>
 
+  <!-- ===== FOOTER ===== -->
   <footer class="footer" id="contato">
     <div class="container">
       <div class="footer-grid">
@@ -162,6 +196,7 @@
     </div>
   </footer>
 
+  <!-- ===== CHAT WIDGET ===== -->
   <div class="chat-widget" id="chatWidget">
     <button class="chat-toggle" id="chatToggle" aria-label="Abrir chat">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -217,17 +252,17 @@
     </div>
   </div>
 
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/pt-br.js"></script>
+  <!-- FullCalendar -->
 
   <script>
+    // === MOBILE NAV ===
     const hamburger = document.getElementById('hamburger');
     const nav = document.getElementById('nav');
     if (hamburger) {
       hamburger.addEventListener('click', () => nav.classList.toggle('nav-open'));
     }
 
+    // === MODAL ===
     function abrirModal() {
       document.getElementById('modalGaleria').style.display = 'block';
       document.body.style.overflow = 'hidden';
@@ -240,24 +275,7 @@
       if (e.target === document.getElementById('modalGaleria')) fecharModal();
     });
 
-    document.addEventListener('DOMContentLoaded', function() {
-      const calendarEl = document.getElementById('calendar');
-      if (!calendarEl) return;
-
-      const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        locale: 'pt-br',
-        firstDay: 1,
-        headerToolbar: {
-          left: 'prev,next today',
-          center: 'title',
-          right: 'dayGridMonth'
-        },
-        events: '/disponibilidade/thePlazaOndina'
-      });
-      calendar.render();
-    });
-
+    // === CHAT WIDGET ===
     (function() {
       const API_URL = '';
       const WHATSAPP_NUM = '5571992900979';

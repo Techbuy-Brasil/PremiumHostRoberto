@@ -1,8 +1,12 @@
 import sys
 import json
+import re
+import os
 import traceback
+import urllib.request
 from pathlib import Path
 from fastapi import FastAPI, HTTPException
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
@@ -28,6 +32,9 @@ config_path = str(Path(__file__).parent / "config.json")
 agent = Agent(config_path)
 store = ConversationStore()
 
+# In-memory blocked dates (survives warm instances)
+_admin_blocked = {}  # {property_key: set("YYYY-MM-DD", ...)}
+
 
 class MessageRequest(BaseModel):
     message: str
@@ -43,9 +50,79 @@ class QuoteRequest(BaseModel):
     guests: int = 2
 
 
+class BlockRequest(BaseModel):
+    property_key: str
+    dates: list[str]
+    password: str
+
+
 @app.get("/api/health")
 def health():
     return {"status": "online", "projeto": "PremiumHost Roberto"}
+
+
+@app.get("/api/calendar/{property_key}")
+def get_calendar(property_key: str):
+    config = agent.pm.config
+    prop = config.get("properties", {}).get(property_key)
+    if not prop:
+        return JSONResponse(content=[])
+    booked = set(prop.get("blocked_dates", []))
+    # merge admin-blocked dates
+    extra = _admin_blocked.get(property_key, set())
+    booked.update(extra)
+    ical_url = prop.get("ical_url")
+    if ical_url:
+        try:
+            req = urllib.request.Request(ical_url, headers={"User-Agent": "Mozilla/5.0"})
+            with urllib.request.urlopen(req, timeout=15) as resp:
+                ical_text = resp.read().decode("utf-8")
+            dates = re.findall(r"DTSTART;VALUE=DATE:(\d{4})(\d{2})(\d{2})", ical_text)
+            for y, m, d in dates:
+                booked.add(f"{y}-{m}-{d}")
+        except Exception:
+            pass
+    return JSONResponse(content=sorted(booked))
+
+
+@app.post("/api/admin/block")
+def admin_block(req: BlockRequest):
+    cfg = agent.pm.config
+    if req.password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    if req.property_key not in cfg.get("properties", {}):
+        raise HTTPException(status_code=404, detail="Imovel nao encontrado")
+    if req.property_key not in _admin_blocked:
+        _admin_blocked[req.property_key] = set()
+    for d in req.dates:
+        if re.match(r"^\d{4}-\d{2}-\d{2}$", d):
+            _admin_blocked[req.property_key].add(d)
+    return JSONResponse(content=sorted(_admin_blocked[req.property_key]))
+
+
+@app.post("/api/admin/unblock")
+def admin_unblock(req: BlockRequest):
+    cfg = agent.pm.config
+    if req.password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    if req.property_key not in cfg.get("properties", {}):
+        raise HTTPException(status_code=404, detail="Imovel nao encontrado")
+    existing = _admin_blocked.get(req.property_key, set())
+    for d in req.dates:
+        existing.discard(d)
+    _admin_blocked[req.property_key] = existing
+    return JSONResponse(content=sorted(existing))
+
+
+@app.get("/api/admin/blocked")
+def admin_list_blocked(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    result = {}
+    for key, dates in _admin_blocked.items():
+        result[key] = sorted(dates)
+    return JSONResponse(content=result)
 
 
 @app.get("/api/imoveis")

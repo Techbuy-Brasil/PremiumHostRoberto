@@ -6,7 +6,7 @@
       "use": "@vercel/python"
     },
     {
-      "src": "*.{html,css,js,json}",
+      "src": "*.{html,css,js,json,png,jpg,jpeg,svg,gif,ico,webp}",
       "use": "@vercel/static"
     }
   ],
@@ -18,6 +18,17 @@
     {
       "src": "/",
       "dest": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*\\.html)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
     }
   ]
 }

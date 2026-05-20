@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste Calendário</title>
+  <link href="https://unpkg.com/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://unpkg.com/fullcalendar@5.11.3/locales/pt-br.js"></script>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #1a1a1a; color: #fff; }
+    #calendar { max-width: 900px; margin: 0 auto; background: #fff; padding: 20px; color: #333; }
+  </style>
+</head>
+<body>
+  <h1>Teste Calendário</h1>
+  <div id="calendar"></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var el = document.getElementById('calendar');
+      console.log('Calendar el:', el);
+      if (!el) { document.body.innerHTML += '<p>ERRO: #calendar não encontrado</p>'; return; }
+      try {
+        var calendar = new FullCalendar.Calendar(el, {
+          initialView: 'dayGridMonth',
+          locale: 'pt-br',
+          firstDay: 1,
+          headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth' },
+          events: '/api/calendar/farol_barra_flat_214',
+          eventColor: '#c8a96a',
+          displayEventTime: false
+        });
+        console.log('Calendar created:', calendar);
+        calendar.render();
+        console.log('Calendar rendered');
+        document.body.innerHTML += '<p style="color:green">✓ Calendário carregado com sucesso!</p>';
+      } catch(e) {
+        document.body.innerHTML += '<p style="color:red">ERRO: ' + e.message + '</p>';
+      }
+    });
+  </script>
+</body>
+</html>
