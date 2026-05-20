@@ -1,0 +1,203 @@
+{
+  "properties": {
+    "farol_barra_flat_214": {
+      "id": 41662018,
+      "name": "Farol Barra Flat 214",
+      "short_name": "Farol Barra Flat",
+      "location": "Barra, Salvador - Bahia",
+      "address": "Avenida Oceânica, Barra, Salvador",
+      "capacity": 6,
+      "bedrooms": 1,
+      "beds": 3,
+      "bathrooms": 1,
+      "base_price": 249,
+      "base_guests": 2,
+      "extra_guest_fee": 75,
+      "cleaning_fee": 0,
+      "amenities": [
+        "Vista para o mar",
+        "Piscina na cobertura",
+        "Ar-condicionado",
+        "Wi-Fi",
+        "Cozinha compacta",
+        "Segurança 24h",
+        "Concierge",
+        "Estacionamento",
+        "Frente à praia da Barra",
+        "Circuito do Carnaval"
+      ],
+      "description": "Flat com vista para o mar no coração da Barra, em frente à praia e no circuito do Carnaval. Acomodação confortável com piscina na cobertura e vista para o Farol da Barra.",
+      "holiday_packages": {
+        "ano_novo_3diarias": {
+          "price": 3000,
+          "min_nights": 3,
+          "description": "Réveillon - pacote de 3 diárias"
+        },
+        "carnaval_7diarias": {
+          "price": 16900,
+          "min_nights": 7,
+          "description": "Carnaval - pacote de 7 diárias"
+        }
+      }
+    },
+    "ondina_apt_hotel_441": {
+      "id": 986288391373272410,
+      "name": "Ondina Apart Hotel 441",
+      "short_name": "Ondina Apt Hotel",
+      "location": "Ondina, Salvador - Bahia",
+      "address": "Av. Oceânica, 2400, Ondina, Salvador",
+      "capacity": 6,
+      "bedrooms": 1,
+      "beds": 3,
+      "bathrooms": 1,
+      "base_price": 249,
+      "base_guests": 2,
+      "extra_guest_fee": 75,
+      "cleaning_fee": 0,
+      "amenities": [
+        "Pé na areia (Praia de Ondina)",
+        "2 piscinas",
+        "Vista para o mar",
+        "Ar-condicionado",
+        "Wi-Fi",
+        "Cozinha",
+        "Academia",
+        "Sauna",
+        "Quadra de tênis",
+        "Estacionamento grátis",
+        "Restaurante",
+        "Bar",
+        "Playground infantil"
+      ],
+      "description": "Apartamento pé na areia em Ondina, com vista deslumbrante para o mar. Complexo com piscinas, academia, sauna e toda infraestrutura de lazer.",
+      "holiday_packages": {
+        "ano_novo_3diarias": {
+          "price": 3000,
+          "min_nights": 3,
+          "description": "Réveillon - pacote de 3 diárias"
+        },
+        "carnaval_7diarias": {
+          "price": 18800,
+          "min_nights": 7,
+          "description": "Carnaval - pacote de 7 diárias"
+        }
+      }
+    },
+    "the_plaza_407": {
+      "id": 1544328946353777106,
+      "name": "The Plaza 407",
+      "short_name": "The Plaza",
+      "location": "Ondina, Salvador - Bahia",
+      "address": "Av. Milton Santos, 58, Ondina, Salvador",
+      "capacity": 4,
+      "bedrooms": 1,
+      "beds": 4,
+      "bathrooms": 1,
+      "base_price": 219,
+      "base_guests": 2,
+      "extra_guest_fee": 75,
+      "cleaning_fee": 0,
+      "amenities": [
+        "Piscina compartilhada",
+        "Ar-condicionado",
+        "Wi-Fi",
+        "Cozinha completa",
+        "Estacionamento grátis",
+        "TV",
+        "Próximo a Praia de Ondina"
+      ],
+      "description": "Apartamento aconchegante com conforto de hotel e localizacao TOP em Ondina. Piscina compartilhada e estrutura completa para sua familia.",
+      "holiday_packages": {
+        "ano_novo_3diarias": {
+          "price": 2600,
+          "min_nights": 3,
+          "description": "Réveillon - pacote de 3 diárias"
+        },
+        "carnaval_7diarias": {
+          "price": 14600,
+          "min_nights": 7,
+          "description": "Carnaval - pacote de 7 diárias"
+        }
+      }
+    },
+    "smart_convencoes_509": {
+      "id": 1320242268460204756,
+      "name": "Smart Convenções 509",
+      "short_name": "Smart Convenções",
+      "location": "Armação, Salvador - Bahia",
+      "address": "Próximo ao Centro de Convenções, Armação, Salvador",
+      "capacity": 2,
+      "bedrooms": 1,
+      "beds": 1,
+      "bathrooms": 1,
+      "base_price": 199,
+      "base_guests": 2,
+      "extra_guest_fee": 0,
+      "cleaning_fee": 0,
+      "amenities": [
+        "Prédio inteligente",
+        "750m da Praia de Boca do Rio",
+        "Próximo ao Centro de Convenções",
+        "Ar-condicionado",
+        "Wi-Fi",
+        "Smart TV com Netflix",
+        "Cozinha compacta",
+        "Supermercado ao lado",
+        "Farmácias próximas",
+        "Energia solar",
+        "Sustentável"
+      ],
+      "description": "Studio moderno no Smart Convenções, prédio inteligente e sustentável. Localização estratégica perto do Centro de Convenções e da praia.",
+      "holiday_packages": {
+        "ano_novo_3diarias": {
+          "price": 4900,
+          "min_nights": 3,
+          "description": "Réveillon - pacote de 3 diárias"
+        },
+        "carnaval_7diarias": {
+          "price": 4900,
+          "min_nights": 7,
+          "description": "Carnaval - pacote de 7 diárias"
+        }
+      }
+    }
+  },
+  "pricing_rules": {
+    "weekend_surcharge": {
+      "friday": 1.20,
+      "saturday": 1.25,
+      "sunday": 1.20
+    },
+    "high_season_months": [1, 2, 7],
+    "high_season_multiplier": 2.0,
+    "min_nights": {
+      "default": 1,
+      "high_season": 2,
+      "holiday_packages": "varies"
+    },
+    "extra_guest_fee": 75,
+    "base_guests": 2
+  },
+  "holidays_br": {
+    "ano_novo": "2026-01-01",
+    "carnaval": ["2026-02-14", "2026-02-15", "2026-02-16", "2026-02-17"],
+    "sexta_santa": "2026-04-03",
+    "pascoa": "2026-04-05",
+    "tiradentes": "2026-04-21",
+    "dia_trabalho": "2026-05-01",
+    "corpus_christi": "2026-06-04",
+    "independencia": "2026-09-07",
+    "aparecida": "2026-10-12",
+    "finados": "2026-11-02",
+    "proclamacao": "2026-11-15",
+    "natal": "2026-12-25"
+  },
+  "holidays_ba": {
+    "independencia_bahia": "2026-07-02"
+  },
+  "holidays_salvador": {
+    "sexta_feira_santa": "2026-04-03",
+    "sao_joao": "2026-06-24",
+    "dia_cidade": "2026-03-29"
+  }
+}

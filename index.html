@@ -787,7 +787,7 @@
         showTyping();
 
         try {
-          const res = await fetch(API_URL + '/chat', {
+          const res = await fetch(API_URL + '/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -869,7 +869,7 @@
 
       async function fetchCotacao(propKey, checkinStr, checkoutStr, guests) {
         try {
-          const res = await fetch(API_URL + '/cotacao', {
+          const res = await fetch(API_URL + '/api/cotacao', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
