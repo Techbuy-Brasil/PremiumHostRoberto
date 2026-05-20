@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin – Fotos | PremiumHost Roberto</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#f5f5f5;font-family:'Inter',sans-serif;padding:30px;color:#333}
+h1{font-size:24px;margin-bottom:6px;color:#1a1a1a}
+.sub{color:#888;font-size:14px;margin-bottom:24px}
+.login-box{max-width:360px;margin:80px auto;background:#fff;border-radius:12px;padding:32px;box-shadow:0 4px 20px rgba(0,0,0,.08)}
+.login-box h2{font-size:18px;margin-bottom:16px}
+.login-box input{width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:15px;margin-bottom:12px}
+.login-box button{width:100%;padding:12px;background:#c8a96a;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+.login-box button:hover{background:#b89655}
+.login-box .erro{color:#e74c3c;font-size:13px;display:none}
+.app{display:none}
+.topo{display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:24px}
+.topo select{padding:10px 14px;border:1px solid #ccc;border-radius:8px;font-size:14px;flex:1;min-width:200px}
+.topo .btn{background:#c8a96a;color:#fff;padding:10px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer}
+.topo .btn:hover{background:#b89655}
+.categorias{display:grid;grid-template-columns:repeat(auto-fill,minmax(480px,1fr));gap:20px}
+.cat-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 12px rgba(0,0,0,.06)}
+.cat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cat-header h3{font-size:15px;font-weight:600}
+.cat-header .btn-remove{background:none;border:none;color:#e74c3c;cursor:pointer;font-size:13px;font-weight:500}
+.fotos{display:flex;flex-direction:column;gap:8px}
+.foto-row{display:flex;gap:8px;align-items:center}
+.foto-row input{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;font-family:monospace}
+.foto-row .btn-del{background:none;border:none;color:#e74c3c;cursor:pointer;font-size:16px;padding:0 4px}
+.foto-row img{width:48px;height:36px;object-fit:cover;border-radius:4px;flex-shrink:0}
+.add-foto{display:flex;gap:8px;margin-top:10px}
+.add-foto input{flex:1;padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:12px;font-family:monospace}
+.add-foto button{padding:8px 14px;background:#2ecc71;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:500}
+.add-foto button:hover{background:#27ae60}
+.add-categoria{display:flex;gap:8px;margin-top:10px;align-items:center}
+.add-categoria input{padding:8px 10px;border:1px solid #ddd;border-radius:6px;font-size:13px}
+.add-categoria button{padding:8px 14px;background:#3498db;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:500}
+.add-categoria button:hover{background:#2980b9}
+.acoes{display:flex;gap:12px;margin-top:24px}
+.acoes .btn-save{padding:12px 28px;background:#c8a96a;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer}
+.acoes .btn-save:hover{background:#b89655}
+.acoes .btn-save:disabled{opacity:.5;cursor:not-allowed}
+.acoes .status{font-size:13px;display:flex;align-items:center;gap:6px}
+.acoes .status.ok{color:#27ae60}
+.acoes .status.erro{color:#e74c3c}
+</style>
+</head>
+<body>
+
+<div class="login-box" id="loginBox">
+  <h2>&#128274; Admin – Gerenciar Fotos</h2>
+  <input type="password" id="senhaInput" placeholder="Senha" onkeydown="if(event.key==='Enter')logar()">
+  <div class="erro" id="erroSenha">Senha incorreta</div>
+  <button onclick="logar()">Entrar</button>
+</div>
+
+<div class="app" id="app">
+  <h1>&#128247; Gerenciar Fotos dos Imóveis</h1>
+  <p class="sub">Adicione, remova ou edite URLs de fotos de cada apartamento. As alterações são aplicadas em tempo real no site.</p>
+
+  <div class="topo">
+    <select id="propSelect" onchange="carregarFotos()"></select>
+    <a href="admin.html" style="color:#888;text-decoration:none;font-size:13px">&#128197; Bloqueio de Datas</a>
+    <span style="flex:1"></span>
+    <button class="btn" onclick="logoff()">Sair</button>
+  </div>
+
+  <div id="categoriasContainer"></div>
+
+  <div class="acoes">
+    <button class="btn-save" id="btnSave" onclick="salvar()">&#128190; Salvar Alterações</button>
+    <span class="status" id="saveStatus"></span>
+  </div>
+</div>
+
+<script>
+var currentKey = null;
+var currentData = null;
+var properties = {};
+var PASSWORD = "";
+
+function logar() {
+  var senha = document.getElementById("senhaInput").value;
+  if (!senha) return;
+  localStorage.setItem("ph_admin_photos_pw", senha);
+  PASSWORD = senha;
+  fetch("/api/admin/blocked?password=" + encodeURIComponent(senha)).then(function(r) {
+    if (!r.ok) {
+      document.getElementById("erroSenha").style.display = "block";
+      localStorage.removeItem("ph_admin_photos_pw");
+      return;
+    }
+    document.getElementById("loginBox").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    iniciar();
+  }).catch(function() {
+    document.getElementById("erroSenha").style.display = "block";
+    localStorage.removeItem("ph_admin_photos_pw");
+  });
+}
+
+function logoff() {
+  PASSWORD = "";
+  localStorage.removeItem("ph_admin_photos_pw");
+  document.getElementById("app").style.display = "none";
+  document.getElementById("loginBox").style.display = "block";
+  document.getElementById("senhaInput").value = "";
+}
+
+// Auto-login
+var saved = localStorage.getItem("ph_admin_photos_pw");
+if (saved) {
+  document.getElementById("senhaInput").value = saved;
+  logar();
+}
+
+function iniciar() {
+  fetch("/api/imoveis").then(function(r) { return r.json(); }).then(function(data) {
+    properties = data;
+    var sel = document.getElementById("propSelect");
+    sel.innerHTML = "";
+    var keys = Object.keys(data).sort();
+    keys.forEach(function(k) {
+      var opt = document.createElement("option");
+      opt.value = k;
+      opt.textContent = data[k].nome || k;
+      sel.appendChild(opt);
+    });
+    if (keys.length) carregarFotos();
+  });
+}
+
+function carregarFotos() {
+  currentKey = document.getElementById("propSelect").value;
+  if (!currentKey) return;
+  fetch("/api/photos/" + currentKey).then(function(r) { return r.json(); }).then(function(data) {
+    currentData = data.categories || {};
+    renderizarCategorias();
+  });
+}
+
+function renderizarCategorias() {
+  var container = document.getElementById("categoriasContainer");
+  var cats = Object.keys(currentData).sort();
+  var html = '<div class="categorias">';
+  cats.forEach(function(cat) {
+    var fotos = currentData[cat] || [];
+    html += '<div class="cat-card" data-cat="' + cat.replace(/"/g,'&quot;') + '">';
+    html += '<div class="cat-header"><h3>' + cat + '</h3><button class="btn-remove" onclick="removerCategoria(\'' + cat.replace(/'/g,"\\'") + '\')">&#128465; Remover</button></div>';
+    html += '<div class="fotos">';
+    fotos.forEach(function(url, i) {
+      html += '<div class="foto-row">';
+      html += '<img src="' + url.replace(/"/g,'&quot;') + '" onerror="this.style.display=\'none\'">';
+      html += '<input type="text" value="' + url.replace(/"/g,'&quot;') + '" onchange="editarFoto(\'' + cat.replace(/'/g,"\\'") + '\',' + i + ',this.value)">';
+      html += '<button class="btn-del" onclick="removerFoto(\'' + cat.replace(/'/g,"\\'") + '\',' + i + ')">&times;</button>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="add-foto">';
+    html += '<input type="text" placeholder="URL da nova foto..." id="newFoto_' + cat.replace(/[^a-zA-Z0-9]/g,'_') + '">';
+    html += '<button onclick="adicionarFoto(\'' + cat.replace(/'/g,"\\'") + '\')">+ Adicionar</button>';
+    html += '</div>';
+    html += '</div>';
+  });
+  html += '</div>';
+  html += '<div class="add-categoria">';
+  html += '<input type="text" placeholder="Nome da nova categoria..." id="newCatName">';
+  html += '<button onclick="adicionarCategoria()">+ Nova Categoria</button>';
+  html += '</div>';
+  container.innerHTML = html;
+}
+
+function adicionarCategoria() {
+  var nome = document.getElementById("newCatName").value.trim();
+  if (!nome) return;
+  currentData[nome] = [];
+  renderizarCategorias();
+  document.getElementById("newCatName").value = "";
+}
+
+function removerCategoria(nome) {
+  if (!confirm("Remover categoria \"" + nome + "\"?")) return;
+  delete currentData[nome];
+  renderizarCategorias();
+}
+
+function adicionarFoto(cat) {
+  var input = document.getElementById("newFoto_" + cat.replace(/[^a-zA-Z0-9]/g,'_'));
+  var url = input.value.trim();
+  if (!url) return;
+  if (!currentData[cat]) currentData[cat] = [];
+  currentData[cat].push(url);
+  renderizarCategorias();
+}
+
+function removerFoto(cat, idx) {
+  if (!currentData[cat]) return;
+  currentData[cat].splice(idx, 1);
+  if (currentData[cat].length === 0) delete currentData[cat];
+  renderizarCategorias();
+}
+
+function editarFoto(cat, idx, val) {
+  if (!currentData[cat]) return;
+  currentData[cat][idx] = val;
+}
+
+function salvar() {
+  var btn = document.getElementById("btnSave");
+  var status = document.getElementById("saveStatus");
+  btn.disabled = true;
+  status.className = "status";
+  status.textContent = "Salvando...";
+
+  fetch("/api/admin/photos/" + currentKey + "?password=" + encodeURIComponent(PASSWORD), {
+    method: "PUT",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({categories: currentData})
+  }).then(function(r) {
+    if (!r.ok) throw new Error("Erro ao salvar");
+    return r.json();
+  }).then(function(data) {
+    currentData = data.categories;
+    status.className = "status ok";
+    status.textContent = "&#10003; Salvo com sucesso!";
+    btn.disabled = false;
+    setTimeout(function(){ status.textContent = ""; }, 3000);
+  }).catch(function(err) {
+    status.className = "status erro";
+    status.textContent = "&#10007; Erro: " + err.message;
+    btn.disabled = false;
+  });
+}
+</script>
+</body>
+</html>

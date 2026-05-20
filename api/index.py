@@ -35,6 +35,29 @@ store = ConversationStore()
 # In-memory blocked dates (survives warm instances)
 _admin_blocked = {}  # {property_key: set("YYYY-MM-DD", ...)}
 
+# In-memory photo overrides (survives warm instances, sourced from /tmp or empty)
+_admin_photos = {}  # {property_key: {category: [url, ...]}}
+
+PHOTOS_TMP = str(Path(__file__).parent / "tmp_photos.json")
+
+
+def _load_photos_override():
+    if os.path.exists(PHOTOS_TMP):
+        try:
+            with open(PHOTOS_TMP, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+
+def _save_photos_override(data: dict):
+    try:
+        with open(PHOTOS_TMP, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
 
 class MessageRequest(BaseModel):
     message: str
@@ -123,6 +146,30 @@ def admin_list_blocked(password: str = ""):
     for key, dates in _admin_blocked.items():
         result[key] = sorted(dates)
     return JSONResponse(content=result)
+
+
+@app.get("/api/photos/{property_key}")
+def get_photos(property_key: str):
+    cfg = agent.pm.config
+    seed = cfg.get("photos", {}).get(property_key, {})
+    overrides = _load_photos_override()
+    merged = overrides.get(property_key, seed) or seed
+    return JSONResponse(content={"key": property_key, "categories": merged})
+
+
+class PhotosUpdate(BaseModel):
+    categories: dict[str, list[str]]
+
+
+@app.put("/api/admin/photos/{property_key}")
+def admin_update_photos(property_key: str, req: PhotosUpdate, password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    overrides = _load_photos_override()
+    overrides[property_key] = req.categories
+    _save_photos_override(overrides)
+    return JSONResponse(content={"key": property_key, "categories": req.categories})
 
 
 @app.get("/api/imoveis")
