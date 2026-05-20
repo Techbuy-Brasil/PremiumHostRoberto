@@ -1,13 +1,10 @@
 from datetime import date, timedelta
 import json
-from pathlib import Path
-
-CONFIG_PATH = Path(__file__).parent / "config.json"
 
 
 class HolidayCalendar:
     def __init__(self, config_path=None):
-        path = config_path or CONFIG_PATH
+        path = config_path
         with open(path, "r", encoding="utf-8") as f:
             self.config = json.load(f)
 
