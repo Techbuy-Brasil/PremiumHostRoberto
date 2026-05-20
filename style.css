@@ -932,3 +932,254 @@ h1, h2, h3, h4 {
     padding: 16px;
   }
 }
+
+/* ===== PÁGINA DO IMÓVEL ===== */
+.imovel-page .page-header {
+  background: #1a1a1a;
+  padding: 100px 0 40px;
+  text-align: center;
+  border-bottom: 1px solid rgba(200,169,106,0.2);
+}
+
+.imovel-page .page-header h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.5rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+
+.imovel-page .page-header .page-location {
+  color: #c8a96a;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+}
+
+.imovel-page .page-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px 60px;
+}
+
+.imovel-page .galeria-airbnb {
+  display: grid;
+  grid-template-columns: 1.3fr 1.3fr;
+  gap: 12px;
+  margin: 0 auto 40px;
+}
+
+.imovel-page .foto-principal img {
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.imovel-page .fotos-laterais {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+}
+
+.imovel-page .fotos-laterais img {
+  width: 100%;
+  height: 254px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+.imovel-page .foto-com-overlay {
+  position: relative;
+  cursor: pointer;
+}
+
+.imovel-page .foto-com-overlay .overlay-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: rgba(0,0,0,0.5);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0 0 4px 4px;
+}
+
+.imovel-page .imovel-info-bar {
+  display: flex;
+  gap: 32px;
+  justify-content: center;
+  flex-wrap: wrap;
+  padding: 24px;
+  margin-bottom: 32px;
+  border: 1px solid #eee;
+  background: #fafaf8;
+}
+
+.imovel-page .imovel-info-bar span {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.imovel-page .imovel-info-bar strong {
+  color: #1a1a1a;
+}
+
+.imovel-page #calendar {
+  max-width: 900px;
+  margin: 0 auto 40px;
+  background: #fff;
+  padding: 20px;
+  border: 1px solid #eee;
+}
+
+.imovel-page .fc .fc-button-primary {
+  background-color: #c8a96a !important;
+  border-color: #c8a96a !important;
+}
+
+.imovel-page .fc .fc-button-primary:hover {
+  background-color: #b89655 !important;
+  border-color: #b89655 !important;
+}
+
+.imovel-page .fc .fc-button-primary:disabled {
+  background-color: #ddd !important;
+  border-color: #ddd !important;
+}
+
+.imovel-page .reserva-btn {
+  display: block;
+  margin: 20px auto;
+  padding: 14px 36px;
+  background: #25D366;
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+  max-width: 300px;
+  transition: all 0.3s;
+}
+
+.imovel-page .reserva-btn:hover {
+  background: #1da851;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(37,211,102,0.3);
+}
+
+.imovel-page .voltar-btn {
+  display: block;
+  width: fit-content;
+  margin: 20px auto;
+  padding: 10px 24px;
+  background: transparent;
+  color: #c8a96a;
+  border: 1px solid #c8a96a;
+  border-radius: 4px;
+  text-align: center;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  max-width: 300px;
+}
+
+.imovel-page .voltar-btn:hover {
+  background: #c8a96a;
+  color: #1a1a1a;
+}
+
+.imovel-page .map-container {
+  margin: 30px auto;
+  max-width: 800px;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+
+.imovel-page .map-container h2 {
+  font-family: 'Cormorant Garamond', serif;
+  text-align: center;
+  margin-bottom: 16px;
+  color: #1a1a1a;
+}
+
+/* Modal */
+.imovel-page .modal {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85);
+  overflow: auto;
+}
+
+.imovel-page .modal-conteudo {
+  margin: 40px auto;
+  background: #fff;
+  padding: 30px;
+  max-width: 1100px;
+  border-radius: 4px;
+}
+
+.imovel-page .fechar {
+  position: fixed;
+  top: 20px;
+  right: 30px;
+  color: #fff;
+  font-size: 2.5rem;
+  font-weight: 300;
+  cursor: pointer;
+  z-index: 10000;
+}
+
+.imovel-page .categoria-bloco {
+  margin-bottom: 40px;
+}
+
+.imovel-page .categoria-bloco h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.4rem;
+  color: #1a1a1a;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.imovel-page .categoria-imagens {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.imovel-page .categoria-imagens img {
+  width: 280px;
+  height: 210px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .imovel-page .galeria-airbnb { grid-template-columns: 1fr; }
+  .imovel-page .foto-principal img { height: 320px; }
+  .imovel-page .fotos-laterais img { height: 180px; }
+  .imovel-page .page-header h1 { font-size: 1.8rem; }
+}
+
+@media (max-width: 600px) {
+  .imovel-page .categoria-imagens img { width: 100%; height: auto; }
+}
