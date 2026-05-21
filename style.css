@@ -1179,19 +1179,18 @@ h1, h2, h3, h4 {
 }
 
 .imovel-page .categoria-imagens img {
-  width: 280px;
-  height: 210px;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 400px;
+  height: auto;
+  object-fit: contain;
   border-radius: 4px;
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  background: #f0f0f0;
+  transition: box-shadow 0.2s ease;
 }
 
 .imovel-page .categoria-imagens img:hover {
-  transform: scale(1.5);
-  box-shadow: 0 12px 32px rgba(0,0,0,0.2);
-  z-index: 10;
-  position: relative;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
 }
 
 /* --- Modal --- */
