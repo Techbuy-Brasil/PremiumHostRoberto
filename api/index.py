@@ -362,16 +362,9 @@ def admin_get_faq(password: str = ""):
     return JSONResponse(content={"faq": []})
 
 
-class FaqUpdateItem(BaseModel):
-    id: str
-    tags: list[str]
-    resposta: str
-    variacoes: list[str] = []
-
-
 class FaqUpdateRequest(BaseModel):
     password: str
-    faq: list[FaqUpdateItem]
+    data: dict
 
 
 @app.put("/api/admin/faq")
@@ -379,8 +372,8 @@ def admin_update_faq(req: FaqUpdateRequest):
     cfg = agent.pm.config
     if req.password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    # Build the full FAQ structure
-    data = {"faq": [item.model_dump() for item in req.faq]}
+    # Save full data structure
+    data = req.data
     # Save to /tmp so it persists between cold starts on Vercel
     try:
         with open(FAQ_TMP, "w", encoding="utf-8") as f:
@@ -394,4 +387,4 @@ def admin_update_faq(req: FaqUpdateRequest):
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
-    return JSONResponse(content={"status": "ok", "count": len(req.faq)})
+    return JSONResponse(content={"status": "ok"})

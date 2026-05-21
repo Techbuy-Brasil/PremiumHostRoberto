@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin FAQ – PremiumHost Roberto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: #f5f3f0; margin: 0; }
+    .topo { background: #1a1a2e; color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .topo h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; margin: 0; color: #c8a96a; }
+    .topo a { color: #c8a96a; text-decoration: none; font-size: .82rem; }
+    .topo a:hover { text-decoration: underline; }
+    .container { max-width: 1000px; margin: 0 auto; padding: 24px 16px 60px; }
+    .login-box { max-width: 360px; margin: 80px auto; text-align: center; }
+    .login-box h2 { font-family: 'Cormorant Garamond', serif; color: #1a1a2e; }
+    .login-box input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; margin-bottom: 12px; box-sizing: border-box; }
+    .login-box button { width: 100%; }
+    .erro { color: #e74c3c; font-size: .85rem; display: none; margin-top: 8px; }
+    .card { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 16px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+    .card h3 { font-size: .95rem; margin: 0 0 6px; color: #1a1a2e; display: flex; align-items: center; gap: 8px; }
+    .card h3 .id-badge { background: #c8a96a; color: #fff; font-size: .7rem; padding: 2px 8px; border-radius: 10px; font-weight: 500; }
+    .card .meta { font-size: .78rem; color: #999; margin-bottom: 12px; }
+    .campo { margin-bottom: 10px; }
+    .campo label { display: block; font-size: .78rem; color: #666; font-weight: 500; margin-bottom: 3px; text-transform: uppercase; letter-spacing: .3px; }
+    .campo input, .campo textarea { width: 100%; padding: 8px 10px; border: 1px solid #ddd; border-radius: 5px; font-size: .85rem; font-family: inherit; }
+    .campo textarea { min-height: 60px; resize: vertical; }
+    .campo input:focus, .campo textarea:focus { outline: none; border-color: #c8a96a; box-shadow: 0 0 0 2px rgba(200,169,106,.2); }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .tag { background: #f0ece4; padding: 3px 10px; border-radius: 12px; font-size: .78rem; display: flex; align-items: center; gap: 4px; }
+    .tag button { background: none; border: none; color: #999; cursor: pointer; font-size: .85rem; padding: 0; line-height: 1; }
+    .tag button:hover { color: #e74c3c; }
+    .tag-input { display: flex; gap: 4px; margin-top: 4px; }
+    .tag-input input { flex: 1; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: .8rem; }
+    .tag-input button { background: #c8a96a; color: #fff; border: none; border-radius: 4px; padding: 6px 12px; cursor: pointer; font-size: .8rem; }
+    .variacao-item { display: flex; gap: 6px; margin-bottom: 4px; align-items: center; }
+    .variacao-item textarea { flex: 1; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: .8rem; min-height: 40px; font-family: inherit; resize: vertical; }
+    .variacao-item button { background: none; border: none; color: #e74c3c; cursor: pointer; font-size: 1rem; padding: 0 4px; }
+    .acoes { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; flex-wrap: wrap; }
+    .btn { padding: 10px 24px; border: none; border-radius: 6px; font-size: .85rem; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: #1a1a2e; color: #fff; }
+    .btn-primary:hover { background: #2a2a4e; }
+    .btn-secondary { background: #e8e0d4; color: #1a1a2e; }
+    .btn-danger { background: #e74c3c; color: #fff; }
+    .btn-add { background: none; border: 1px dashed #c8a96a; color: #c8a96a; border-radius: 6px; padding: 10px; cursor: pointer; font-size: .85rem; width: 100%; text-align: center; }
+    .btn-add:hover { background: #faf8f5; }
+    .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; font-size: .85rem; display: none; z-index: 1000; color: #fff; }
+    .toast.success { background: #27ae60; }
+    .toast.error { background: #e74c3c; }
+    .hidden { display: none; }
+    @media (max-width: 600px) {
+      .topo { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- Topo -->
+    <div class="topo" id="topo" style="display:none">
+      <div>
+        <h1>FAQ do Assistente IA</h1>
+        <span style="font-size:.72rem;opacity:.6">Gerencie as perguntas e respostas que o Roberto conhece</span>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="admin.html">Datas</a>
+        <a href="admin-photos.html">Fotos</a>
+        <a href="admin-precos.html">Preços</a>
+        <a href="#" onclick="sair()" style="color:#fff">Sair</a>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div class="login-box" id="loginBox">
+      <h2>&#128172; FAQ do Assistente</h2>
+      <p style="color:#888;font-size:.85rem;margin-bottom:20px">Digite a senha de admin para gerenciar as perguntas e respostas</p>
+      <input type="password" id="senhaInput" placeholder="Senha" onkeydown="if(event.key==='Enter')login()">
+      <button class="btn btn-primary" onclick="login()">Entrar</button>
+      <p class="erro" id="loginErro"></p>
+    </div>
+
+    <!-- Conteudo -->
+    <div class="container" id="conteudo" style="display:none">
+
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px">
+        <div>
+          <button class="btn btn-secondary" onclick="carregar()">&#8635; Recarregar</button>
+          <button class="btn btn-success" style="background:#27ae60;color:#fff" onclick="adicionarTopico()">+ Novo Tópico</button>
+        </div>
+        <span style="font-size:.78rem;color:#888" id="contador"></span>
+      </div>
+
+      <div id="faqList"></div>
+
+      <div class="acoes">
+        <button class="btn btn-secondary" onclick="carregar()">Descartar alterações</button>
+        <button class="btn btn-primary" onclick="salvar()">&#128190; Salvar tudo</button>
+      </div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+  </div>
+
+  <script>
+    const API = 'https://premiumhost-roberto.vercel.app';
+    let password = '';
+    let faqData = null; // latest loaded data
+    let nextId = 1;
+
+    function toast(msg, ok) {
+      const t = document.getElementById('toast');
+      t.className = 'toast ' + (ok ? 'success' : 'error');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    function login() {
+      const pwd = document.getElementById('senhaInput').value;
+      if (!pwd) return;
+      password = pwd;
+      fetch(API + '/api/admin/faq?password=' + encodeURIComponent(password))
+        .then(r => { if (!r.ok) throw new Error('Senha incorreta'); return r.json(); })
+        .then(data => {
+          document.getElementById('loginBox').style.display = 'none';
+          document.getElementById('conteudo').style.display = 'block';
+          document.getElementById('topo').style.display = 'flex';
+          faqData = data;
+          renderizar(data);
+        })
+        .catch(e => {
+          document.getElementById('loginErro').textContent = e.message;
+          document.getElementById('loginErro').style.display = 'block';
+          password = '';
+        });
+    }
+
+    function sair() {
+      password = '';
+      document.getElementById('loginBox').style.display = 'block';
+      document.getElementById('conteudo').style.display = 'none';
+      document.getElementById('topo').style.display = 'none';
+      document.getElementById('senhaInput').value = '';
+    }
+
+    function renderizar(data) {
+      const list = document.getElementById('faqList');
+      const faqs = data.faq || [];
+      document.getElementById('contador').textContent = faqs.length + ' tópicos';
+      list.innerHTML = '';
+      faqs.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.idx = idx;
+        card.innerHTML = criarCardHTML(item, idx);
+        list.appendChild(card);
+      });
+
+      // Recalc nextId
+      nextId = 1;
+      faqs.forEach(f => { const n = parseInt(f.id.replace(/\D/g,'')) || 0; if (n >= nextId) nextId = n + 1; });
+    }
+
+    function criarCardHTML(item, idx) {
+      const tags = (item.tags || []).map(t => `<span class="tag">${esc(t)} <button onclick="removerTag(${idx},'${esc(t)}')" title="Remover">×</button></span>`).join('');
+      const variacoes = (item.variacoes || []).map((v, vi) => `
+        <div class="variacao-item">
+          <textarea onchange="editarVariacao(${idx},${vi},this.value)">${esc(v)}</textarea>
+          <button onclick="removerVariacao(${idx},${vi})" title="Remover">×</button>
+        </div>
+      `).join('');
+      return `
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <h3>
+            <input value="${esc(item.id)}" onchange="editarId(${idx},this.value)" style="font-size:.85rem;padding:2px 6px;border:1px solid #ddd;border-radius:4px;width:140px;font-family:inherit">
+            <span class="id-badge">ID</span>
+          </h3>
+          <button class="btn btn-danger" style="padding:4px 10px;font-size:.75rem" onclick="removerTopico(${idx})">Excluir</button>
+        </div>
+        <div class="campo">
+          <label>Resposta principal</label>
+          <textarea rows="4" onchange="editarResposta(${idx},this.value)">${esc(item.resposta || '')}</textarea>
+        </div>
+        <div class="campo">
+          <label>Tags (palavras-chave para identificar a pergunta)</label>
+          <div class="tag-list">${tags}</div>
+          <div class="tag-input">
+            <input placeholder="Nova tag..." id="tagInput${idx}" onkeydown="if(event.key==='Enter'){event.preventDefault();adicionarTag(${idx})}">
+            <button onclick="adicionarTag(${idx})">+</button>
+          </div>
+        </div>
+        <div class="campo">
+          <label>Variações de resposta (opcional)</label>
+          ${variacoes}
+          <button class="btn-add" style="margin-top:4px" onclick="adicionarVariacao(${idx})">+ Adicionar variação</button>
+        </div>
+      `;
+    }
+
+    function editarId(idx, val) {
+      faqData.faq[idx].id = val.trim();
+    }
+    function editarResposta(idx, val) {
+      faqData.faq[idx].resposta = val;
+    }
+    function editarVariacao(idx, vi, val) {
+      faqData.faq[idx].variacoes[vi] = val;
+    }
+
+    function adicionarTag(idx) {
+      const input = document.getElementById('tagInput' + idx);
+      const tag = input.value.trim().toLowerCase();
+      if (!tag) return;
+      if (!faqData.faq[idx].tags) faqData.faq[idx].tags = [];
+      if (faqData.faq[idx].tags.includes(tag)) return;
+      faqData.faq[idx].tags.push(tag);
+      input.value = '';
+      reRenderizar();
+    }
+
+    function removerTag(idx, tag) {
+      faqData.faq[idx].tags = faqData.faq[idx].tags.filter(t => t !== tag);
+      reRenderizar();
+    }
+
+    function adicionarVariacao(idx) {
+      if (!faqData.faq[idx].variacoes) faqData.faq[idx].variacoes = [];
+      faqData.faq[idx].variacoes.push('');
+      reRenderizar();
+    }
+
+    function removerVariacao(idx, vi) {
+      faqData.faq[idx].variacoes.splice(vi, 1);
+      reRenderizar();
+    }
+
+    function adicionarTopico() {
+      if (!faqData.faq) faqData.faq = [];
+      faqData.faq.push({
+        id: 'topico_' + (nextId++),
+        tags: [],
+        resposta: '',
+        variacoes: [],
+      });
+      reRenderizar();
+      // Scroll to bottom
+      setTimeout(() => {
+        const list = document.getElementById('faqList');
+        list.lastElementChild?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+
+    function removerTopico(idx) {
+      if (!confirm('Excluir este tópico?')) return;
+      faqData.faq.splice(idx, 1);
+      reRenderizar();
+    }
+
+    function reRenderizar() {
+      renderizar(faqData);
+    }
+
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function carregar() {
+      fetch(API + '/api/admin/faq?password=' + encodeURIComponent(password))
+        .then(r => r.json())
+        .then(data => {
+          faqData = data;
+          renderizar(data);
+          toast('Dados recarregados', true);
+        })
+        .catch(e => toast('Erro: ' + e.message, false));
+    }
+
+    function salvar() {
+      // Sanitize: remove empty variacoes
+      (faqData.faq || []).forEach(f => {
+        if (f.variacoes) f.variacoes = f.variacoes.filter(v => v.trim());
+      });
+      fetch(API + '/api/admin/faq', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: password, data: faqData }),
+      })
+        .then(r => { if (!r.ok) throw new Error('Erro ao salvar'); return r.json(); })
+        .then(() => toast('FAQ salvo com sucesso!', true))
+        .catch(e => toast('Erro: ' + e.message, false));
+    }
+  </script>
+
+</body>
+</html>
