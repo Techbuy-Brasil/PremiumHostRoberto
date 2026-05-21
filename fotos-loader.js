@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   var overlay = document.querySelector('.foto-com-overlay');
   if (overlay) overlay.addEventListener('click', abrirModal);
+  document.querySelectorAll('.galeria-airbnb img').forEach(function(img) {
+    img.addEventListener('click', abrirModal);
+  });
 });
 
 function carregarFotosApi(propertyKey) {
