@@ -1325,3 +1325,75 @@ h1, h2, h3, h4 {
 @media (max-width: 600px) {
   .imovel-page .categoria-imagens img { width: 100%; height: auto; }
 }
+
+/* ===== Avaliações Airbnb ===== */
+.avaliacoes {
+  padding: 80px 20px;
+  background: #faf8f5;
+  text-align: center;
+}
+.avaliacoes-stats {
+  display: flex;
+  justify-content: center;
+  gap: 60px;
+  margin: 40px 0;
+  flex-wrap: wrap;
+}
+.stat-item {
+  text-align: center;
+}
+.stat-nota {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: #888;
+  margin-top: 6px;
+}
+.avaliacoes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.avaliacao-card {
+  background: #fff;
+  padding: 32px 28px;
+  border-radius: 12px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.06);
+  text-align: left;
+}
+.avaliacao-estrelas {
+  color: #c8a96a;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
+}
+.avaliacao-texto {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #444;
+  margin-bottom: 16px;
+  font-style: italic;
+}
+.avaliacao-autor {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.avaliacao-nome {
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 0.9rem;
+}
+.avaliacao-data {
+  color: #aaa;
+  font-size: 0.8rem;
+}
