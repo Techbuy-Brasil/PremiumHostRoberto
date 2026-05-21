@@ -1204,6 +1204,69 @@ h1, h2, h3, h4 {
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
 
+.imovel-page .galeria-airbnb {
+  display: grid;
+  grid-template-columns: 1.3fr 1.3fr;
+  gap: 12px;
+  max-width: 1400px;
+  margin: 0 auto 40px;
+}
+
+.imovel-page .foto-principal img {
+  width: 100%;
+  height: 520px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.imovel-page .fotos-laterais {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+}
+
+.imovel-page .fotos-laterais img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.imovel-page .foto-com-overlay {
+  position: relative;
+  cursor: pointer;
+}
+
+.imovel-page .foto-com-overlay img {
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+
+.imovel-page .overlay-text {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.4);
+  color: white;
+  font-size: 1.1rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  transition: background 0.3s ease;
+}
+
+.imovel-page .foto-com-overlay:hover .overlay-text {
+  background: rgba(0, 0, 0, 0.6);
+}
+
 /* --- Modal --- */
 .imovel-page .modal {
   display: none;
