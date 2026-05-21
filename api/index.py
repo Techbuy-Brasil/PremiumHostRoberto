@@ -344,3 +344,54 @@ def quote(req: QuoteRequest):
         "media_noite": breakdown["nightly_avg"],
         "temporada": agent.calendar.get_season_label(checkin, checkout),
     }
+
+
+FAQ_TMP = "/tmp/faq_premiumhost.json"
+
+
+@app.get("/api/admin/faq")
+def admin_get_faq(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    # Load from faq.json
+    faq_path = str(Path(__file__).parent / "faq.json")
+    if os.path.exists(faq_path):
+        with open(faq_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return JSONResponse(content={"faq": []})
+
+
+class FaqUpdateItem(BaseModel):
+    id: str
+    tags: list[str]
+    resposta: str
+    variacoes: list[str] = []
+
+
+class FaqUpdateRequest(BaseModel):
+    password: str
+    faq: list[FaqUpdateItem]
+
+
+@app.put("/api/admin/faq")
+def admin_update_faq(req: FaqUpdateRequest):
+    cfg = agent.pm.config
+    if req.password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    # Build the full FAQ structure
+    data = {"faq": [item.model_dump() for item in req.faq]}
+    # Save to /tmp so it persists between cold starts on Vercel
+    try:
+        with open(FAQ_TMP, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+    # Also save to the actual faq.json if possible (for Git persistence)
+    faq_path = str(Path(__file__).parent / "faq.json")
+    try:
+        with open(faq_path, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+    return JSONResponse(content={"status": "ok", "count": len(req.faq)})

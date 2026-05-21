@@ -1,0 +1,176 @@
+{
+  "faq": [
+    {
+      "id": "checkin",
+      "tags": ["checkin", "check-in", "check in", "entrada", "chegada", "chegar", "horario de entrada", "que horas", "acessar", "retirar chave", "early checkin", "antes do horario", "chave", "codigo", "portaria", "instrucoes", "instruções", "checkin antecipado"],
+      "resposta": "O check-in padrão é a partir das **14h**. Early check-in pode ser solicitado (R$ 50, sujeito a disponibilidade). O acesso é 100% digital — envio todas as instruções (códigos, portaria, etc) pelo WhatsApp até **24h antes** da chegada, sem precisar encontrar ninguém presencialmente.",
+      "variacoes": [
+        "O horário de check-in é a partir das **14h**. Se precisar chegar mais cedo, posso verificar o early check-in (R$ 50). Mando as instruções de acesso pelo WhatsApp antes da sua chegada!",
+        "Check-in às **14h**! O acesso é super tranquilo — envio tudo pelo WhatsApp: código do portão, apartamento, instruções. Tudo digital :) Early check-in? Só avisar com antecedência (R$ 50)."
+      ]
+    },
+    {
+      "id": "checkout",
+      "tags": ["checkout", "check-out", "check out", "saida", "saída", "sair", "late checkout", "late check-out", "sair mais tarde", "depois das 11", "ate que horas", "até que horas"],
+      "resposta": "O check-out é até as **11h** do dia da saída. Late check-out até 15h pode ser solicitado (R$ 70, sujeito a disponibilidade). É só combinar comigo!",
+      "variacoes": [
+        "Precisa sair até **11h**. Late check-out? Até 15h por R$ 70, se tiver disponibilidade. Dá uma confirmada comigo!",
+        "Check-out: **11h**. Se quiser estender, late check-out até 15h por R$ 70 — é só pedir!"
+      ]
+    },
+    {
+      "id": "incluso",
+      "tags": ["incluso", "incluído", "oferece", "tem", "possui", "item", "equipado", "acomodacao", "acomodação", "utensilio", "utensílio", "cozinha", "o que tem", "o que esta incluso", "roupa de cama", "toalha", "secador", "ferro", "ar condicionado", "wifi", "wi-fi", "limpeza", "taxa de limpeza", "servico", "serviço", "comodidades", "amenidades"],
+      "resposta": "Todos os apartamentos são completos e incluem:\n• Ar-condicionado\n• Wi-Fi de alta velocidade\n• TV\n• Cozinha equipada (fogão, geladeira, micro-ondas, utensílios)\n• Roupa de cama e banho\n• Secador de cabelo\n• Ferro de passar\n• **Taxa de limpeza grátis**\n\nCada imóvel tem seus diferenciais — piscina, academia, vista pro mar, estacionamento. Dá uma olhada na página do apartamento que te interessou!",
+      "variacoes": [
+        "Completaço! Ar-condicionado, wi-fi, TV, cozinha equipada, roupa de cama, secador, ferro... e a taxa de limpeza é por minha conta :) Cada apt tem seus extras como piscina e academia!",
+        "Você não precisa se preocupar com nada. Todos têm ar-condicionado, wi-fi, cozinha equipada, roupa de banho/cama, secador... sem taxa de limpeza! Fora os diferenciais como piscina e academia."
+      ]
+    },
+    {
+      "id": "pagamento",
+      "tags": ["pagamento", "pagar", "pix", "cartao", "cartão", "credito", "crédito", "parcelar", "parcelamento", "transferencia", "transferência", "deposito", "depósito", "forma de pagamento", "como pagar", "sinal", "entrada", "reservar", "garantir", "cancelamento", "cancelar", "reembolso", "politica de cancelamento", "politica de reserva", "como reservar", "confirmar", "reserva"],
+      "resposta": "Aceito **PIX, transferência bancária e cartão de crédito** (via link, parcelo em até 3x sem juros).\n\n**Sinal de 50%** no ato da reserva, o restante até 7 dias antes do check-in.\n\n**Cancelamento:**\n• Até 7 dias antes → reembolso integral\n• Entre 3 e 7 dias → 50%\n• Menos de 3 dias → sem reembolso\n\nPeríodos especiais (Réveillon, Carnaval) têm política própria — consulte comigo!",
+      "variacoes": [
+        "PIX, transferência ou cartão de crédito (parcelo em até 3x). Sinal de 50% na reserva, saldo até 7 dias antes. Cancelamento grátis com 7 dias de antecedência!",
+        "Aceito PIX, transferência e cartão (parcelado em até 3x sem juros). Só 50% de sinal pra garantir, o resto paga até 7 dias antes. Cancelamento grátis até 7 dias :)"
+      ]
+    },
+    {
+      "id": "explore",
+      "tags": ["explorar", "salvador", "o que fazer", "turismo", "praia", "farol da barra", "pelourinho", "mercado modelo", "elevador lacerda", "restaurante", "bar", "comer", "passeio", "pontos turisticos", "o que visitar", "vizinhança", "bairro", "regiao", "região"],
+      "resposta": "Você vai amar! Os apts ficam na **Barra e Ondina**, o melhor de Salvador.\n\n**Pertinho:**\n• Farol da Barra\n• Praia da Barra e Porto da Barra\n• Dezenas de restaurantes, bares, mercados e farmácias a pé\n\n**Rapidinho de Uber:**\n• Pelourinho (15min)\n• Mercado Modelo (10min)\n• Elevador Lacerda (12min)\n• Igreja do Bonfim (20min)\n\nO aeroporto fica a 30-40min (táxi R$ 60-80, Uber R$ 40-60). Não precisa de carro!",
+      "variacoes": [
+        "Melhor localização de Salvador! Barra e Ondina têm praia, restaurantes, mercados — tudo a pé. Farol da Barra é do lado! De Uber você chega no Pelourinho em 15min.",
+        "Você vai estar no coração de Salvador! Praia na porta, Farol da Barra a poucos passos, e o centro histórico a 15min de Uber. Sem contar os melhores bares e restaurantes :)"
+      ]
+    },
+    {
+      "id": "estacionamento",
+      "tags": ["estacionamento", "garagem", "vaga", "carro", "estacionar", "onde estacionar", "tem garagem", "estaciona", "vaga de garagem"],
+      "resposta": "Varia conforme o condomínio. Alguns imóveis têm **vaga de garagem inclusa**, outros não. Me fala qual apartamento te interessou que eu confirmo certinho pra você!",
+      "variacoes": [
+        "Depende do prédio, viu? Alguns têm vaga inclusa, outros não. Me diz qual apt você está pensando que eu vejo pra você!",
+        "Tem imóvel com garagem inclusa sim! Qual deles te interessou? Confirmo na hora pra você!"
+      ]
+    },
+    {
+      "id": "piscina",
+      "tags": ["piscina", "lazer", "area de lazer", "área de lazer", "tem piscina", "academia", "sauna"],
+      "resposta": "Sim! A maioria dos nossos imóveis tem **piscina no condomínio**. Alguns também têm academia, sauna, quadra... Dá uma olhada nas fotos e comodidades de cada apt na página do site!",
+      "variacoes": [
+        "Piscina liberada na maioria dos condomínios! Alguns têm academia e sauna também. Dá uma conferida nas fotos de cada apt!",
+        "Tem piscina sim! E alguns prédios têm academia, sauna e área de lazer completa. Qual apt você está considerando?"
+      ]
+    },
+    {
+      "id": "seguranca",
+      "tags": ["segurança", "seguranca", "portaria", "cameras", "câmeras", "portaria 24h", "é seguro", "perigoso", "assalto", "violencia", "violência"],
+      "resposta": "A Barra e Ondina são **regiões seguras e bem movimentadas**, com avenidas iluminadas e muito movimento até tarde. Todos os condomínios têm **portaria 24h** e câmeras de segurança. Como em qualquer grande cidade, é bom ficar atento a pertences pessoais em áreas mais cheias.",
+      "variacoes": [
+        "Super tranquilo! Barra e Ondina são regiões nobres, seguras e movimentadas. Os prédios são todos com portaria 24h e câmeras. Só manter a atenção normal com pertences como em qualquer capital.",
+        "Pode ficar tranquilo! A região é super segura, bem iluminada, com muito movimento. Todos os condomínios têm portaria 24h. É uma das melhores áreas de Salvador!"
+      ]
+    },
+    {
+      "id": "aeroporto",
+      "tags": ["aeroporto", "chegar", "como chegar", "transporte", "uber", "taxi", "táxi", "transfer", "onibus", "ônibus", "ssa", "chegar do aeroporto", "distancia", "distância", "longe"],
+      "resposta": "O Aeroporto de Salvador (SSA) fica a **30-40 minutos** de carro da Barra/Ondina.\n\n**Opções:**\n• Táxi: R$ 60-80\n• Uber: R$ 40-60\n• Transfer: posso indicar um de confiança\n\nNão precisa alugar carro — a região tem tudo perto!",
+      "variacoes": [
+        "De Uber fica uns R$ 40-60 e leva 30-40min. Táxi é R$ 60-80. Tranquilo e sem estresse! Se quiser, posso indicar um transfer de confiança.",
+        "30-40 minutos do aeroporto. Uber é a opção mais prática (R$ 40-60). Não precisa de carro pra nada — praia, mercado, tudo a pé!"
+      ]
+    },
+    {
+      "id": "pet",
+      "tags": ["pet", "pets", "animal", "cachorro", "gato", "dog", "cat", "aceita pet", "aceita cachorro", "pode levar", "animal de estimação"],
+      "resposta": "A política de pets varia conforme o condomínio. A maioria **não permite** animais. Me fala qual apt você está interessado que eu confirmo pra você!",
+      "variacoes": [
+        "Olha, a maioria dos condomínios não permite pets. Pode me dizer qual apt você quer? Confirmo certinho pra você!",
+        "Infelizmente a maioria dos prédios não aceita pets. Qual apt você está pensando? Posso verificar!"
+      ]
+    },
+    {
+      "id": "crianca",
+      "tags": ["crianca", "criança", "crianças", "criancas", "bebe", "bebê", "familia", "família", "filho", "filhos"],
+      "resposta": "Super tranquilo! Crianças são bem-vindas em todos os apartamentos. Alguns condomínios têm playground e área infantil. Só me avisa quantas crianças e as idades que confirmo o melhor apt pra sua família!",
+      "variacoes": [
+        "Claro! Todos os apts aceitam crianças. Alguns condomínios têm playground. Me diz quantas crianças e as idades que te mostro a melhor opção!",
+        "Pode trazer a família toda! Crianças são super bem-vindas. Alguns prédios têm playground e área kids. Qual a faixa etária?"
+      ]
+    },
+    {
+      "id": "mercado",
+      "tags": ["mercado", "supermercado", "padaria", "farmacia", "farmácia", "compras", "mercado perto", "onde comprar"],
+      "resposta": "Tem de tudo a pé! Na Barra e Ondina você encontra supermercados, padarias, farmácias, restaurantes e lanchonetes a poucos minutos dos apartamentos. Destaque para o comércio da Rua Marquês de Caravelas e a orla da Barra com quiosques e restaurantes.",
+      "variacoes": [
+        "Tudo perto! Supermercado, padaria, farmácia — a poucos minutos a pé. Na orla da Barra tem vários quiosques e restaurantes também!",
+        "Mercado, padaria, farmácia... tem tudo caminhando. A região é super completa!"
+      ]
+    },
+    {
+      "id": "consumo",
+      "tags": ["agua", "água", "luz", "energia", "conta", "consumo", "taxa extra", "cobranca", "cobrança", "franquia"],
+      "resposta": "Água, luz e wi-fi estão **incluídos na diária**. Sem cobranças extras ou surpresas no final. O valor que você vê na simulação é o valor final!",
+      "variacoes": [
+        "Tudo incluso: água, luz e wi-fi. Sem surpresas na conta!",
+        "Água, luz e internet já estão no valor. O preço que te passo é o preço final, sem taxa extra."
+      ]
+    },
+    {
+      "id": "dia_visita",
+      "tags": ["visitar", "visita", "amigo", "amigos", "convidado", "pode entrar", "pessoa extra", "pessoas extras", "pode receber"],
+      "resposta": "Sim, pode receber visitas durante o dia! À noite e pernoite, apenas os hóspedes registrados na reserva. A portaria pede identificação, então é bom avisar com antecedência se for receber alguém.",
+      "variacoes": [
+        "Pode receber visitas de boa durante o dia. À noite só os hóspedes da reserva. É bom avisar a portaria com antecedência se for receber alguém.",
+        "Visitante durante o dia sem problemas. Só não pode pernoitar sem estar na reserva. A portaria é tranquila mas pede identificação."
+      ]
+    },
+    {
+      "id": "toalhas_roupa",
+      "tags": ["toalha", "roupa de cama", "roupa de banho", "lencois", "lençóis", "travesseiro", "coberta", "cama", "banho"],
+      "resposta": "Todos os apartamentos fornecem **roupa de cama e banho** completas: lençóis, fronhas, toalhas de banho e rosto. Tudo higienizado profissionalmente entre uma estadia e outra.",
+      "variacoes": [
+        "Lençóis, fronhas, toalhas — tudo incluso e trocado entre cada hóspede. Só trazer a mala!",
+        "Roupa de cama e banho completas, limpinhas. É só chegar e aproveitar!"
+      ]
+    }
+  ],
+  "saudacoes": [
+    "Oi! Aqui é o Roberto :)",
+    "Olá! Roberto falando!",
+    "E aí! Beleza? Aqui é o Roberto da PremiumHost!",
+    "Fala aí! Roberto na área :)"
+  ],
+  "apresentacoes": [
+    "Oi! Aqui é o Roberto, da PremiumHost! :)\n\nTemos apartamentos incríveis em Salvador — na Barra e em Ondina, pé na areia ou pertinho de tudo.\n\nMe conta: qual imóvel te interessou, quantas pessoas vão ficar e quais datas você está pensando? Assim já faço as contas pra você!",
+    "Olá, tudo bem? Aqui é o Roberto! :)\n\nSomos da PremiumHost e temos os melhores apartamentos em Salvador — Barra e Ondina, completos e prontos pra receber.\n\nPode me perguntar sobre disponibilidade, preços ou qualquer dúvida sobre a hospedagem!",
+    "Bem-vindo! Roberto aqui, da PremiumHost :)\n\nTemos 6 apartamentos incríveis em Salvador — todos completos, com ar-condicionado, wi-fi e cozinha equipada.\n\nPra começar: qual apt te interessou, pra quantas pessoas e quais datas?"
+  ],
+  "precos_disponivel": [
+    "Boas notícias! O {nome} está disponível! :)",
+    "Disponível! O {nome} pode ser seu nessas datas :)",
+    "É sucesso! O {nome} está liberado para o período!",
+    "Fechou! O {nome} está disponível sim!"
+  ],
+  "precos_calculado": [
+    "Pra {guests} hóspedes, do dia {checkin} ao {checkout} ({nights} noites), o valor total fica em **R$ {total}** — média de R$ {media}/noite.",
+    "Fechando pra {guests} pessoas de {checkin} a {checkout} ({nights} noites): **R$ {total}** no total, dando R$ {media}/noite.",
+    "Valor total: **R$ {total}** ({nights} noites · R$ {media}/noite) para {guests} hóspedes de {checkin} a {checkout}."
+  ],
+  "indisponivel": [
+    "Poxa, infelizmente o {nome} já está reservado para {checkin} a {checkout} :(",
+    "Que pena! O {nome} está ocupado nesse período :(",
+    "Infelizmente o {nome} não está disponível para essas datas :("
+  ],
+  "despedidas": [
+    "Foi um prazer conversar com você! :) Quando quiser, é só me chamar de novo. Um abraço!",
+    "Valeu pelo papo! Qualquer coisa, tô por aqui ou no WhatsApp (71) 99290-0979. Até mais!",
+    "Disponha! Se surgir qualquer dúvida, é só chamar. Boa sorte e até logo! :)"
+  ],
+  "agradecimento": [
+    "Imagina! É um prazer ajudar :)",
+    "Por nada! Tô sempre aqui pra ajudar :)",
+    "Disponha! Qualquer coisa é só chamar!"
+  ]
+}

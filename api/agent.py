@@ -6,82 +6,82 @@ from holidays import HolidayCalendar
 from pricing import PricingEngine, _load_overrides
 from templates import ResponseTemplates
 from storage import ConversationStore
+from knowledge import KnowledgeBase
 
 
 class Agent:
     def __init__(self, config_path=None):
         self.pm = PropertyManager(config_path)
         self.calendar = HolidayCalendar(config_path)
-        self.templates = ResponseTemplates()
+        self.knowledge = KnowledgeBase()
+        self.templates = ResponseTemplates(self.knowledge)
         self.store = ConversationStore()
         self.current_guest = None
         self.current_property = None
 
-    faq_keywords = {
-        "checkin": [
-            r"check[-\s]?in", r"entrada", r"chegad", r"hospedar",
-            r"fazer checkin", r"fazer o checkin", r"entregar chave",
-            r"retirar chave", r"acessar", r"entrar", r"early",
-            r"antes das 14", r"antes do horario",
-        ],
-        "checkout": [
-            r"check[-\s]?out", r"sa[íi]da", r"sair", r"sair do apt",
-            r"late check", r"sair mais tarde", r"depois das 11",
-            r"horario de sair", r"ate que horas",
-        ],
-        "incluso": [
-            r"inclus[oó]?", r"oferece", r"tem ", r"possui",
-            r"item", r"equipad", r"acomodac", r"utensilio",
-            r"cozinha", r"o que vend", r"o que esta incluso",
-            r"roupa de cama", r"toalha", r"secador", r"ferro",
-            r"ar condicionado", r"wifi", r"wi.fi",
-            r"limpeza", r"taxa de limpeza",
-        ],
-        "pagamento": [
-            r"pagamento", r"pagar", r"pix", r"cartao", r"cartão",
-            r"credito", r"crédito", r"boleto", r"parcel",
-            r"transferencia", r"transferência", r"deposito",
-            r"depósito", r"forma de pagamento", r"como pagar",
-            r"sinal", r"entrada", r"reserva", r"garantir",
-            r"cancelamento", r"cancelar", r"reembolso",
-            r"politica de cancelamento", r"politica de reserva",
-        ],
-        "explore": [
-            r"explorar", r"salvador", r"o que fazer", r"turismo",
-            r"praia", r"farol da barra", r"pelourinho", r"mercado modelo",
-            r"elevador", r"restaurant", r"bar", r"balada",
-            r"aeroporto", r"chegar", r"como chegar", r"transporte",
-            r"uber", r"taxi", r"táxi", r"onibus", r"ônibus",
-            r"localizac", r"localização", r"perto", r"proximo",
-            r"próximo", r"vizinhan", r"bairro", r"regiao", r"região",
-            r"passeio", r"pontos turisticos", r"o que visitar",
-        ],
-        "estacionamento": [
-            r"estacionamento", r"garagem", r"vaga", r"carro",
-            r"estacionar", r"onde estacionar", r"tem garagem",
-            r"estaciona", r"parque", r"estacionamento gratis",
-        ],
-        "piscina": [
-            r"piscina", r"lazer", r"area de lazer", r"área de lazer",
-            r"piscina no predio", r"tem piscina", r"piscina gratis",
-            r"academia", r"sauna", r"lazer",
-        ],
-        "seguranca": [
-            r"seguran", r"portaria", r"cameras", r"câmeras",
-            r"seguranca 24h", r"portaria 24h", r"e seguro",
-            r"perigoso", r"assalto",
-        ],
-    }
+    def _get_memory(self, guest_id):
+        """Get remembered conversation context for this guest."""
+        data = self.store.get_guest(guest_id)
+        return data.get("preferences", {}).get("conversation_memory", {})
+
+    def _save_memory(self, guest_id, memory):
+        """Save conversation context for this guest."""
+        prefs = self.store.get_guest(guest_id).get("preferences", {})
+        prefs["conversation_memory"] = memory
+        self.store.update_preferences(guest_id, prefs)
+
+    def _detect_known_topics(self, text):
+        topics = []
+        text_lower = text.lower()
+        if re.search(r"check[-\s]?in|entrada|chegad|acessar|chave|codigo|early", text_lower):
+            topics.append("checkin")
+        if re.search(r"check[-\s]?out|sa[íi]da|sair|late", text_lower):
+            topics.append("checkout")
+        if re.search(r"incluso|incluído|oferece|tem |possui|comodidades|amenidades|o que tem|o que esta incluso|cozinha|utensilio|roupa de cama|toalha|wifi", text_lower):
+            topics.append("incluso")
+        if re.search(r"pagamento|pagar|pix|cartao|cartão|credito|crédito|parcel|transferencia|deposito|sinal|cancelamento|reembolso|reservar|garantir", text_lower):
+            topics.append("pagamento")
+        if re.search(r"explorar|salvador|o que fazer|turismo|praia|farol|pelourinho|passeio|vizinhança|restaurant|bar", text_lower) and not re.search(r"(?:flat|apart)", text_lower):
+            topics.append("explore")
+        if re.search(r"estacionamento|garagem|vaga|carro|estacionar", text_lower):
+            topics.append("estacionamento")
+        if re.search(r"piscina|lazer|academia|sauna|quadra", text_lower) and not re.search(r"ondina", text_lower):
+            topics.append("piscina")
+        if re.search(r"segurança|seguranca|portaria|e seguro|camera|câmera|perigoso", text_lower):
+            topics.append("seguranca")
+        if re.search(r"aeroporto|chegar|transporte|uber|taxi|táxi|transfer|ssa|distancia", text_lower):
+            topics.append("aeroporto")
+        if re.search(r"pet|pets|cachorro|gato|animal|levar.*animal|aceita.*pet", text_lower):
+            topics.append("pet")
+        if re.search(r"criança|crianças|crianca|criancas|bebe|bebê|familia|família|filho", text_lower):
+            topics.append("crianca")
+        if re.search(r"mercado|supermercado|padaria|farmacia|farmácia|compras|onde comprar", text_lower):
+            topics.append("mercado")
+        if re.search(r"agua|água|luz|energia|conta|consumo|franquia|incluso na diaria", text_lower):
+            topics.append("consumo")
+        if re.search(r"toalha|roupa de cama|roupa de banho|lençol|travesseiro", text_lower):
+            topics.append("toalhas_roupa")
+        return topics
 
     def _detect_faq_intent(self, text):
+        """Use KnowledgeBase to find the best FAQ match."""
+        # First check explicit multi-topic request
         text_lower = text.lower()
-        for topic, patterns in self.faq_keywords.items():
-            for pattern in patterns:
-                if re.search(pattern, text_lower):
-                    return topic
-
-        if re.search(r"duvida|dúvida|pergunta|perguntar|info|informaç", text_lower):
+        if re.search(r"duvida|dúvida|pergunta|perguntar|info|informaç|sobre o que|o que você sabe", text_lower):
             return "menu"
+
+        # Use KnowledgeBase for smart matching
+        faq_item = self.knowledge.find_faq(text)
+        if faq_item:
+            return faq_item["id"]
+
+        # Fallback to regex-based topic detection
+        topics = self._detect_known_topics(text)
+        if len(topics) == 1:
+            return topics[0]
+        if len(topics) > 1:
+            # Multiple topics found - return the first one that had a good match
+            return topics[0]
 
         return None
 
@@ -120,29 +120,19 @@ class Agent:
             "farol barra flat": "farol_barra_flat_214",
             "barra flat 214": "farol_barra_flat_214",
             "flat 214": "farol_barra_flat_214",
-            "214": "farol_barra_flat_214",
-
             "farol barra flat 304": "farol_barra_flat_304",
             "barra flat 304": "farol_barra_flat_304",
             "flat 304": "farol_barra_flat_304",
-            "304": "farol_barra_flat_304",
-
             "ondina apart hotel 441": "ondina_apt_hotel_441",
-            "ondina apt hotel 441": "ondina_apt_hotel_441",
             "ondina apt 441": "ondina_apt_hotel_441",
             "apart hotel 441": "ondina_apt_hotel_441",
-            "hotel 441": "ondina_apt_hotel_441",
             "ondina 441": "ondina_apt_hotel_441",
-
             "ondina apart hotel 305": "ondina_apt_hotel_305",
-            "ondina apt hotel 305": "ondina_apt_hotel_305",
             "ondina apt 305": "ondina_apt_hotel_305",
             "ondina 305": "ondina_apt_hotel_305",
-
             "the plaza 407": "the_plaza_407",
             "plaza 407": "the_plaza_407",
             "plaza": "the_plaza_407",
-
             "smart convencoes 509": "smart_convencoes_509",
             "smart convenções 509": "smart_convencoes_509",
             "smart 509": "smart_convencoes_509",
@@ -153,13 +143,11 @@ class Agent:
             if keyword in text_lower:
                 return self.pm.get_property(prop_key)
 
-        # fallback: try to find any property name mention
-        for key_name in ["farol barra", "ondina", "the plaza", "plaza", "smart conven", "barra flat"]:
+        for key_name in ["farol barra", "ondina", "the plaza", "smart conven", "barra flat"]:
             if key_name in text_lower:
                 for kw, pk in property_map.items():
                     if kw == key_name or kw.startswith(key_name):
                         return self.pm.get_property(pk)
-
         return None
 
     def extract_dates(self, text):
@@ -221,13 +209,12 @@ class Agent:
             return single_dates[:1]
         if found_dates:
             return found_dates[:1]
-
         return []
 
     def extract_guests(self, text):
         patterns = [
             r"(\d+)\s*(?:hóspedes|hospedes|pessoas|adultos|convidados)",
-            r"(?:para|somos|seremos|vão|vamos)\s+(\d+)",
+            r"(?:para|somos|seremos|serão|vão|vamos)\s+(\d+)",
             r"(?:sou|é)\s+(\d+)\s+(?:pessoas?|hospedes|hóspedes)",
         ]
         for pattern in patterns:
@@ -247,7 +234,7 @@ class Agent:
                 return match.group(1).strip()
         return None
 
-    def parse_message(self, text):
+    def parse_message(self, text, guest_id=None):
         info = {}
 
         name = self.extract_name(text)
@@ -327,23 +314,22 @@ class Agent:
         if guest_name or guest_id:
             self.identify_guest(guest_name or guest_id, guest_id)
 
-        self.store.add_conversation(self.current_guest or "anon", message, "guest")
+        gid = self.current_guest or "anon"
+        self.store.add_conversation(gid, message, "guest")
 
-        # Handle social/conversational intents first
         text_stripped = message.strip()
 
+        # --- SOCIAL INTENTS ---
         if self._detect_greeting(text_stripped) and len(text_stripped) < 60:
-            guest_data = self.store.get_guest(self.current_guest or "anon")
+            guest_data = self.store.get_guest(gid)
             saved_name = guest_data.get("preferences", {}).get("name")
             if saved_name:
                 return self.templates.greeting(saved_name)
-            # check if message has a name
             name = self.extract_name(text_stripped)
             if name:
-                self.store.update_preferences(self.current_guest or "anon", {"name": name})
+                self.store.update_preferences(gid, {"name": name})
                 return self.templates.greeting(name)
-            # simple greeting with no name, check if we already know the guest
-            if guest_id and len(guest_data.get("conversations", [])) > 1:
+            if gid and len(guest_data.get("conversations", [])) > 1:
                 return self.templates.greeting()
             return self.templates.welcome_message()
 
@@ -353,15 +339,25 @@ class Agent:
         if self._detect_goodbye(text_stripped):
             return self.templates.goodbye()
 
-        # Parse for structured info (dates, property, guests)
-        info = self.parse_message(text_stripped)
+        # --- PARSE MESSAGE ---
+        info = self.parse_message(text_stripped, gid)
         if info.get("name"):
-            self.store.update_preferences(self.current_guest or "anon", {"name": info["name"]})
+            self.store.update_preferences(gid, {"name": info["name"]})
 
-        has_quote_info = bool(info.get("property") and info.get("checkin")) or \
-                         bool(self.current_property and info.get("checkin") and info.get("checkout"))
+        # Merge with saved memory
+        memory = self._get_memory(gid)
+        if not info.get("checkin") and memory.get("checkin"):
+            info["checkin"] = date.fromisoformat(memory["checkin"]) if isinstance(memory["checkin"], str) else memory["checkin"]
+        if not info.get("checkout") and memory.get("checkout"):
+            info["checkout"] = date.fromisoformat(memory["checkout"]) if isinstance(memory["checkout"], str) else memory["checkout"]
+        if not info.get("guests") and memory.get("guests"):
+            info["guests"] = memory["guests"]
+        if not info.get("property") and not self.current_property and memory.get("property_key"):
+            self.current_property = self.pm.get_property(memory["property_key"])
 
-        # Only fall through to FAQ if there's no pricing info in the message
+        # --- CHECK FAQ FIRST (before property gate) ---
+        has_quote_info = bool(info.get("checkin") and info.get("checkout"))
+
         if not has_quote_info:
             faq_topic = self._detect_faq_intent(text_stripped)
             if faq_topic:
@@ -371,10 +367,11 @@ class Agent:
                 if resposta:
                     return resposta
 
-        # Pix / payment info
+        # --- PIX INFO (before property gate too) ---
         if self._detect_pix_intent(text_stripped):
             return self.templates.pix_info()
 
+        # --- PROPERTY IDENTIFICATION ---
         prop = info.get("property") or self.current_property
         if not prop:
             detected = self.identify_property(message)
@@ -388,7 +385,7 @@ class Agent:
 
         self.current_property = prop
 
-        # Check booking confirmation intent
+        # --- BOOKING INTENT ---
         if self._detect_booking_intent(text_stripped) and hasattr(self, '_last_quote'):
             return self.templates.confirm_booking(
                 prop.name,
@@ -397,6 +394,7 @@ class Agent:
                 self._last_quote["total"],
             )
 
+        # --- PRICING FLOW ---
         missing = self.missing_info(info)
 
         if missing:
@@ -417,6 +415,15 @@ class Agent:
         checkin = info["checkin"]
         checkout = info["checkout"]
         guests = info.get("guests", 2)
+
+        # Save to memory
+        new_memory = {
+            "checkin": checkin.isoformat(),
+            "checkout": checkout.isoformat(),
+            "guests": guests,
+            "property_key": prop.key,
+        }
+        self._save_memory(gid, new_memory)
 
         if guests > prop.capacity:
             return self.templates.over_capacity(prop.name, prop.capacity, guests)
@@ -447,7 +454,6 @@ class Agent:
         nights = breakdown["nights"]
         nightly_avg = breakdown["nightly_avg"]
 
-        # Store for booking confirmation
         self._last_quote = {
             "checkin": checkin,
             "checkout": checkout,
@@ -474,19 +480,15 @@ class Agent:
             extra_info=extra_info,
         )
 
-        self.store.add_conversation(
-            self.current_guest or "anon",
-            {
-                "type": "quote",
-                "property": prop.name,
-                "checkin": checkin.isoformat(),
-                "checkout": checkout.isoformat(),
-                "guests": guests,
-                "total": total,
-                "nights": nights,
-            },
-            "agent",
-        )
+        self.store.add_conversation(gid, {
+            "type": "quote",
+            "property": prop.name,
+            "checkin": checkin.isoformat(),
+            "checkout": checkout.isoformat(),
+            "guests": guests,
+            "total": total,
+            "nights": nights,
+        }, "agent")
 
         return response
 
