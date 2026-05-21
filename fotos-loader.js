@@ -1,3 +1,23 @@
+function abrirModal() {
+  var el = document.getElementById('modalGaleria');
+  if (el) el.style.display = 'block';
+}
+
+function fecharModal() {
+  var el = document.getElementById('modalGaleria');
+  if (el) el.style.display = 'none';
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  var fechar = document.querySelector('#modalGaleria .fechar');
+  if (fechar) fechar.addEventListener('click', fecharModal);
+  window.addEventListener('click', function(e) {
+    if (e.target === document.getElementById('modalGaleria')) fecharModal();
+  });
+  var overlay = document.querySelector('.foto-com-overlay');
+  if (overlay) overlay.addEventListener('click', abrirModal);
+});
+
 function carregarFotosApi(propertyKey) {
   fetch('/api/photos/' + propertyKey)
     .then(function(r) {
