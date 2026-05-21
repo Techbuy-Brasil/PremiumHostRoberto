@@ -35,7 +35,7 @@ store = ConversationStore()
 # In-memory blocked dates (survives warm instances)
 _admin_blocked = {}  # {property_key: set("YYYY-MM-DD", ...)}
 
-# In-memory photo overrides (survives warm instances, sourced from /tmp or empty)
+# In-memory photo overrides (synced to /tmp for cross-instance resilience)
 _admin_photos = {}  # {property_key: {category: [url, ...]}}
 
 PHOTOS_TMP = "/tmp/photos_premiumhost.json"
@@ -57,6 +57,18 @@ def _save_photos_override(data: dict):
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
+
+
+def _get_photos_for(property_key: str) -> dict:
+    """Return merged photo data: memory override > /tmp override > config seed."""
+    if property_key in _admin_photos:
+        return _admin_photos[property_key]
+    overrides = _load_photos_override()
+    if property_key in overrides:
+        _admin_photos[property_key] = overrides[property_key]
+        return _admin_photos[property_key]
+    cfg = agent.pm.config
+    return cfg.get("photos", {}).get(property_key, {})
 
 
 class MessageRequest(BaseModel):
@@ -150,10 +162,7 @@ def admin_list_blocked(password: str = ""):
 
 @app.get("/api/photos/{property_key}")
 def get_photos(property_key: str):
-    cfg = agent.pm.config
-    seed = cfg.get("photos", {}).get(property_key, {})
-    overrides = _load_photos_override()
-    merged = overrides.get(property_key, seed) or seed
+    merged = _get_photos_for(property_key)
     return JSONResponse(content={"key": property_key, "categories": merged})
 
 
@@ -166,6 +175,7 @@ def admin_update_photos(property_key: str, req: PhotosUpdate, password: str = ""
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
+    _admin_photos[property_key] = req.categories
     overrides = _load_photos_override()
     overrides[property_key] = req.categories
     _save_photos_override(overrides)
