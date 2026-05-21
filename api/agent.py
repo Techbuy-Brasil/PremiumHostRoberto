@@ -227,7 +227,8 @@ class Agent:
     def extract_guests(self, text):
         patterns = [
             r"(\d+)\s*(?:hóspedes|hospedes|pessoas|adultos|convidados)",
-            r"(?:para|somos|seremos|vão|vamos|sou|é)\s*(\d+)",
+            r"(?:para|somos|seremos|vão|vamos)\s+(\d+)",
+            r"(?:sou|é)\s+(\d+)\s+(?:pessoas?|hospedes|hóspedes)",
         ]
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
