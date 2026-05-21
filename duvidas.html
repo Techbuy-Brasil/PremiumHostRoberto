@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tire Dúvidas – PremiumHost Roberto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .duvidas-hero {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      color: #fff;
+      text-align: center;
+      padding: 80px 20px 60px;
+    }
+    .duvidas-hero h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 3rem;
+      margin-bottom: 12px;
+      color: #c8a96a;
+    }
+    .duvidas-hero p {
+      font-size: 1.1rem;
+      opacity: 0.85;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .duvidas-container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 60px 20px 80px;
+    }
+    .faq-section {
+      margin-bottom: 50px;
+    }
+    .faq-section h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      color: #1a1a2e;
+      margin-bottom: 24px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #c8a96a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .faq-section h2 .icone {
+      font-size: 1.6rem;
+    }
+    .faq-item {
+      margin-bottom: 6px;
+      border: 1px solid #e8e0d4;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .faq-pergunta {
+      background: #faf8f5;
+      padding: 16px 20px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background 0.2s;
+      font-size: 0.95rem;
+    }
+    .faq-pergunta:hover {
+      background: #f0ece4;
+    }
+    .faq-pergunta .seta {
+      transition: transform 0.3s;
+      font-size: 0.8rem;
+      color: #c8a96a;
+    }
+    .faq-pergunta.ativa .seta {
+      transform: rotate(180deg);
+    }
+    .faq-resposta {
+      padding: 0 20px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.35s ease, padding 0.35s ease;
+      line-height: 1.7;
+      color: #555;
+    }
+    .faq-resposta.aberta {
+      padding: 16px 20px;
+      max-height: 400px;
+    }
+    .faq-cta {
+      text-align: center;
+      margin-top: 60px;
+      padding: 40px;
+      background: #faf8f5;
+      border-radius: 12px;
+    }
+    .faq-cta h3 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: #1a1a2e;
+      margin-bottom: 12px;
+    }
+    .faq-cta p {
+      color: #666;
+      margin-bottom: 20px;
+    }
+    @media (max-width: 600px) {
+      .duvidas-hero h1 { font-size: 2rem; }
+      .duvidas-hero { padding: 50px 16px 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <a href="index.html" class="logo"><img src="/logo-white.png" alt="PremiumHost" class="logo-img">PremiumHost<span> Roberto</span></a>
+      <nav class="nav" id="nav">
+        <a href="index.html#apartamentos">Apartamentos</a>
+        <a href="index.html#consulta">Disponibilidade</a>
+        <a href="index.html#sobre">Sobre</a>
+        <a href="index.html#contato">Contato</a>
+      </nav>
+      <a href="https://wa.me/5571992900979" target="_blank" class="btn-whatsapp">WhatsApp</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
+    </div>
+  </header>
+
+  <div class="duvidas-hero">
+    <h1>&#10067; Tire Dúvidas</h1>
+    <p>Tudo que você precisa saber sobre sua hospedagem em Salvador com a PremiumHost Roberto</p>
+  </div>
+
+  <div class="duvidas-container">
+
+    <div class="faq-section">
+      <h2><span class="icone">&#128338;</span> Horários</h2>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Qual o horário de check-in? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          O check-in padrão é a partir das <strong>14:00</strong>. Caso necessite de horário especial, consulte-nos com antecedência para verificar a disponibilidade.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Qual o horário de check-out? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          O check-out deve ser realizado até as <strong>12:00</strong> do dia da saída. Horários estendidos podem ser solicitados, sujeitos à disponibilidade e taxa adicional.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          É possível fazer early check-in ou late check-out? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Sim, ambos podem ser solicitados mediante disponibilidade. O early check-in tem custo de <strong>R$ 50</strong> e o late check-out até as 15h tem custo de <strong>R$ 70</strong>. Consulte-nos pelo WhatsApp para confirmar se existe disponibilidade.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Como faço para retirar as chaves? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          O Check-in é feito direto na recepção, que funciona 24 horas <strong>Qualquer hora que chegar será atendido</strong> Não há necessidade de encontrar um anfitrião presencialmente.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-section">
+      <h2><span class="icone">&#9989;</span> O que está incluso</h2>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          O que o apartamento oferece? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Todos os apartamentos são completos e incluem: <strong>ar-condicionado, wi-fi, TV, cozinha equipada (fogão, geladeira, micro-ondas, utensílios), roupa de cama e banho</strong>. Cada imóvel tem sua página com a lista completa de comodidades.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          As taxas de limpeza estão inclusas? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Sim, a limpeza profissional está inclusa em todas as reservas. O apartamento é higienizado antes da sua chegada e após a saída. Oferecemos também serviço de limpeza adicional durante a estadia mediante solicitação (taxa extra).
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Tem estacionamento incluso? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Sim, 1 vaga rotativa ja incluso.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Os apartamentos têm piscina? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Sim, a maioria dos nossos imóveis tem acesso à <strong>piscina do condomínio</strong>. Verifique a página de cada apartamento para fotos e detalhes sobre a área de lazer.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-section">
+      <h2><span class="icone">&#128179;</span> Pagamento</h2>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Quais formas de pagamento são aceitas? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Aceitamos <strong>PIX, transferência bancária, cartão de crédito (via link de pagamento) e dinheiro</strong>. Para pagamento no cartão, pode ser parcelado em até 3x sem juros.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Preciso pagar um sinal para reservar? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Sim, solicitamos um <strong>sinal de 50%</strong> no ato da reserva. O restante deve ser pago até <strong>7 dias antes do check-in</strong>. Para reservas de última hora (menos de 7 dias), o pagamento integral é solicitado.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Qual a política de cancelamento? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Oferecemos <strong>cancelamento gratuito até 7 dias antes</strong> do check-in (reembolso integral). Entre 3 e 7 dias, reembolso de 50%. Menos de 3 dias ou não comparecimento, não há reembolso. Períodos de alta temporada (Réveillon, Carnaval) têm política especial de cancelamento — consulte-nos.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Há taxa de limpeza ou taxa de serviço? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          A <strong>taxa de limpeza é gratuita</strong> para todas as reservas. Não cobramos taxa de serviço adicional. O valor que você vê na cotação é o valor final, sem surpresas.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-section">
+      <h2><span class="icone">&#127758;</span> Explore Salvador</h2>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Quais praias ficam próximas aos apartamentos? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Nossos imóveis estão localizados nas melhores regiões de Salvador. O <strong>Farol da Barra</strong> fica a poucos passos da praia da Barra e do Porto da Barra. Os apartamentos em <strong>Ondina</strong> estão na orla, com acesso direto à praia de Ondina. A região é perfeita para quem quer sol e mar sem precisar de carro.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          O que fazer perto dos apartamentos? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Você estará próximo dos principais pontos turísticos: <strong>Farol da Barra, Mercado Modelo, Pelourinho, Elevador Lacerda, Igreja do Bonfim</strong>. A região também tem ótimos restaurantes, bares, mercados e farmácias a poucos minutos a pé. O circuito do Carnaval passa em frente aos flats da Barra.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          É seguro andar a pé na região? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Sim, as regiões da Barra e Ondina são <strong>consideradas seguras</strong> para turistas durante o dia e a noite. As avenidas são movimentadas e bem iluminadas. Como em qualquer grande cidade, recomendamos atenção com pertences pessoais em locais com maior concentração de pessoas.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Como chegar do aeroporto? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          O Aeroporto de Salvador (SSA) fica a cerca de <strong>30-40 minutos</strong> de carro da Barra/Ondina. Opções de transporte: <strong>táxi (R$ 60-80), Uber (R$ 40-60), ou transfer</strong> que podemos indicar. Não há necessidade de alugar carro, pois a região tem tudo perto.
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-pergunta" onclick="toggleFAQ(this)">
+          Tem mercado ou restaurante perto? <span class="seta">&#9660;</span>
+        </div>
+        <div class="faq-resposta">
+          Sim! A Barra e Ondina são bairros completos. Você encontra <strong>supermercados, padarias, farmácias, restaurantes, lanchonetes e bares</strong> a poucos minutos a pé dos apartamentos. Destaque para o <strong>comércio da Rua Marquês de Caravelas</strong> e a <strong>orla da Barra</strong> com diversos quiosques e restaurantes.
+        </div>
+      </div>
+    </div>
+
+    <div class="faq-cta">
+      <h3>&#128172; Ainda tem dúvidas?</h3>
+      <p>Fale diretamente conosco no WhatsApp. Respondemos rápido!</p>
+      <a href="https://wa.me/5571992900979" target="_blank" class="consulta-btn" style="display:inline-block;">Falar no WhatsApp</a>
+    </div>
+
+  </div>
+
+  <footer class="footer" id="contato">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>PremiumHost<span class="gold"> Roberto</span></h3>
+          <p>Administradora de apartamentos de temporada em Salvador, BA. Sua melhor experiência em hospedagem começa aqui.</p>
+        </div>
+        <div class="footer-contato">
+          <h4>Contato</h4>
+          <p>&#128205; Salvador, Bahia</p>
+          <p>&#128231; premiumhostroberto@gmail.com</p>
+          <p>&#128222; (71) 99290-0979</p>
+          <a href="https://wa.me/5571992900979" target="_blank" class="footer-whatsapp">&#128172; Fale pelo WhatsApp</a>
+        </div>
+        <div class="footer-links">
+          <h4>Links</h4>
+          <a href="index.html#apartamentos">Apartamentos</a>
+          <a href="index.html#consulta">Consultar Disponibilidade</a>
+          <a href="index.html#sobre">Sobre Nós</a>
+          <a href="duvidas.html">Tire Dúvidas</a>
+        </div>
+        <div class="footer-social">
+          <h4>Redes Sociais</h4>
+          <div class="social-icons">
+            <a href="https://www.instagram.com/farolbarraflat/" target="_blank" aria-label="Instagram">&#127754;</a>
+            <a href="https://wa.me/5571992900979" target="_blank" aria-label="WhatsApp">&#128241;</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 PremiumHost Roberto — Todos os direitos reservados. Salvador, Bahia.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    function toggleFAQ(el) {
+      var resposta = el.nextElementSibling;
+      var isOpen = resposta.classList.contains('aberta');
+      document.querySelectorAll('.faq-resposta.aberta').forEach(function(r) {
+        r.classList.remove('aberta');
+        r.previousElementSibling.classList.remove('ativa');
+      });
+      if (!isOpen) {
+        resposta.classList.add('aberta');
+        el.classList.add('ativa');
+      }
+    }
+  </script>
+  <script src="style.js"></script>
+
+</body>
+</html>
