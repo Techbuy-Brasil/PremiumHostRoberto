@@ -166,6 +166,18 @@ def get_photos(property_key: str):
     return JSONResponse(content={"key": property_key, "categories": merged})
 
 
+@app.get("/api/photos-debug")
+def photos_debug(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    return JSONResponse(content={
+        "in_memory": {k: list(v.keys()) for k, v in _admin_photos.items()},
+        "tmp_file_exists": os.path.exists(PHOTOS_TMP),
+        "tmp_content": _load_photos_override(),
+    })
+
+
 class PhotosUpdate(BaseModel):
     categories: dict[str, list[str]]
 
