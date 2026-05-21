@@ -1194,6 +1194,16 @@ h1, h2, h3, h4 {
   box-shadow: 0 8px 24px rgba(0,0,0,0.18);
 }
 
+.imovel-page .galeria-airbnb img {
+  transition: transform 0.25s ease, box-shadow 0.2s ease;
+  cursor: pointer;
+}
+
+.imovel-page .galeria-airbnb img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
 /* --- Modal --- */
 .imovel-page .modal {
   display: none;
