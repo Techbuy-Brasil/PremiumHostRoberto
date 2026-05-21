@@ -3,7 +3,7 @@ from datetime import datetime, date, timedelta
 
 from properties import PropertyManager
 from holidays import HolidayCalendar
-from pricing import PricingEngine
+from pricing import PricingEngine, _load_overrides
 from templates import ResponseTemplates
 from storage import ConversationStore
 
@@ -17,6 +17,93 @@ class Agent:
         self.current_guest = None
         self.current_property = None
 
+    faq_keywords = {
+        "checkin": [
+            r"check[-\s]?in", r"entrada", r"chegad", r"hospedar",
+            r"fazer checkin", r"fazer o checkin", r"entregar chave",
+            r"retirar chave", r"acessar", r"entrar", r"early",
+            r"antes das 14", r"antes do horario",
+        ],
+        "checkout": [
+            r"check[-\s]?out", r"sa[íi]da", r"sair", r"sair do apt",
+            r"late check", r"sair mais tarde", r"depois das 11",
+            r"horario de sair", r"ate que horas",
+        ],
+        "incluso": [
+            r"inclus[oó]?", r"oferece", r"tem ", r"possui",
+            r"item", r"equipad", r"acomodac", r"utensilio",
+            r"cozinha", r"o que vend", r"o que esta incluso",
+            r"roupa de cama", r"toalha", r"secador", r"ferro",
+            r"ar condicionado", r"wifi", r"wi.fi",
+            r"limpeza", r"taxa de limpeza",
+        ],
+        "pagamento": [
+            r"pagamento", r"pagar", r"pix", r"cartao", r"cartão",
+            r"credito", r"crédito", r"boleto", r"parcel",
+            r"transferencia", r"transferência", r"deposito",
+            r"depósito", r"forma de pagamento", r"como pagar",
+            r"sinal", r"entrada", r"reserva", r"garantir",
+            r"cancelamento", r"cancelar", r"reembolso",
+            r"politica de cancelamento", r"politica de reserva",
+        ],
+        "explore": [
+            r"explorar", r"salvador", r"o que fazer", r"turismo",
+            r"praia", r"farol da barra", r"pelourinho", r"mercado modelo",
+            r"elevador", r"restaurant", r"bar", r"balada",
+            r"aeroporto", r"chegar", r"como chegar", r"transporte",
+            r"uber", r"taxi", r"táxi", r"onibus", r"ônibus",
+            r"localizac", r"localização", r"perto", r"proximo",
+            r"próximo", r"vizinhan", r"bairro", r"regiao", r"região",
+            r"passeio", r"pontos turisticos", r"o que visitar",
+        ],
+        "estacionamento": [
+            r"estacionamento", r"garagem", r"vaga", r"carro",
+            r"estacionar", r"onde estacionar", r"tem garagem",
+            r"estaciona", r"parque", r"estacionamento gratis",
+        ],
+        "piscina": [
+            r"piscina", r"lazer", r"area de lazer", r"área de lazer",
+            r"piscina no predio", r"tem piscina", r"piscina gratis",
+            r"academia", r"sauna", r"lazer",
+        ],
+        "seguranca": [
+            r"seguran", r"portaria", r"cameras", r"câmeras",
+            r"seguranca 24h", r"portaria 24h", r"e seguro",
+            r"perigoso", r"assalto",
+        ],
+    }
+
+    def _detect_faq_intent(self, text):
+        text_lower = text.lower()
+        for topic, patterns in self.faq_keywords.items():
+            for pattern in patterns:
+                if re.search(pattern, text_lower):
+                    return topic
+
+        if re.search(r"duvida|dúvida|pergunta|perguntar|info|informaç", text_lower):
+            return "menu"
+
+        return None
+
+    def _detect_greeting(self, text):
+        return bool(re.search(r"^(oi|ola|olá|bom dia|boa tarde|boa noite|hey|há quanto tempo|e ai|e aí)",
+                    text.strip(), re.IGNORECASE))
+
+    def _detect_thanks(self, text):
+        return bool(re.search(r"obrigad|valeu|brigad|agradec|thanks|thank|grato", text, re.IGNORECASE))
+
+    def _detect_goodbye(self, text):
+        return bool(re.search(r"tchau|ate logo|até logo|ate mais|até mais|flw|falou|bye|adeus|obrigad.*(?:era isso|so isso|só isso|so era)",
+                    text, re.IGNORECASE))
+
+    def _detect_booking_intent(self, text):
+        return bool(re.search(r"(?:quero|gostaria de|vou|vamos) (?:reservar|confirmar|fechar|alugar|garantir)",
+                    text, re.IGNORECASE))
+
+    def _detect_pix_intent(self, text):
+        return bool(re.search(r"(?:chave|como.*pix|passa.*pix|qual.*pix|pix.*qual|pagar.*pix|fazer pix|pagamento.*pix)",
+                    text, re.IGNORECASE))
+
     def identify_guest(self, guest_name, guest_id=None):
         if not guest_id:
             guest_id = guest_name.lower().replace(" ", "_")
@@ -26,32 +113,53 @@ class Agent:
         return self.store.get_guest(guest_id)
 
     def identify_property(self, text):
-        text = text.lower()
+        text_lower = text.lower()
 
         property_map = {
-            "farol": "farol_barra_flat_214",
-            "farol barra": "farol_barra_flat_214",
+            "farol barra flat 214": "farol_barra_flat_214",
+            "farol barra flat": "farol_barra_flat_214",
+            "barra flat 214": "farol_barra_flat_214",
             "flat 214": "farol_barra_flat_214",
-            "barra flat": "farol_barra_flat_214",
-            "ondina": "ondina_apt_hotel_441",
-            "ondina apt": "ondina_apt_hotel_441",
+            "214": "farol_barra_flat_214",
+
+            "farol barra flat 304": "farol_barra_flat_304",
+            "barra flat 304": "farol_barra_flat_304",
+            "flat 304": "farol_barra_flat_304",
+            "304": "farol_barra_flat_304",
+
+            "ondina apart hotel 441": "ondina_apt_hotel_441",
+            "ondina apt hotel 441": "ondina_apt_hotel_441",
+            "ondina apt 441": "ondina_apt_hotel_441",
             "apart hotel 441": "ondina_apt_hotel_441",
             "hotel 441": "ondina_apt_hotel_441",
-"the plaza": "the_plaza_407",
+            "ondina 441": "ondina_apt_hotel_441",
 
+            "ondina apart hotel 305": "ondina_apt_hotel_305",
+            "ondina apt hotel 305": "ondina_apt_hotel_305",
+            "ondina apt 305": "ondina_apt_hotel_305",
+            "ondina 305": "ondina_apt_hotel_305",
+
+            "the plaza 407": "the_plaza_407",
             "plaza 407": "the_plaza_407",
-
             "plaza": "the_plaza_407",
-            "smart": "smart_convencoes_509",
-            "smart conven": "smart_convencoes_509",
-            "convenções": "smart_convencoes_509",
-            "convencoes": "smart_convencoes_509",
-            "509": "smart_convencoes_509",
+
+            "smart convencoes 509": "smart_convencoes_509",
+            "smart convenções 509": "smart_convencoes_509",
+            "smart 509": "smart_convencoes_509",
+            "convencoes 509": "smart_convencoes_509",
         }
 
         for keyword, prop_key in property_map.items():
-            if keyword in text:
+            if keyword in text_lower:
                 return self.pm.get_property(prop_key)
+
+        # fallback: try to find any property name mention
+        for key_name in ["farol barra", "ondina", "the plaza", "plaza", "smart conven", "barra flat"]:
+            if key_name in text_lower:
+                for kw, pk in property_map.items():
+                    if kw == key_name or kw.startswith(key_name):
+                        return self.pm.get_property(pk)
+
         return None
 
     def extract_dates(self, text):
@@ -119,7 +227,7 @@ class Agent:
     def extract_guests(self, text):
         patterns = [
             r"(\d+)\s*(?:hóspedes|hospedes|pessoas|adultos|convidados)",
-            r"(?:para|somos|seremos|vão|vamos)\s*(\d+)",
+            r"(?:para|somos|seremos|vão|vamos|sou|é)\s*(\d+)",
         ]
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
@@ -160,7 +268,7 @@ class Agent:
         if prop:
             info["property"] = prop
 
-        if re.search(r"criança|crianças|crianca|criancas|bebê|bebe|crian", text, re.IGNORECASE):
+        if re.search(r"criança|crianças|crianca|criancas|bebê|bebe", text, re.IGNORECASE):
             info["has_children"] = True
 
         if re.search(r"pet|pets|animal|cachorro|gato|dog|cat", text, re.IGNORECASE):
@@ -170,6 +278,8 @@ class Agent:
 
     def missing_info(self, info):
         missing = []
+        if "property" not in info and not self.current_property:
+            missing.append("property")
         if "checkin" not in info:
             missing.append("checkin")
         if "checkout" not in info:
@@ -218,10 +328,51 @@ class Agent:
 
         self.store.add_conversation(self.current_guest or "anon", message, "guest")
 
-        info = self.parse_message(message)
+        # Handle social/conversational intents first
+        text_stripped = message.strip()
 
-        if info.get("name") and not guest_name:
+        if self._detect_greeting(text_stripped) and len(text_stripped) < 60:
+            guest_data = self.store.get_guest(self.current_guest or "anon")
+            saved_name = guest_data.get("preferences", {}).get("name")
+            if saved_name:
+                return self.templates.greeting(saved_name)
+            # check if message has a name
+            name = self.extract_name(text_stripped)
+            if name:
+                self.store.update_preferences(self.current_guest or "anon", {"name": name})
+                return self.templates.greeting(name)
+            # simple greeting with no name, check if we already know the guest
+            if guest_id and len(guest_data.get("conversations", [])) > 1:
+                return self.templates.greeting()
+            return self.templates.welcome_message()
+
+        if self._detect_thanks(text_stripped):
+            return self.templates.thanks_reply()
+
+        if self._detect_goodbye(text_stripped):
+            return self.templates.goodbye()
+
+        # Parse for structured info (dates, property, guests)
+        info = self.parse_message(text_stripped)
+        if info.get("name"):
             self.store.update_preferences(self.current_guest or "anon", {"name": info["name"]})
+
+        has_quote_info = bool(info.get("property") and info.get("checkin")) or \
+                         bool(self.current_property and info.get("checkin") and info.get("checkout"))
+
+        # Only fall through to FAQ if there's no pricing info in the message
+        if not has_quote_info:
+            faq_topic = self._detect_faq_intent(text_stripped)
+            if faq_topic:
+                if faq_topic == "menu":
+                    return self.templates.faq_menu()
+                resposta = self.templates.faq_resposta(faq_topic)
+                if resposta:
+                    return resposta
+
+        # Pix / payment info
+        if self._detect_pix_intent(text_stripped):
+            return self.templates.pix_info()
 
         prop = info.get("property") or self.current_property
         if not prop:
@@ -232,79 +383,82 @@ class Agent:
 
         if not prop:
             other_props = self.get_all_properties_for_alternatives()
-            return self.templates.welcome_message()
+            return self.templates.no_property_match()
 
         self.current_property = prop
+
+        # Check booking confirmation intent
+        if self._detect_booking_intent(text_stripped) and hasattr(self, '_last_quote'):
+            return self.templates.confirm_booking(
+                prop.name,
+                self._last_quote["checkin"].strftime("%d/%m/%Y"),
+                self._last_quote["checkout"].strftime("%d/%m/%Y"),
+                self._last_quote["total"],
+            )
+
         missing = self.missing_info(info)
 
         if missing:
-            extra_info = ""
-            if prop:
-                extra_info = f"Voce perguntou sobre o {prop.name}! Otima escolha!\n\n"
-
+            extra = ""
             if info.get("checkin") and not info.get("checkout"):
-                extra_info += f"Entendi que o check-in seria dia {info['checkin'].strftime('%d/%m/%Y')}. "
-                extra_info += "Qual seria a data de check-out?\n\n"
+                extra = f"Entendi que o check-in seria dia {info['checkin'].strftime('%d/%m/%Y')}. "
                 remaining = [m for m in missing if m != "checkin"]
             elif info.get("checkout") and not info.get("checkin"):
-                extra_info += f"Entendi que o check-out seria dia {info['checkout'].strftime('%d/%m/%Y')}. "
-                extra_info += "Qual seria a data de check-in?\n\n"
+                extra = f"Entendi que o check-out seria dia {info['checkout'].strftime('%d/%m/%Y')}. "
                 remaining = [m for m in missing if m != "checkout"]
             else:
                 remaining = missing
 
             if remaining:
-                return f"{extra_info}{self.templates.need_info(remaining)}"
-
-            return extra_info.strip()
+                return f"{extra}{self.templates.need_info(remaining)}"
+            return extra.strip()
 
         checkin = info["checkin"]
         checkout = info["checkout"]
         guests = info.get("guests", 2)
 
         if guests > prop.capacity:
-            return (
-                f"O **{prop.name}** tem capacidade máxima de **{prop.capacity} hóspedes**. "
-                f"Para {guests} pessoas, que tal dar uma olhada em um dos nossos outros imóveis? "
-                f"Temos opções maiores como o Farol Barra Flat ou Ondina Apart Hotel que "
-                f"comportam ate 6 pessoas!"
-            )
+            return self.templates.over_capacity(prop.name, prop.capacity, guests)
 
         if checkout <= checkin:
-            return (
-                "A data de check-out precisa ser posterior à data de check-in. "
-                "Pode verificar as datas? 😊"
-            )
+            return self.templates.invalid_dates()
 
-        engine = PricingEngine(prop, self.calendar)
+        overrides = _load_overrides()
+        engine = PricingEngine(prop, self.calendar, overrides)
         avail, avail_msg = engine.check_availability(checkin, checkout)
 
         if not avail:
             suggestions = self.suggest_alternatives(checkin, checkout, prop)
             if suggestions:
-                alt_msg = self.templates.alternative_dates(prop.name, suggestions)
-                other_props = self.get_all_properties_for_alternatives()
-                alt_msg += f"\n{self.templates.alternative_property(other_props)}"
-                return alt_msg
+                response = self.templates.unavailable(prop.name,
+                    checkin.strftime("%d/%m/%Y"), checkout.strftime("%d/%m/%Y"))
+                response += f"\n\n{self.templates.alternative_dates(prop.name, suggestions)}"
+                return response
             else:
                 other_props = self.get_all_properties_for_alternatives()
-                return (
-                    f"Infelizmente nao temos disponibilidade no {prop.name} para "
-                    f"{checkin.strftime('%d/%m/%Y')} a {checkout.strftime('%d/%m/%Y')} "
-                    f"e nao encontrei datas proximas alternativas.\n\n"
-                    f"{self.templates.alternative_property(other_props)}"
-                )
+                response = self.templates.unavailable(prop.name,
+                    checkin.strftime("%d/%m/%Y"), checkout.strftime("%d/%m/%Y"))
+                response += f"\n\n{self.templates.alternative_property(other_props)}"
+                return response
 
         breakdown = engine.calculate_total(checkin, checkout, guests)
         total = breakdown["total"]
         nights = breakdown["nights"]
         nightly_avg = breakdown["nightly_avg"]
 
+        # Store for booking confirmation
+        self._last_quote = {
+            "checkin": checkin,
+            "checkout": checkout,
+            "total": total,
+            "property": prop,
+        }
+
         season_context = self.calendar.describe_period_context(checkin, checkout)
 
         extra_info = ""
         if breakdown.get("extra_guests_fee", 0) > 0:
-            extra_info += f"*Taxa de hóspedes extras: R$ {breakdown['extra_guests_fee']:.0f}*\n"
+            extra_info += f"*Taxa de hóspedes extras: R$ {breakdown['extra_guests_fee']:.0f}*"
 
         response = self.templates.available(
             property_name=prop.name,
