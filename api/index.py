@@ -171,10 +171,19 @@ def photos_debug(password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
+    # test write
+    test_ok = False
+    try:
+        with open("/tmp/photos_premiumhost_test.txt", "w") as f:
+            f.write("ok")
+        test_ok = True
+    except Exception as e:
+        test_ok = str(e)
     return JSONResponse(content={
         "in_memory": {k: list(v.keys()) for k, v in _admin_photos.items()},
         "tmp_file_exists": os.path.exists(PHOTOS_TMP),
         "tmp_content": _load_photos_override(),
+        "tmp_write_test": test_ok,
     })
 
 
