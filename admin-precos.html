@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Preços – PremiumHost Roberto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-body { font-family: Inter, sans-serif; background: #f5f3f0; min-height: 100vh; }
+    .admin-topo { background: #1a1a2e; color: #fff; padding: 16px 24px; display: flex; justify-content: space-between; align-items: center; }
+    .admin-topo h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.3rem; margin: 0; color: #c8a96a; }
+    .admin-topo small { opacity: .6; font-size: .75rem; }
+    .admin-sair { color: #c8a96a; text-decoration: none; font-size: .85rem; }
+    .admin-container { max-width: 1100px; margin: 0 auto; padding: 30px 20px 60px; }
+    .admin-card { background: #fff; border-radius: 10px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 8px rgba(0,0,0,.07); }
+    .admin-card h2 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; color: #1a1a2e; margin: 0 0 16px; padding-bottom: 10px; border-bottom: 1px solid #eee; }
+    .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .admin-campo { display: flex; flex-direction: column; gap: 4px; }
+    .admin-campo label { font-size: .8rem; color: #666; font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+    .admin-campo input { padding: 8px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: .9rem; }
+    .admin-campo input:focus { outline: none; border-color: #c8a96a; box-shadow: 0 0 0 2px rgba(200,169,106,.2); }
+    .admin-prop-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .admin-prop-header h3 { font-size: .95rem; margin: 0; }
+    .admin-prop-header h3 small { font-weight: 400; color: #999; font-size: .8rem; }
+    .admin-divider { border: none; border-top: 1px solid #eee; margin: 20px 0; }
+    .admin-acoes { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .admin-btn { padding: 10px 28px; border: none; border-radius: 6px; font-size: .9rem; font-weight: 600; cursor: pointer; }
+    .admin-btn-primary { background: #1a1a2e; color: #fff; }
+    .admin-btn-primary:hover { background: #2a2a4e; }
+    .admin-btn-secondary { background: #e8e0d4; color: #1a1a2e; }
+    .admin-toast { position: fixed; top: 20px; right: 20px; background: #1a1a2e; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: .85rem; display: none; z-index: 1000; }
+    .admin-login { max-width: 360px; margin: 80px auto; text-align: center; }
+    .admin-login input { padding: 10px 14px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; width: 100%; box-sizing: border-box; margin-bottom: 12px; }
+    .admin-login button { width: 100%; }
+    .admin-date-override { background: #faf8f5; border: 1px solid #e8e0d4; border-radius: 8px; padding: 14px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 10px; align-items: end; }
+    .admin-date-override input { padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: .85rem; width: 100%; box-sizing: border-box; }
+    .admin-date-override label { font-size: .75rem; color: #666; margin-bottom: 2px; display: block; }
+    .admin-btn-remove { background: none; border: 1px solid #e74c3c; color: #e74c3c; border-radius: 6px; padding: 6px 12px; cursor: pointer; font-size: .8rem; }
+    .admin-btn-add { background: none; border: 1px dashed #c8a96a; color: #c8a96a; border-radius: 6px; padding: 8px 16px; cursor: pointer; font-size: .85rem; width: 100%; }
+    .admin-btn-add:hover { background: #faf8f5; }
+    @media (max-width: 600px) {
+      .admin-date-override { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <div id="adminApp">
+
+    <div class="admin-topo" id="topo" style="display:none">
+      <div>
+        <h1>Painel de Preços</h1>
+        <small>PremiumHost Roberto</small>
+      </div>
+      <div>
+        <a href="admin.html" class="admin-sair" style="margin-right:12px">Bloqueio de Datas</a>
+        <a href="admin-photos.html" class="admin-sair" style="margin-right:12px">Fotos</a>
+        <a href="#" onclick="sair()" class="admin-sair">Sair</a>
+      </div>
+    </div>
+
+    <div class="admin-login" id="loginBox">
+      <h1 style="font-family:'Cormorant Garamond',serif;color:#1a1a2e;font-size:1.5rem;margin-bottom:20px">Painel de Preços</h1>
+      <p style="color:#888;font-size:.85rem;margin-bottom:20px">Digite a senha de admin para acessar</p>
+      <input type="password" id="senhaInput" placeholder="Senha" onkeydown="if(event.key==='Enter')login()">
+      <button class="admin-btn admin-btn-primary" onclick="login()">Entrar</button>
+      <p id="loginErro" style="color:#e74c3c;font-size:.8rem;margin-top:10px;display:none"></p>
+    </div>
+
+    <div class="admin-container" id="conteudo" style="display:none">
+
+      <div id="propCards"></div>
+
+      <div class="admin-card">
+        <h2>Regras Gerais</h2>
+        <div class="admin-grid">
+          <div class="admin-campo">
+            <label>Sexta</label>
+            <input type="number" step="0.01" id="g_fri" value="1.20">
+          </div>
+          <div class="admin-campo">
+            <label>Sábado</label>
+            <input type="number" step="0.01" id="g_sat" value="1.25">
+          </div>
+          <div class="admin-campo">
+            <label>Domingo</label>
+            <input type="number" step="0.01" id="g_sun" value="1.20">
+          </div>
+          <div class="admin-campo">
+            <label>Mult. Alta Temporada</label>
+            <input type="number" step="0.1" id="g_hs_mult" value="2.0">
+          </div>
+          <div class="admin-campo">
+            <label>Meses Alta Temp. (separados por vírgula)</label>
+            <input type="text" id="g_hs_months" value="1, 2, 7">
+          </div>
+          <div class="admin-campo">
+            <label>Mín. Noites (normal)</label>
+            <input type="number" id="g_min_nights" value="1">
+          </div>
+          <div class="admin-campo">
+            <label>Mín. Noites (alta temp.)</label>
+            <input type="number" id="g_min_hs" value="2">
+          </div>
+        </div>
+      </div>
+
+      <div class="admin-card">
+        <h2>Períodos Especiais</h2>
+        <p style="color:#888;font-size:.8rem;margin-bottom:12px">Datas com multiplicador personalizado (ex: feriados, eventos)</p>
+        <div id="dateOverridesList"></div>
+        <button class="admin-btn-add" onclick="addDateOverride()">+ Adicionar período</button>
+      </div>
+
+      <div class="admin-acoes">
+        <button class="admin-btn admin-btn-secondary" onclick="carregar()">Recarregar</button>
+        <button class="admin-btn admin-btn-primary" onclick="salvar()">Salvar Alterações</button>
+      </div>
+
+    </div>
+
+    <div class="admin-toast" id="toast"></div>
+
+  </div>
+
+  <script>
+    const API = 'https://premiumhost-roberto.vercel.app';
+    let password = '';
+    let properties = {};
+
+    function mostrarToast(msg, ok) {
+      const t = document.getElementById('toast');
+      t.style.display = 'block';
+      t.style.background = ok ? '#27ae60' : '#e74c3c';
+      t.textContent = msg;
+      setTimeout(() => t.style.display = 'none', 3000);
+    }
+
+    function login() {
+      const pwd = document.getElementById('senhaInput').value;
+      if (!pwd) return;
+      password = pwd;
+      fetch(`${API}/api/admin/precos?password=${encodeURIComponent(password)}`)
+        .then(r => { if (!r.ok) throw new Error('Senha incorreta'); return r.json(); })
+        .then(data => {
+          document.getElementById('loginBox').style.display = 'none';
+          document.getElementById('conteudo').style.display = 'block';
+          document.getElementById('topo').style.display = 'flex';
+          properties = data.properties;
+          preencher(data);
+        })
+        .catch(e => {
+          document.getElementById('loginErro').textContent = e.message;
+          document.getElementById('loginErro').style.display = 'block';
+          password = '';
+        });
+    }
+
+    function sair() {
+      password = '';
+      document.getElementById('loginBox').style.display = 'block';
+      document.getElementById('conteudo').style.display = 'none';
+      document.getElementById('topo').style.display = 'none';
+      document.getElementById('senhaInput').value = '';
+    }
+
+    function preencher(data) {
+      // Properties
+      const container = document.getElementById('propCards');
+      container.innerHTML = '';
+      for (const [key, prop] of Object.entries(data.properties)) {
+        const div = document.createElement('div');
+        div.className = 'admin-card';
+        div.dataset.key = key;
+        div.innerHTML = `
+          <div class="admin-prop-header">
+            <h3>${prop.nome || key} <small>${key}</small></h3>
+          </div>
+          <div class="admin-grid">
+            <div class="admin-campo">
+              <label>Preço Base (R$)</label>
+              <input type="number" step="1" class="p-base" value="${prop.base_price}">
+            </div>
+            <div class="admin-campo">
+              <label>Hóspedes Base</label>
+              <input type="number" class="p-guests" value="${prop.base_guests}">
+            </div>
+            <div class="admin-campo">
+              <label>Taxa Extra (/pessoa/noite)</label>
+              <input type="number" step="1" class="p-extra" value="${prop.extra_guest_fee}">
+            </div>
+            <div class="admin-campo">
+              <label>Taxa Limpeza (R$)</label>
+              <input type="number" step="1" class="p-cleaning" value="${prop.cleaning_fee}">
+            </div>
+          </div>
+        `;
+        container.appendChild(div);
+      }
+
+      // General rules
+      const g = data.general;
+      document.getElementById('g_fri').value = g.weekend_surcharge?.friday || 1.20;
+      document.getElementById('g_sat').value = g.weekend_surcharge?.saturday || 1.25;
+      document.getElementById('g_sun').value = g.weekend_surcharge?.sunday || 1.20;
+      document.getElementById('g_hs_mult').value = g.high_season_multiplier || 2.0;
+      document.getElementById('g_hs_months').value = (g.high_season_months || [1,2,7]).join(', ');
+      document.getElementById('g_min_nights').value = g.min_nights_default || 1;
+      document.getElementById('g_min_hs').value = g.min_nights_high_season || 2;
+
+      // Date overrides
+      renderDateOverrides(data.date_overrides || []);
+    }
+
+    function renderDateOverrides(overrides) {
+      const list = document.getElementById('dateOverridesList');
+      list.innerHTML = '';
+      overrides.forEach((od, i) => {
+        const div = document.createElement('div');
+        div.className = 'admin-date-override';
+        div.innerHTML = `
+          <div>
+            <label>Data Início</label>
+            <input type="date" class="do-start" value="${od.start}">
+          </div>
+          <div>
+            <label>Data Fim</label>
+            <input type="date" class="do-end" value="${od.end}">
+          </div>
+          <div>
+            <label>Multiplicador</label>
+            <input type="number" step="0.1" class="do-mult" value="${od.multiplier}">
+          </div>
+          <button class="admin-btn-remove" onclick="removeDateOverride(this)">Remover</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function addDateOverride() {
+      const list = document.getElementById('dateOverridesList');
+      const div = document.createElement('div');
+      div.className = 'admin-date-override';
+      div.innerHTML = `
+        <div>
+          <label>Data Início</label>
+          <input type="date" class="do-start">
+        </div>
+        <div>
+          <label>Data Fim</label>
+          <input type="date" class="do-end">
+        </div>
+        <div>
+          <label>Multiplicador</label>
+          <input type="number" step="0.1" class="do-mult" value="1.5">
+        </div>
+        <button class="admin-btn-remove" onclick="removeDateOverride(this)">Remover</button>
+      `;
+      list.appendChild(div);
+    }
+
+    function removeDateOverride(el) {
+      el.closest('.admin-date-override').remove();
+    }
+
+    function coletar() {
+      // Properties
+      const props = {};
+      document.querySelectorAll('#propCards .admin-card').forEach(card => {
+        const key = card.dataset.key;
+        props[key] = {
+          base_price: parseFloat(card.querySelector('.p-base').value) || 0,
+          base_guests: parseInt(card.querySelector('.p-guests').value) || 2,
+          extra_guest_fee: parseFloat(card.querySelector('.p-extra').value) || 0,
+          cleaning_fee: parseFloat(card.querySelector('.p-cleaning').value) || 0,
+        };
+      });
+
+      // General
+      const general = {
+        weekend_surcharge: {
+          friday: parseFloat(document.getElementById('g_fri').value) || 1.0,
+          saturday: parseFloat(document.getElementById('g_sat').value) || 1.0,
+          sunday: parseFloat(document.getElementById('g_sun').value) || 1.0,
+        },
+        high_season_multiplier: parseFloat(document.getElementById('g_hs_mult').value) || 1.0,
+        high_season_months: document.getElementById('g_hs_months').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n)),
+        min_nights_default: parseInt(document.getElementById('g_min_nights').value) || 1,
+        min_nights_high_season: parseInt(document.getElementById('g_min_hs').value) || 2,
+      };
+
+      // Date overrides
+      const dateOverrides = [];
+      document.querySelectorAll('#dateOverridesList .admin-date-override').forEach(el => {
+        const start = el.querySelector('.do-start').value;
+        const end = el.querySelector('.do-end').value;
+        const mult = parseFloat(el.querySelector('.do-mult').value) || 1.0;
+        if (start && end) {
+          dateOverrides.push({ start, end, multiplier: mult });
+        }
+      });
+
+      return { general, properties: props, date_overrides: dateOverrides, password };
+    }
+
+    function salvar() {
+      const data = coletar();
+      fetch(`${API}/api/admin/precos`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+        .then(r => { if (!r.ok) throw new Error('Erro ao salvar'); return r.json(); })
+        .then(() => mostrarToast('Preços salvos com sucesso!', true))
+        .catch(e => mostrarToast('Erro: ' + e.message, false));
+    }
+
+    function carregar() {
+      fetch(`${API}/api/admin/precos?password=${encodeURIComponent(password)}`)
+        .then(r => r.json())
+        .then(data => {
+          properties = data.properties;
+          preencher(data);
+          mostrarToast('Dados recarregados', true);
+        })
+        .catch(e => mostrarToast('Erro ao recarregar: ' + e.message, false));
+    }
+  </script>
+
+</body>
+</html>

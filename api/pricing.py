@@ -1,10 +1,29 @@
 from datetime import date
+import json
+import os
+
+
+PRECOS_TMP = "/tmp/precos_premiumhost.json"
+
+
+def _load_overrides():
+    if os.path.exists(PRECOS_TMP):
+        try:
+            with open(PRECOS_TMP, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
 
 
 class PricingEngine:
-    def __init__(self, property_obj, holiday_calendar):
+    def __init__(self, property_obj, holiday_calendar, overrides=None):
         self.property = property_obj
         self.calendar = holiday_calendar
+        self._overrides = overrides or _load_overrides()
+        self._prop_overrides = self._overrides.get("properties", {}).get(property_obj.key, {})
+        self._general = self._overrides.get("general", {})
+        self._date_overrides = self._overrides.get("date_overrides", [])
 
     def check_availability(self, checkin, checkout):
         nights = (checkout - checkin).days
@@ -29,15 +48,29 @@ class PricingEngine:
         return None
 
     def calculate_daily_rate(self, d):
-        rate = self.property.base_price
+        base_price = self._prop_overrides.get("base_price", self.property.base_price)
+        rate = base_price
 
-        weekend_mult = self.calendar.get_weekend_multiplier(d)
+        hs_mult = self._general.get("high_season_multiplier",
+                    self.calendar.config.get("pricing_rules", {}).get("high_season_multiplier", 2.0))
+
+        weekend_surcharge = self._general.get("weekend_surcharge",
+                              self.calendar.config.get("pricing_rules", {}).get("weekend_surcharge", {}))
+
+        weekend_mult = self.calendar.get_weekend_multiplier(d, weekend_surcharge)
 
         if self.calendar.is_high_season(d):
-            rate *= 2.0
+            rate *= hs_mult
 
         if weekend_mult > 1.0:
             rate *= weekend_mult
+
+        for od in self._date_overrides:
+            start = date.fromisoformat(od["start"])
+            end = date.fromisoformat(od["end"])
+            if start <= d <= end:
+                rate *= od.get("multiplier", 1.0)
+                break
 
         return round(rate, 2)
 
@@ -65,11 +98,15 @@ class PricingEngine:
             daily_rates.append(rate)
             total += rate
 
-        extra_guests = max(0, guests - self.property.base_guests)
-        extra_fee_total = extra_guests * self.property.extra_guest_fee * nights
+        override_base_guests = self._prop_overrides.get("base_guests", self.property.base_guests)
+        override_extra_fee = self._prop_overrides.get("extra_guest_fee", self.property.extra_guest_fee)
+        override_cleaning = self._prop_overrides.get("cleaning_fee", self.property.cleaning_fee)
+
+        extra_guests = max(0, guests - override_base_guests)
+        extra_fee_total = extra_guests * override_extra_fee * nights
         total += extra_fee_total
 
-        cleaning_fee = self.property.cleaning_fee
+        cleaning_fee = override_cleaning
         total += cleaning_fee
 
         breakdown = {

@@ -203,6 +203,92 @@ def admin_update_photos(property_key: str, req: PhotosUpdate, password: str = ""
     return JSONResponse(content={"key": property_key, "categories": req.categories})
 
 
+PRECOS_TMP = "/tmp/precos_premiumhost.json"
+
+PRECOS_DEFAULTS = {
+    "general": {
+        "weekend_surcharge": {"friday": 1.20, "saturday": 1.25, "sunday": 1.20},
+        "high_season_months": [1, 2, 7],
+        "high_season_multiplier": 2.0,
+        "min_nights_default": 1,
+        "min_nights_high_season": 2,
+    },
+    "properties": {},
+    "date_overrides": [],
+}
+
+
+def _load_precos_override():
+    if os.path.exists(PRECOS_TMP):
+        try:
+            with open(PRECOS_TMP, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+
+def _save_precos_override(data: dict):
+    try:
+        with open(PRECOS_TMP, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+
+class PrecosUpdate(BaseModel):
+    general: dict
+    properties: dict[str, dict]
+    date_overrides: list[dict]
+    password: str
+
+
+@app.get("/api/admin/precos")
+def admin_get_precos(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+
+    override = _load_precos_override()
+    general = override.get("general", PRECOS_DEFAULTS["general"])
+    date_overrides = override.get("date_overrides", [])
+    prop_overrides = override.get("properties", {})
+
+    properties_data = {}
+    for key in cfg.get("properties", {}):
+        prop = cfg["properties"][key]
+        base = {
+            "nome": prop.get("name", key),
+            "base_price": prop.get("base_price", 0),
+            "extra_guest_fee": prop.get("extra_guest_fee", 75),
+            "base_guests": prop.get("base_guests", 2),
+            "cleaning_fee": prop.get("cleaning_fee", 0),
+        }
+        if key in prop_overrides:
+            base.update(prop_overrides[key])
+        properties_data[key] = base
+
+    return JSONResponse(content={
+        "general": general,
+        "properties": properties_data,
+        "date_overrides": date_overrides,
+    })
+
+
+@app.put("/api/admin/precos")
+def admin_update_precos(req: PrecosUpdate):
+    cfg = agent.pm.config
+    if req.password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+
+    override = _load_precos_override()
+    override["general"] = req.general
+    override["properties"] = req.properties
+    override["date_overrides"] = req.date_overrides
+    _save_precos_override(override)
+    return JSONResponse(content={"status": "ok"})
+
+
 @app.get("/api/imoveis")
 def list_properties():
     result = {}
@@ -227,7 +313,7 @@ def chat(req: MessageRequest):
 
 @app.post("/api/cotacao")
 def quote(req: QuoteRequest):
-    from pricing import PricingEngine
+    from pricing import PricingEngine, _load_overrides
     from datetime import datetime
 
     prop = agent.pm.get_property(req.property_key)
@@ -240,7 +326,8 @@ def quote(req: QuoteRequest):
     except ValueError:
         raise HTTPException(status_code=400, detail="Formato invalido. Use DD/MM/AAAA")
 
-    engine = PricingEngine(prop, agent.calendar)
+    overrides = _load_overrides()
+    engine = PricingEngine(prop, agent.calendar, overrides)
     avail, msg = engine.check_availability(checkin, checkout)
     if not avail:
         return {"disponivel": False, "motivo": msg}

@@ -41,8 +41,8 @@ class HolidayCalendar:
     def is_sunday(self, d):
         return d.weekday() == 6
 
-    def get_weekend_multiplier(self, d):
-        rules = self.config.get("pricing_rules", {}).get("weekend_surcharge", {})
+    def get_weekend_multiplier(self, d, rules_override=None):
+        rules = rules_override if rules_override else self.config.get("pricing_rules", {}).get("weekend_surcharge", {})
         if self.is_saturday(d):
             return rules.get("saturday", 1.25)
         if self.is_friday(d) or self.is_sunday(d):
