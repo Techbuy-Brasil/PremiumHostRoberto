@@ -136,6 +136,17 @@ function iniciar() {
 function carregarFotos() {
   currentKey = document.getElementById("propSelect").value;
   if (!currentKey) return;
+
+  // Check localStorage first
+  try {
+    var stored = JSON.parse(localStorage.getItem("ph_photos_override") || "{}");
+    if (stored[currentKey]) {
+      currentData = stored[currentKey];
+      renderizarCategorias();
+      return;
+    }
+  } catch(e) {}
+
   fetch("/api/photos/" + currentKey).then(function(r) { return r.json(); }).then(function(data) {
     currentData = data.categories || {};
     renderizarCategorias();
