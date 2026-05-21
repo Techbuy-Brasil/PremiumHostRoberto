@@ -38,7 +38,7 @@ _admin_blocked = {}  # {property_key: set("YYYY-MM-DD", ...)}
 # In-memory photo overrides (survives warm instances, sourced from /tmp or empty)
 _admin_photos = {}  # {property_key: {category: [url, ...]}}
 
-PHOTOS_TMP = str(Path(__file__).parent / "tmp_photos.json")
+PHOTOS_TMP = "/tmp/photos_premiumhost.json"
 
 
 def _load_photos_override():
