@@ -9,7 +9,7 @@ class KnowledgeBase:
         if faq_path is None:
             faq_path = str(Path(__file__).parent / "faq.json")
         self.path = faq_path
-        self._data = self._load()
+        self._data, self._mtime = self._load()
 
     def _load(self):
         # Try /tmp first (admin edits via API persist here on Vercel)
@@ -17,24 +17,38 @@ class KnowledgeBase:
         if os.path.exists(tmp_path):
             try:
                 with open(tmp_path, "r", encoding="utf-8") as f:
-                    return json.load(f)
+                    return json.load(f), os.path.getmtime(tmp_path)
             except Exception:
                 pass
 
         # Fall back to local faq.json
         if not os.path.exists(self.path):
             return {"faq": [], "saudacoes": [], "apresentacoes": [], "precos_disponivel": [],
-                    "precos_calculado": [], "indisponivel": [], "despedidas": [], "agradecimento": []}
+                    "precos_calculado": [], "indisponivel": [], "despedidas": [], "agradecimento": []}, None
         try:
+            mtime = os.path.getmtime(self.path) if os.path.exists(self.path) else None
             with open(self.path, "r", encoding="utf-8") as f:
-                return json.load(f)
+                return json.load(f), mtime
         except Exception:
-            return {}
+            return {}, None
+
+    def _ensure_fresh(self):
+        tmp_path = "/tmp/faq_premiumhost.json"
+        if os.path.exists(tmp_path):
+            try:
+                mtime = os.path.getmtime(tmp_path)
+                if mtime != self._mtime:
+                    with open(tmp_path, "r", encoding="utf-8") as f:
+                        self._data = json.load(f)
+                        self._mtime = mtime
+            except Exception:
+                pass
 
     def reload(self):
-        self._data = self._load()
+        self._data, self._mtime = self._load()
 
     def find_faq(self, text, property_key=None):
+        self._ensure_fresh()
         text_lower = text.lower()
         best = None
         best_score = 0
@@ -62,13 +76,14 @@ class KnowledgeBase:
         return None
 
     def get_random(self, key, default=None):
+        self._ensure_fresh()
         items = self._data.get(key, [])
         if not items:
             return default
         return random.choice(items)
 
-    def format_random(self, key, **kwargs):
-        template = self.get_random(key)
+    def format_random(self, key, default=None, **kwargs):
+        template = self.get_random(key, default=default)
         if not template:
             return None
         try:
