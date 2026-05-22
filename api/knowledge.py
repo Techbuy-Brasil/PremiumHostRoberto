@@ -3,6 +3,8 @@ import os
 import random
 from pathlib import Path
 
+from blob_store import blob_read, blob_available
+
 
 class KnowledgeBase:
     def __init__(self, faq_path=None):
@@ -12,7 +14,16 @@ class KnowledgeBase:
         self._data, self._mtime = self._load()
 
     def _load(self):
-        # Try /tmp first (admin edits via API persist here on Vercel)
+        # Try Vercel Blob first (persists across all instances)
+        if blob_available():
+            try:
+                data = blob_read()
+                if data:
+                    return data, "blob"
+            except Exception:
+                pass
+
+        # Try /tmp next (admin edits via API persist here on Vercel)
         tmp_path = "/tmp/faq_premiumhost.json"
         if os.path.exists(tmp_path):
             try:
@@ -33,6 +44,18 @@ class KnowledgeBase:
             return {}, None
 
     def _ensure_fresh(self):
+        # Check Blob first
+        if blob_available():
+            try:
+                data = blob_read()
+                if data:
+                    self._data = data
+                    self._mtime = "blob"
+                    return
+            except Exception:
+                pass
+
+        # Check /tmp
         tmp_path = "/tmp/faq_premiumhost.json"
         if os.path.exists(tmp_path):
             try:

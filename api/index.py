@@ -17,6 +17,7 @@ if _api_dir not in sys.path:
 
 from agent import Agent
 from storage import ConversationStore
+from blob_store import blob_write
 
 app = FastAPI(title="PremiumHost Roberto - API", version="1.0.0")
 
@@ -379,8 +380,9 @@ def admin_update_faq(req: FaqUpdateRequest):
     cfg = agent.pm.config
     if req.password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    # Save full data structure
     data = req.data
+    # Save to Vercel Blob first (persists across all instances)
+    blob_write(data)
     # Save to /tmp so it persists between cold starts on Vercel
     try:
         with open(FAQ_TMP, "w", encoding="utf-8") as f:

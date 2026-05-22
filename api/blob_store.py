@@ -1,0 +1,47 @@
+import json
+import os
+import urllib.request
+import urllib.error
+
+
+BLOB_URL = os.environ.get("BLOB_API_URL", "")
+BLOB_TOKEN = os.environ.get("BLOB_READ_WRITE_TOKEN", "")
+
+
+def blob_available():
+    return bool(BLOB_URL and BLOB_TOKEN)
+
+
+def blob_read():
+    """Read JSON from Vercel Blob. Returns None if unavailable."""
+    if not blob_available():
+        return None
+    try:
+        req = urllib.request.Request(BLOB_URL, headers={
+            "Authorization": f"Bearer {BLOB_TOKEN}",
+        })
+        with urllib.request.urlopen(req, timeout=10) as r:
+            return json.loads(r.read().decode("utf-8"))
+    except Exception:
+        return None
+
+
+def blob_write(data):
+    """Write JSON to Vercel Blob. Returns True on success."""
+    if not blob_available():
+        return False
+    try:
+        body = json.dumps(data).encode("utf-8")
+        req = urllib.request.Request(
+            BLOB_URL,
+            data=body,
+            headers={
+                "Authorization": f"Bearer {BLOB_TOKEN}",
+                "Content-Type": "application/json",
+            },
+            method="PUT",
+        )
+        with urllib.request.urlopen(req, timeout=10) as r:
+            return r.status == 200
+    except Exception:
+        return False
