@@ -144,7 +144,7 @@ class ResponseTemplates:
         return None
 
     def faq_menu(self):
-        return (
+        return self._r("menu_faq",
             "Pergunta pra mim! Posso te ajudar com:\n\n"
             "• Horários de check-in / check-out\n"
             "• O que está incluso\n"
@@ -158,7 +158,7 @@ class ResponseTemplates:
         )
 
     def no_property_match(self):
-        return (
+        return self._r("sem_imovel",
             "Não consegui identificar qual imóvel você está procurando. "
             "Temos essas opções:\n\n"
             "1. **Farol Barra Flat 214** — Barra\n"
@@ -171,7 +171,7 @@ class ResponseTemplates:
         )
 
     def fallback(self):
-        return (
+        return self._r("fallback",
             "Entendi! Deixa eu ver se posso ajudar...\n\n"
             "Se você estiver procurando disponibilidade, me passa: "
             "o apartamento, as datas e quantos hóspedes.\n"

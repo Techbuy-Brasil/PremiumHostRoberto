@@ -172,5 +172,18 @@
     "Imagina! É um prazer ajudar :)",
     "Por nada! Tô sempre aqui pra ajudar :)",
     "Disponha! Qualquer coisa é só chamar!"
+  ],
+  "sem_imovel": [
+    "Não consegui identificar qual imóvel você está procurando. Temos essas opções:\n\n1. **Farol Barra Flat 214** — Barra\n2. **Farol Barra Flat 304** — Barra\n3. **Ondina Apart Hotel 441** — Ondina\n4. **Ondina Apart Hotel 305** — Ondina\n5. **The Plaza 407** — Ondina\n6. **Smart Convenções 509** — Armação\n\nQual te chamou mais atenção?",
+    "Qual imóvel você está procurando? Temos 6 opções em Salvador — Barra, Ondina e Armação. Me fala qual te interessou!",
+    "Hmm, não entendi qual apartamento você quer. Dá uma olhada no site e me conta qual te chamou mais atenção :)"
+  ],
+  "menu_faq": [
+    "Pergunta pra mim! Posso te ajudar com:\n\n• Horários de check-in / check-out\n• O que está incluso\n• Formas de pagamento e cancelamento\n• Localização e pontos turísticos\n• Estacionamento / Piscina / Lazer\n• Pets e crianças\n• Como chegar do aeroporto\n• Supermercados e farmácias perto\n\nÉ só perguntar! :)",
+    "Pode perguntar à vontade! Sei tudo sobre check-in, checkout, o que cada apt oferece, pagamento, a região... é só falar! :)"
+  ],
+  "fallback": [
+    "Entendi! Deixa eu ver se posso ajudar...\n\nSe você estiver procurando disponibilidade, me passa: o apartamento, as datas e quantos hóspedes.\nSe for uma dúvida sobre a hospedagem, pode perguntar que eu respondo na hora! :)\n\nOu se preferir, pode falar direto comigo no WhatsApp: (71) 99290-0979",
+    "Vamos ver se consigo ajudar! Para simular disponibilidade, preciso saber: qual apartamento, datas e número de hóspedes.\n\nSe tiver qualquer dúvida sobre a hospedagem, é só perguntar também :)"
   ]
 }
