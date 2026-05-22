@@ -284,18 +284,32 @@
     }
 
     function salvar() {
+      // Read data directly from DOM to catch textarea edits that onchange missed
+      var cards = document.querySelectorAll('#faqList .card');
+      cards.forEach(function(card, idx) {
+        if (!faqData.faq[idx]) return;
+        var resp = card.querySelector('textarea');
+        if (resp) faqData.faq[idx].resposta = resp.value;
+        var idInput = card.querySelector('h3 input');
+        if (idInput) faqData.faq[idx].id = idInput.value.trim();
+        var variacoes = card.querySelectorAll('.variacao-item textarea');
+        faqData.faq[idx].variacoes = [];
+        variacoes.forEach(function(v) {
+          if (v.value.trim()) faqData.faq[idx].variacoes.push(v.value);
+        });
+      });
       // Sanitize: remove empty variacoes
-      (faqData.faq || []).forEach(f => {
-        if (f.variacoes) f.variacoes = f.variacoes.filter(v => v.trim());
+      (faqData.faq || []).forEach(function(f) {
+        if (f.variacoes) f.variacoes = f.variacoes.filter(function(v) { return v.trim(); });
       });
       fetch(API + '/api/admin/faq', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: password, data: faqData }),
       })
-        .then(r => { if (!r.ok) throw new Error('Erro ao salvar'); return r.json(); })
-        .then(() => toast('FAQ salvo com sucesso!', true))
-        .catch(e => toast('Erro: ' + e.message, false));
+        .then(function(r) { if (!r.ok) throw new Error('Erro ao salvar'); return r.json(); })
+        .then(function() { toast('FAQ salvo com sucesso!', true); })
+        .catch(function(e) { toast('Erro: ' + e.message, false); });
     }
   </script>
 

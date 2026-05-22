@@ -354,7 +354,14 @@ def admin_get_faq(password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    # Load from faq.json
+    # Load from /tmp first (admin edits persist here on Vercel)
+    if os.path.exists(FAQ_TMP):
+        try:
+            with open(FAQ_TMP, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    # Fall back to local faq.json
     faq_path = str(Path(__file__).parent / "faq.json")
     if os.path.exists(faq_path):
         with open(faq_path, "r", encoding="utf-8") as f:
