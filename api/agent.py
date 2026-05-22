@@ -65,23 +65,14 @@ class Agent:
 
     def _detect_faq_intent(self, text):
         """Use KnowledgeBase to find the best FAQ match."""
-        # First check explicit multi-topic request
         text_lower = text.lower()
         if re.search(r"duvida|dúvida|pergunta|perguntar|info|informaç|sobre o que|o que você sabe", text_lower):
             return "menu"
 
-        # Use KnowledgeBase for smart matching
+        # Use KnowledgeBase for smart matching (reflects admin edits)
         faq_item = self.knowledge.find_faq(text)
         if faq_item:
             return faq_item["id"]
-
-        # Fallback to regex-based topic detection
-        topics = self._detect_known_topics(text)
-        if len(topics) == 1:
-            return topics[0]
-        if len(topics) > 1:
-            # Multiple topics found - return the first one that had a good match
-            return topics[0]
 
         return None
 

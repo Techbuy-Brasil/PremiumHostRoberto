@@ -98,5 +98,11 @@ class KnowledgeBase:
             topics.append({"id": item["id"], "tags": item["tags"][:3]})
         return topics
 
+    def get_faq_by_id(self, topic_id):
+        for item in self._data.get("faq", []):
+            if item["id"] == topic_id:
+                return item
+        return None
+
     def get_all_faq(self):
         return self._data

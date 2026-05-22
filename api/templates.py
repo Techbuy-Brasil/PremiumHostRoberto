@@ -135,66 +135,12 @@ class ResponseTemplates:
         )
 
     def faq_resposta(self, topic=None):
-        faqs = {
-            "checkin": (
-                "O check-in padrão é a partir das **14h**. Early check-in pode ser solicitado "
-                "(R$ 50, sujeito a disponibilidade). O acesso é 100% digital — envio as instruções "
-                "pelo WhatsApp até 24h antes."
-            ),
-            "checkout": (
-                "O check-out é até as **11h**. Late check-out até 15h por R$ 70 "
-                "(sujeito a disponibilidade)."
-            ),
-            "incluso": (
-                "Todos incluem: ar-condicionado, wi-fi, TV, cozinha equipada, "
-                "roupa de cama/banho, secador, ferro. Taxa de limpeza grátis!\n\n"
-                "Cada apt tem seus diferenciais — piscina, academia, vista pro mar."
-            ),
-            "pagamento": (
-                "Aceito **PIX, transferência e cartão** (parcelo em até 3x sem juros).\n"
-                "Sinal de 50%, restante 7 dias antes.\n"
-                "Cancelamento grátis até 7 dias antes."
-            ),
-            "explore": (
-                "Barra e Ondina, o melhor de Salvador! Praia, Farol da Barra, "
-                "restaurantes e mercados a pé. Pelourinho a 15min de Uber."
-            ),
-            "estacionamento": (
-                "Varia conforme o condomínio. Alguns têm vaga inclusa. "
-                "Qual apt te interessou? Confirmo pra você!"
-            ),
-            "piscina": (
-                "Sim! A maioria tem piscina. Alguns também têm academia, sauna e quadra."
-            ),
-            "seguranca": (
-                "Região segura, bem iluminada e movimentada. "
-                "Todos os condomínios têm portaria 24h e câmeras."
-            ),
-            "aeroporto": (
-                "30-40min do aeroporto. Uber R$ 40-60, táxi R$ 60-80. "
-                "Não precisa de carro!"
-            ),
-            "pet": (
-                "A maioria dos condomínios não permite pets. "
-                "Qual apt te interessou? Confirmo pra você!"
-            ),
-            "crianca": (
-                "Crianças são bem-vindas! Alguns condomínios têm playground. "
-                "Me avisa quantas crianças e as idades!"
-            ),
-            "mercado": (
-                "Tem mercado, padaria, farmácia a poucos minutos a pé. "
-                "A região é super completa!"
-            ),
-            "consumo": (
-                "Água, luz e wi-fi estão inclusos na diária. Sem surpresas!"
-            ),
-            "toalhas_roupa": (
-                "Roupa de cama e banho completas, higienizadas entre cada hóspede."
-            ),
-        }
-        if topic and topic in faqs:
-            return faqs[topic]
+        if topic and self.knowledge:
+            item = self.knowledge.get_faq_by_id(topic)
+            if item:
+                if item.get("variacoes"):
+                    return random.choice(item["variacoes"])
+                return item.get("resposta")
         return None
 
     def faq_menu(self):
