@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Administração - PremiumHost</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #0f172a; /* Azul Marinho Escuro */
+            --secondary-color: #1e293b; /* Variação de Azul */
+            --accent-color: #3b82f6; /* Azul de Destaque */
+            --bg-color: #f8fafc; /* Fundo Areia/Cinza Claro */
+            --card-bg: #ffffff;
+            --text-color: #334155;
+            --text-light: #64748b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Cabeçalho */
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        header h1 span {
+            color: var(--accent-color);
+        }
+
+        header p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        /* Container Principal */
+        main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+        }
+
+        /* Grid de Links */
+        .grid-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Estilo dos Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-color);
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-color: var(--accent-color);
+        }
+
+        .card i {
+            font-size: 2.5rem;
+            color: var(--accent-color);
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover i {
+            transform: scale(1.1);
+        }
+
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Atalho para o Site Principal */
+        .site-principal {
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .btn-site {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: var(--secondary-color);
+            color: white;
+            text-decoration: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn-site:hover {
+            background-color: var(--primary-color);
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 1rem;
+            font-size: 0.8rem;
+            border-top: 1px solid #334155;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Painel <span>PremiumHost</span></h1>
+        <p>Links Rápidos de Administração do Sistema</p>
+    </header>
+
+    <main>
+        <div class="grid-links">
+            
+            <a href="https://premiumhost-roberto.vercel.app/admin.html" target="_blank" class="card">
+                <i class="fa-solid fa-sliders"></i>
+                <h3>Admin de Datas</h3>
+                <p>Dashboard principal de controle</p>
+            </a>
+
+            <a href="https://premiumhost-roberto.vercel.app/admin-precos.html" target="_blank" class="card">
+                <i class="fa-solid fa-dollar-sign"></i>
+                <h3>Gerenciar Preços</h3>
+                <p>Atualizar valores e tarifas</p>
+            </a>
+
+            <a href="https://premiumhost-roberto.vercel.app/admin-photos.html" target="_blank" class="card">
+                <i class="fa-solid fa-images"></i>
+                <h3>Gerenciar Fotos</h3>
+                <p>Upload e controle da galeria</p>
+            </a>
+
+            <a href="https://premiumhost-roberto.vercel.app/admin-faq.html" target="_blank" class="card">
+                <i class="fa-solid fa-circle-question"></i>
+                <h3>Gerenciar FAQ</h3>
+                <p>Editar perguntas frequentes</p>
+            </a>
+
+        </div>
+
+        <div class="site-principal">
+            <a href="https://premiumhost-roberto.vercel.app" target="_blank" class="btn-site">
+                <i class="fa-solid fa-globe"></i> Ir para o Site Principal
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        &copy; 2026 PremiumHost - Uso Exclusivo Administrador
+    </footer>
+
+</body>
+</html>
