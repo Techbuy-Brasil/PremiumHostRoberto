@@ -8,6 +8,23 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    .pix-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); overflow: auto; }
+    .pix-modal-content { background: #fff; margin: 5% auto; padding: 32px; border-radius: 12px; max-width: 500px; width: 90%; position: relative; }
+    .pix-modal-close { position: absolute; right: 16px; top: 12px; font-size: 1.8rem; cursor: pointer; color: #999; }
+    .pix-modal h2 { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; margin-bottom: 16px; }
+    .pix-resumo { background: #f9f6f0; padding: 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.8; }
+    .pix-resumo strong { color: #c8a96a; }
+    .pix-qr { text-align: center; margin: 20px 0; }
+    .pix-qr canvas { border: 2px solid #c8a96a; border-radius: 8px; padding: 8px; background: #fff; }
+    .pix-codigo { background: #f5f3f0; padding: 10px; border-radius: 6px; font-size: 0.75rem; word-break: break-all; margin: 12px 0; font-family: monospace; cursor: pointer; }
+    .pix-codigo:hover { background: #eee; }
+    .btn-pix-pagar { display: block; width: 100%; background: #28a745; color: #fff; border: none; padding: 14px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 12px; }
+    .btn-pix-pagar:hover { background: #218838; }
+    .btn-reservar { display: inline-block; background: #c8a96a; color: #1a1a1a !important; padding: 8px 16px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer; }
+    .btn-reservar:hover { background: #b89650; }
+  </style>
 </head>
 <body>
 
@@ -332,6 +349,18 @@
       </div>
     </div>
   </section>
+
+  <!-- ===== PIX MODAL ===== -->
+  <div class="pix-modal" id="pixModal">
+    <div class="pix-modal-content">
+      <span class="pix-modal-close" onclick="fecharPixModal()">&times;</span>
+      <h2>Reservar Apartamento</h2>
+      <div class="pix-resumo" id="pixResumo"></div>
+      <div class="pix-qr" id="pixQrContainer"></div>
+      <div class="pix-codigo" id="pixCodigo" onclick="copiarPix()" title="Clique para copiar"></div>
+      <button class="btn-pix-pagar" onclick="enviarWhatsPix()">Já paguei - Confirmar reserva</button>
+    </div>
+  </div>
 
   <!-- ===== FOOTER ===== -->
   <footer class="footer" id="contato">
@@ -942,7 +971,10 @@
             <div class="resultado-card-preco">R$ ${cotacao.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})} <small>total</small></div>
             <div class="resultado-card-noites">R$ ${cotacao.media_noite.toLocaleString('pt-BR', {minimumFractionDigits: 2})} / noite · ${noites} noites</div>
           `;
-          btnHtml = `<a href="https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent('Olá! Gostaria de reservar o ' + prop.name + ' das ' + formatDate(checkin.value) + ' ao ' + formatDate(checkout.value) + ' para ' + document.getElementById('hospedes').value + ' pessoas.')}" target="_blank" class="card-btn">Reservar via WhatsApp</a>`;
+          btnHtml = `
+            <button class="btn-reservar" onclick="abrirPixModal('${prop.key}','${prop.name.replace(/'/g,"\\'")}',${cotacao.total},'${formatDate(checkin.value)}','${formatDate(checkout.value)}',${document.getElementById('hospedes').value})">Reservar</button>
+            <a href="https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent('Olá! Gostaria de reservar o ' + prop.name + ' das ' + formatDate(checkin.value) + ' ao ' + formatDate(checkout.value) + ' para ' + document.getElementById('hospedes').value + ' pessoas.')}" target="_blank" class="card-btn" style="display:inline-block;margin-top:4px">Reservar via WhatsApp</a>
+          `;
         } else if (estado === 'livre') {
           precoHtml = `<div class="resultado-card-preco">Disponível <small>consulte preço</small></div>`;
           btnHtml = `<a href="https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent('Olá! Gostaria de informações sobre o ' + prop.name + ' para ' + document.getElementById('hospedes').value + ' pessoas, do ' + formatDate(checkin.value) + ' ao ' + formatDate(checkout.value) + '.')}" target="_blank" class="card-btn">Consultar via WhatsApp</a>`;
@@ -1047,7 +1079,80 @@
         resultados.appendChild(grid);
         resultados.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
-    })();
+
+    })();   // end chat/disp IIFE
+
+    // === PIX MODAL (global) ===
+    let bookingInfo = null;
+
+    function abrirPixModal(propKey, propName, total, checkinStr, checkoutStr, hospedes) {
+        bookingInfo = { propKey, propName, total, checkin: checkinStr, checkout: checkoutStr, hospedes };
+        var resumo = document.getElementById('pixResumo');
+        var entrada = total / 2;
+        resumo.innerHTML = '<strong>' + propName + '</strong><br>' +
+          checkinStr + ' a ' + checkoutStr + ' · ' + hospedes + ' hóspede' + (hospedes > 1 ? 's' : '') +
+          '<br><br>Valor total: <strong>R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong>' +
+          '<br>Entrada (50%): <strong style="color:#c8a96a">R$ ' + entrada.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong>' +
+          '<br><br><small style="color:#888">Restante (50%): deverá ser pago até o dia do check-in</small>';
+
+        // Fetch PIX payload
+        fetch(API_URL + '/api/pix/payload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ total: total, property_name: propName, checkin: checkinStr, checkout: checkoutStr }),
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            // Render QR code
+            var qrContainer = document.getElementById('pixQrContainer');
+            qrContainer.innerHTML = '';
+            var qrDiv = document.createElement('div');
+            qrDiv.style.display = 'inline-block';
+            qrContainer.appendChild(qrDiv);
+            if (typeof QRCode !== 'undefined') {
+              new QRCode(qrDiv, { text: data.payload, width: 200, height: 200 });
+            } else {
+              qrDiv.textContent = 'Erro ao gerar QR Code';
+            }
+            // Show copy-paste code
+            var codigo = document.getElementById('pixCodigo');
+            codigo.textContent = 'PIX Copia e Cola (clique para copiar): ' + data.payload;
+            codigo.style.display = 'block';
+          })
+          .catch(function() {
+            document.getElementById('pixQrContainer').innerHTML = '<p style="color:red">Erro ao gerar PIX. Tente novamente.</p>';
+          });
+
+        document.getElementById('pixModal').style.display = 'block';
+      }
+
+      function fecharPixModal() {
+        document.getElementById('pixModal').style.display = 'none';
+      }
+
+      function copiarPix() {
+        var codigo = document.getElementById('pixCodigo');
+        var texto = codigo.textContent.replace('PIX Copia e Cola (clique para copiar): ', '');
+        navigator.clipboard.writeText(texto).then(function() {
+          var original = codigo.textContent;
+          codigo.textContent = 'Copiado!';
+          setTimeout(function() { codigo.textContent = original; }, 2000);
+        });
+      }
+
+      function enviarWhatsPix() {
+        if (!bookingInfo) return;
+        var msg = 'Ol\u00e1 Roberto! Acabei de fazer o PIX da entrada para confirmar a reserva do ' +
+          bookingInfo.propName + ' das ' + bookingInfo.checkin + ' ao ' + bookingInfo.checkout +
+          ' para ' + bookingInfo.hospedes + ' h\u00f3spede' + (bookingInfo.hospedes > 1 ? 's' : '') +
+          '. Valor total: R$ ' + bookingInfo.total.toFixed(2) +
+          '. Segue comprovante abaixo.';
+        window.open('https://wa.me/' + WHATSAPP_NUM + '?text=' + encodeURIComponent(msg), '_blank');
+      }
+
+    document.getElementById('pixModal').addEventListener('click', function(e) {
+      if (e.target === this) fecharPixModal();
+    });
   </script>
   <script src="style.js"></script>
 

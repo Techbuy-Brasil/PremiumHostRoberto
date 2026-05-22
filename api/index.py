@@ -18,6 +18,7 @@ if _api_dir not in sys.path:
 from agent import Agent
 from storage import ConversationStore
 from blob_store import blob_write
+from pix import gerar_pix_payload
 
 app = FastAPI(title="PremiumHost Roberto - API", version="1.0.0")
 
@@ -397,3 +398,24 @@ def admin_update_faq(req: FaqUpdateRequest):
     except Exception:
         pass
     return JSONResponse(content={"status": "ok"})
+
+
+class PixPayloadRequest(BaseModel):
+    total: float
+    property_name: str = "Apartamento"
+    checkin: str = ""
+    checkout: str = ""
+
+
+@app.post("/api/pix/payload")
+def gerar_pix(req: PixPayloadRequest):
+    entrada = req.total / 2
+    payload = gerar_pix_payload(valor=entrada)
+    return JSONResponse(content={
+        "payload": payload,
+        "valor_entrada": round(entrada, 2),
+        "valor_total": round(req.total, 2),
+        "propriedade": req.property_name,
+        "checkin": req.checkin,
+        "checkout": req.checkout,
+    })
