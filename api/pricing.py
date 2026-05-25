@@ -2,11 +2,16 @@ from datetime import date
 import json
 import os
 
+from blob_store import blob_get_key
+
 
 PRECOS_TMP = "/tmp/precos_premiumhost.json"
 
 
 def _load_overrides():
+    blob = blob_get_key("pricing")
+    if blob is not None:
+        return blob
     if os.path.exists(PRECOS_TMP):
         try:
             with open(PRECOS_TMP, "r", encoding="utf-8") as f:

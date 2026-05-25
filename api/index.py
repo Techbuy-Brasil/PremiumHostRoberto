@@ -17,7 +17,7 @@ if _api_dir not in sys.path:
 
 from agent import Agent
 from storage import ConversationStore
-from blob_store import blob_write
+from blob_store import blob_get_key, blob_set_key, blob_read, blob_write
 from pix import gerar_pix_payload
 
 app = FastAPI(title="PremiumHost Roberto - API", version="1.0.0")
@@ -34,13 +34,61 @@ config_path = str(Path(__file__).parent / "config.json")
 agent = Agent(config_path)
 store = ConversationStore()
 
-# In-memory blocked dates (survives warm instances)
+# In-memory blocked dates (synced to /tmp for cross-instance resilience)
 _admin_blocked = {}  # {property_key: set("YYYY-MM-DD", ...)}
+# In-memory force-available dates (override blocked/ical)
+_admin_available = {}  # {property_key: set("YYYY-MM-DD", ...)}
 
 # In-memory photo overrides (synced to /tmp for cross-instance resilience)
 _admin_photos = {}  # {property_key: {category: [url, ...]}}
 
+CALENDAR_TMP = "/tmp/calendario_premiumhost.json"
 PHOTOS_TMP = "/tmp/photos_premiumhost.json"
+
+BLOCKED_TMP = "/tmp/blocked_premiumhost.json"
+
+
+def _load_calendar_state():
+    if os.path.exists(CALENDAR_TMP):
+        try:
+            with open(CALENDAR_TMP, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {}
+
+
+def _save_calendar_state(data: dict):
+    try:
+        with open(CALENDAR_TMP, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
+
+
+def _sync_calendar_state():
+    # Try blob first (cross-instance)
+    try:
+        blob = blob_get_key("calendar")
+        if isinstance(blob, dict):
+            for key, dates in blob.get("blocked", {}).items():
+                _admin_blocked.setdefault(key, set()).update(dates)
+            for key, dates in blob.get("available", {}).items():
+                _admin_available.setdefault(key, set()).update(dates)
+            # Sync back to /tmp
+            _save_calendar_state(blob)
+            return
+    except Exception:
+        pass
+    # Fallback to /tmp
+    data = _load_calendar_state()
+    for key, dates in data.get("blocked", {}).items():
+        _admin_blocked.setdefault(key, set()).update(dates)
+    for key, dates in data.get("available", {}).items():
+        _admin_available.setdefault(key, set()).update(dates)
+
+
+_sync_calendar_state()
 
 
 def _load_photos_override():
@@ -119,7 +167,20 @@ def get_calendar(property_key: str):
                 booked.add(f"{y}-{m}-{d}")
         except Exception:
             pass
+    # Remove force-available dates
+    available = _admin_available.get(property_key, set())
+    booked -= available
     return JSONResponse(content=sorted(booked))
+
+
+def _save_blocked_state():
+    data = {"blocked": {k: sorted(v) for k, v in _admin_blocked.items()},
+            "available": {k: sorted(v) for k, v in _admin_available.items()}}
+    _save_calendar_state(data)
+    try:
+        blob_set_key("calendar", data)
+    except Exception:
+        pass
 
 
 @app.post("/api/admin/block")
@@ -134,6 +195,7 @@ def admin_block(req: BlockRequest):
     for d in req.dates:
         if re.match(r"^\d{4}-\d{2}-\d{2}$", d):
             _admin_blocked[req.property_key].add(d)
+    _save_blocked_state()
     return JSONResponse(content=sorted(_admin_blocked[req.property_key]))
 
 
@@ -147,7 +209,37 @@ def admin_unblock(req: BlockRequest):
     existing = _admin_blocked.get(req.property_key, set())
     for d in req.dates:
         existing.discard(d)
-    _admin_blocked[req.property_key] = existing
+    _save_blocked_state()
+    return JSONResponse(content=sorted(existing))
+
+
+@app.post("/api/admin/available")
+def admin_available(req: BlockRequest):
+    cfg = agent.pm.config
+    if req.password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    if req.property_key not in cfg.get("properties", {}):
+        raise HTTPException(status_code=404, detail="Imovel nao encontrado")
+    if req.property_key not in _admin_available:
+        _admin_available[req.property_key] = set()
+    for d in req.dates:
+        if re.match(r"^\d{4}-\d{2}-\d{2}$", d):
+            _admin_available[req.property_key].add(d)
+    _save_blocked_state()
+    return JSONResponse(content=sorted(_admin_available[req.property_key]))
+
+
+@app.post("/api/admin/unavailable")
+def admin_unavailable(req: BlockRequest):
+    cfg = agent.pm.config
+    if req.password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    if req.property_key not in cfg.get("properties", {}):
+        raise HTTPException(status_code=404, detail="Imovel nao encontrado")
+    existing = _admin_available.get(req.property_key, set())
+    for d in req.dates:
+        existing.discard(d)
+    _save_blocked_state()
     return JSONResponse(content=sorted(existing))
 
 
@@ -160,6 +252,17 @@ def admin_list_blocked(password: str = ""):
     for key, dates in _admin_blocked.items():
         result[key] = sorted(dates)
     return JSONResponse(content=result)
+
+
+@app.get("/api/admin/state")
+def admin_get_state(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    return JSONResponse(content={
+        "blocked": {k: sorted(v) for k, v in _admin_blocked.items()},
+        "available": {k: sorted(v) for k, v in _admin_available.items()},
+    })
 
 
 @app.get("/api/photos/{property_key}")
@@ -221,6 +324,11 @@ PRECOS_DEFAULTS = {
 
 
 def _load_precos_override():
+    # Try Blob first (cross-instance persistence)
+    blob = blob_get_key("pricing")
+    if blob is not None:
+        return blob
+    # Try /tmp next (same instance fallback)
     if os.path.exists(PRECOS_TMP):
         try:
             with open(PRECOS_TMP, "r", encoding="utf-8") as f:
@@ -231,11 +339,14 @@ def _load_precos_override():
 
 
 def _save_precos_override(data: dict):
+    # Save to /tmp first (guaranteed on this instance)
     try:
         with open(PRECOS_TMP, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
+    # Also save to Blob (cross-instance)
+    blob_set_key("pricing", data)
 
 
 class PrecosUpdate(BaseModel):
@@ -356,7 +467,15 @@ def admin_get_faq(password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    # Load from /tmp first (admin edits persist here on Vercel)
+    # Load from Vercel Blob first (persists across all instances)
+    _bd = blob_read()
+    if isinstance(_bd, dict):
+        _faq = _bd.get("faq")
+        if isinstance(_faq, dict):
+            return _faq
+        if _faq is None and "saudacoes" in _bd:
+            return _bd
+    # Load from /tmp next (admin edits persist here on Vercel)
     if os.path.exists(FAQ_TMP):
         try:
             with open(FAQ_TMP, "r", encoding="utf-8") as f:
@@ -383,7 +502,7 @@ def admin_update_faq(req: FaqUpdateRequest):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     data = req.data
     # Save to Vercel Blob first (persists across all instances)
-    blob_write(data)
+    blob_set_key("faq", data)
     # Save to /tmp so it persists between cold starts on Vercel
     try:
         with open(FAQ_TMP, "w", encoding="utf-8") as f:

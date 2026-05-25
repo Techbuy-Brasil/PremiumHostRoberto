@@ -55,10 +55,27 @@
       <div class="hint">Preencha só "Início" para uma data, ou ambas para um intervalo.</div>
     </div>
 
+    <div class="section">
+      <label>Disponibilizar data(s)</label>
+      <div class="row">
+        <input type="date" id="dataInicioAvail">
+        <input type="date" id="dataFimAvail">
+        <button class="btn-primary" onclick="disponibilizar()">+</button>
+      </div>
+      <div class="hint">Força estas datas como disponíveis, mesmo se bloqueadas no iCal ou config.</div>
+    </div>
+
     <div>
       <label>Datas bloqueadas (admin)</label>
       <div id="listaDatas">
         <p style="color:#888;font-size:0.85rem">Carregue os imóveis primeiro.</p>
+      </div>
+    </div>
+
+    <div>
+      <label>Datas disponibilizadas (forçadas)</label>
+      <div id="listaAvailable">
+        <p style="color:#888;font-size:0.85rem">Nenhuma data forçada como disponível.</p>
       </div>
     </div>
 
@@ -99,6 +116,100 @@
       }
     }
 
+    async function carregarEstado() {
+      var pwd = document.getElementById('senha').value || SENHA;
+      var data = await api('GET', '/api/admin/state?password=' + encodeURIComponent(pwd));
+      if (!data) {
+        document.getElementById('listaDatas').innerHTML = '<p style="color:#888;font-size:0.85rem">Nenhuma data bloqueada via admin.</p>';
+        document.getElementById('listaAvailable').innerHTML = '<p style="color:#888;font-size:0.85rem">Nenhuma data forçada como disponível.</p>';
+        return;
+      }
+      renderDatas(data.blocked || {}, 'listaDatas', 'desbloquear', 'Remover');
+      renderDatas(data.available || {}, 'listaAvailable', 'removerDisponivel', 'Remover');
+    }
+
+    function renderDatas(data, containerId, fnName, btnLabel) {
+      var el = document.getElementById(containerId);
+      var keys = Object.keys(data);
+      if (keys.length === 0) {
+        el.innerHTML = '<p style="color:#888;font-size:0.85rem">Nenhuma data.</p>';
+        return;
+      }
+      var html = '';
+      keys.forEach(function(key) {
+        if (data[key].length === 0) return;
+        html += '<div style="margin-bottom:8px"><strong>' + (PROP_KEYS[key] || key) + '</strong><ul>';
+        data[key].forEach(function(d) {
+          html += '<li>' + d + ' <button onclick="' + fnName + '(\'' + key + '\',\'' + d + '\')" title="' + btnLabel + '">&times;</button></li>';
+        });
+        html += '</ul></div>';
+      });
+      el.innerHTML = html || '<p style="color:#888;font-size:0.85rem">Nenhuma data.</p>';
+    }
+
+    async function bloquear() {
+      var pwd = document.getElementById('senha').value || SENHA;
+      var key = document.getElementById('imovel').value;
+      var inicio = document.getElementById('dataInicio').value;
+      var fim = document.getElementById('dataFim').value || inicio;
+      if (!key || !inicio) { msg('Selecione im\u00f3vel e data de in\u00edcio.', 'error'); return; }
+      if (inicio > fim) { msg('Data final precisa ser depois da inicial.', 'error'); return; }
+      var dates = gerarIntervalo(inicio, fim);
+      var res = await api('POST', '/api/admin/block', { property_key: key, dates: dates, password: pwd });
+      if (res) {
+        msg(dates.length + ' data(s) bloqueada(s) com sucesso!', 'success');
+        document.getElementById('dataInicio').value = '';
+        document.getElementById('dataFim').value = '';
+        carregarEstado();
+      }
+    }
+
+    async function desbloquear(key, date) {
+      var pwd = document.getElementById('senha').value || SENHA;
+      var res = await api('POST', '/api/admin/unblock', { property_key: key, dates: [date], password: pwd });
+      if (res) {
+        msg('Data ' + date + ' desbloqueada.', 'success');
+        carregarEstado();
+      }
+    }
+
+    async function disponibilizar() {
+      var pwd = document.getElementById('senha').value || SENHA;
+      var key = document.getElementById('imovel').value;
+      var inicio = document.getElementById('dataInicioAvail').value;
+      var fim = document.getElementById('dataFimAvail').value || inicio;
+      if (!key || !inicio) { msg('Selecione imóvel e data de início.', 'error'); return; }
+      if (inicio > fim) { msg('Data final precisa ser depois da inicial.', 'error'); return; }
+      var dates = gerarIntervalo(inicio, fim);
+      var res = await api('POST', '/api/admin/available', { property_key: key, dates: dates, password: pwd });
+      if (res) {
+        msg(dates.length + ' data(s) disponibilizada(s) com sucesso!', 'success');
+        document.getElementById('dataInicioAvail').value = '';
+        document.getElementById('dataFimAvail').value = '';
+        carregarEstado();
+      }
+    }
+
+    async function removerDisponivel(key, date) {
+      var pwd = document.getElementById('senha').value || SENHA;
+      var res = await api('POST', '/api/admin/unavailable', { property_key: key, dates: [date], password: pwd });
+      if (res) {
+        msg('Data ' + date + ' removida das disponíveis.', 'success');
+        carregarEstado();
+      }
+    }
+
+    function gerarIntervalo(inicio, fim) {
+      var dates = [];
+      var d = new Date(inicio + 'T12:00:00');
+      var end = new Date(fim + 'T12:00:00');
+      while (d <= end) {
+        dates.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'));
+        d.setDate(d.getDate() + 1);
+      }
+      return dates;
+    }
+
     async function carregarImoveis() {
       var d = await api('GET', '/api/imoveis');
       if (!d) return;
@@ -111,68 +222,7 @@
         opt.textContent = d[key].nome;
         sel.appendChild(opt);
       }
-      carregarBloqueadas();
-    }
-
-    async function carregarBloqueadas() {
-      var pwd = document.getElementById('senha').value || SENHA;
-      var data = await api('GET', '/api/admin/blocked?password=' + encodeURIComponent(pwd));
-      if (!data) {
-        document.getElementById('listaDatas').innerHTML = '<p style="color:#888;font-size:0.85rem">Nenhuma data bloqueada via admin.</p>';
-        return;
-      }
-      renderDatas(data);
-    }
-
-    function renderDatas(data) {
-      var el = document.getElementById('listaDatas');
-      var keys = Object.keys(data);
-      if (keys.length === 0) {
-        el.innerHTML = '<p style="color:#888;font-size:0.85rem">Nenhuma data bloqueada via admin.</p>';
-        return;
-      }
-      var html = '';
-      keys.forEach(function(key) {
-        if (data[key].length === 0) return;
-        html += '<div style="margin-bottom:8px"><strong>' + (PROP_KEYS[key] || key) + '</strong><ul>';
-        data[key].forEach(function(d) {
-          html += '<li>' + d + ' <button onclick="desbloquear(\'' + key + '\',\'' + d + '\')" title="Remover">&times;</button></li>';
-        });
-        html += '</ul></div>';
-      });
-      el.innerHTML = html || '<p style="color:#888;font-size:0.85rem">Nenhuma data bloqueada via admin.</p>';
-    }
-
-    async function bloquear() {
-      var pwd = document.getElementById('senha').value || SENHA;
-      var key = document.getElementById('imovel').value;
-      var inicio = document.getElementById('dataInicio').value;
-      var fim = document.getElementById('dataFim').value || inicio;
-      if (!key || !inicio) { msg('Selecione im\u00f3vel e data de in\u00edcio.', 'error'); return; }
-      if (inicio > fim) { msg('Data final precisa ser depois da inicial.', 'error'); return; }
-      var dates = [];
-      var d = new Date(inicio + 'T12:00:00');
-      var end = new Date(fim + 'T12:00:00');
-      while (d <= end) {
-        dates.push(d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'));
-        d.setDate(d.getDate() + 1);
-      }
-      var res = await api('POST', '/api/admin/block', { property_key: key, dates: dates, password: pwd });
-      if (res) {
-        msg(dates.length + ' data(s) bloqueada(s) com sucesso!', 'success');
-        document.getElementById('dataInicio').value = '';
-        document.getElementById('dataFim').value = '';
-        carregarBloqueadas();
-      }
-    }
-
-    async function desbloquear(key, date) {
-      var pwd = document.getElementById('senha').value || SENHA;
-      var res = await api('POST', '/api/admin/unblock', { property_key: key, dates: [date], password: pwd });
-      if (res) {
-        msg('Data ' + date + ' desbloqueada.', 'success');
-        carregarBloqueadas();
-      }
+      carregarEstado();
     }
 
     carregarImoveis();

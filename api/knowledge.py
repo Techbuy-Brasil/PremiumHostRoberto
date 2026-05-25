@@ -3,7 +3,7 @@ import os
 import random
 from pathlib import Path
 
-from blob_store import blob_read, blob_available
+from blob_store import blob_get_key, blob_read, blob_available
 
 
 class KnowledgeBase:
@@ -17,9 +17,14 @@ class KnowledgeBase:
         # Try Vercel Blob first (persists across all instances)
         if blob_available():
             try:
-                data = blob_read()
-                if data:
-                    return data, "blob"
+                all_data = blob_read()
+                if isinstance(all_data, dict):
+                    faq_data = all_data.get("faq")
+                    if isinstance(faq_data, dict):
+                        return faq_data, "blob"
+                    # Legacy: flat blob with FAQ at top level
+                    if faq_data is None and "saudacoes" in all_data:
+                        return all_data, "blob"
             except Exception:
                 pass
 
@@ -47,11 +52,17 @@ class KnowledgeBase:
         # Check Blob first
         if blob_available():
             try:
-                data = blob_read()
-                if data:
-                    self._data = data
-                    self._mtime = "blob"
-                    return
+                all_data = blob_read()
+                if isinstance(all_data, dict):
+                    faq_data = all_data.get("faq")
+                    if isinstance(faq_data, dict):
+                        self._data = faq_data
+                        self._mtime = "blob"
+                        return
+                    if faq_data is None and "saudacoes" in all_data:
+                        self._data = all_data
+                        self._mtime = "blob"
+                        return
             except Exception:
                 pass
 

@@ -45,3 +45,25 @@ def blob_write(data):
             return r.status == 200
     except Exception:
         return False
+
+
+def blob_get_key(key: str):
+    """Read blob and return a specific top-level key. Returns None if missing."""
+    data = blob_read()
+    if isinstance(data, dict):
+        return data.get(key)
+    return None
+
+
+def blob_set_key(key: str, value):
+    """Set a top-level key in the blob without overwriting other keys."""
+    if not blob_available():
+        return False
+    try:
+        data = blob_read()
+        if not isinstance(data, dict):
+            data = {}
+        data[key] = value
+        return blob_write(data)
+    except Exception:
+        return False
