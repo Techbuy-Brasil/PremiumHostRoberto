@@ -89,7 +89,7 @@ function logar() {
   if (!senha) return;
   localStorage.setItem("ph_admin_photos_pw", senha);
   PASSWORD = senha;
-  fetch("/api/admin/blocked?password=" + encodeURIComponent(senha)).then(function(r) {
+  fetch("/api/admin/blocked?password=" + encodeURIComponent(senha) + "&_=" + Date.now()).then(function(r) {
     if (!r.ok) {
       document.getElementById("erroSenha").style.display = "block";
       localStorage.removeItem("ph_admin_photos_pw");

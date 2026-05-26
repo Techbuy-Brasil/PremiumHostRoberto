@@ -126,7 +126,7 @@
       const pwd = document.getElementById('senhaInput').value;
       if (!pwd) return;
       password = pwd;
-      fetch(API + '/api/admin/faq?password=' + encodeURIComponent(password))
+      fetch(API + '/api/admin/faq?password=' + encodeURIComponent(password) + '&_=' + Date.now())
         .then(r => { if (!r.ok) throw new Error('Senha incorreta'); return r.json(); })
         .then(data => {
           document.getElementById('loginBox').style.display = 'none';
@@ -214,7 +214,7 @@
     }
 
     function criarCardHTML(item, idx) {
-      const tags = (item.tags || []).map(t => `<span class="tag">${esc(t)} <button onclick="removerTag(${idx},'${esc(t)}')" title="Remover">×</button></span>`).join('');
+      const tags = (item.tags || []).map(t => `<span class="tag">${esc(t)} <button onclick="removerTag(this,'${esc(t)}')" title="Remover">×</button></span>`).join('');
       const variacoes = (item.variacoes || []).map((v, vi) => `
         <div class="variacao-item">
           <textarea onchange="editarVariacao(${idx},${vi},this.value)">${esc(v)}</textarea>
@@ -237,8 +237,8 @@
           <label>Tags (palavras-chave para identificar a pergunta)</label>
           <div class="tag-list">${tags}</div>
           <div class="tag-input">
-            <input placeholder="Nova tag..." id="tagInput${idx}" onkeydown="if(event.key==='Enter'){event.preventDefault();adicionarTag(${idx})}">
-            <button onclick="adicionarTag(${idx})">+</button>
+            <input placeholder="Nova tag..." id="tagInput${idx}" onkeydown="if(event.key==='Enter'){event.preventDefault();this.parentElement.querySelector('button').click()}">
+            <button onclick="adicionarTag(this,${idx})">+</button>
           </div>
         </div>
         <div class="campo">
@@ -259,20 +259,29 @@
       faqData.faq[idx].variacoes[vi] = val;
     }
 
-    function adicionarTag(idx) {
-      const input = document.getElementById('tagInput' + idx);
+    function adicionarTag(btn, idx) {
+      const card = btn.closest('.card');
+      const input = card.querySelector('.tag-input input');
+      if (!input) return;
       const tag = input.value.trim().toLowerCase();
-      if (!tag) return;
+      if (!tag) { console.log('adicionarTag: empty tag'); return; }
+      if (!faqData.faq[idx]) { console.log('adicionarTag: no faqData.faq[' + idx + ']'); return; }
       if (!faqData.faq[idx].tags) faqData.faq[idx].tags = [];
-      if (faqData.faq[idx].tags.includes(tag)) return;
+      if (faqData.faq[idx].tags.includes(tag)) { console.log('adicionarTag: duplicate tag'); return; }
       faqData.faq[idx].tags.push(tag);
       input.value = '';
-      reRenderizar();
+      const tagList = card.querySelector('.tag-list');
+      const span = document.createElement('span');
+      span.className = 'tag';
+      span.innerHTML = esc(tag) + ' <button onclick="removerTag(this,\'' + esc(tag) + '\')" title="Remover">×</button>';
+      tagList.appendChild(span);
     }
 
-    function removerTag(idx, tag) {
-      faqData.faq[idx].tags = faqData.faq[idx].tags.filter(t => t !== tag);
-      reRenderizar();
+    function removerTag(btn, tag) {
+      const card = btn.closest('.card');
+      const idx = parseInt(card.dataset.idx);
+      faqData.faq[idx].tags = faqData.faq[idx].tags.filter(function(t) { return t !== tag; });
+      btn.closest('.tag').remove();
     }
 
     function adicionarVariacao(idx) {
@@ -314,11 +323,11 @@
 
     function esc(s) {
       if (!s) return '';
-      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
     }
 
     function carregar() {
-      fetch(API + '/api/admin/faq?password=' + encodeURIComponent(password))
+      fetch(API + '/api/admin/faq?password=' + encodeURIComponent(password) + '&_=' + Date.now())
         .then(r => r.json())
         .then(data => {
           faqData = data;

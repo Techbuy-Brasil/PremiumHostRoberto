@@ -4,6 +4,8 @@ import random
 from pathlib import Path
 
 from blob_store import blob_get_key, blob_read, blob_available
+from supabase_db import configured as supabase_configured
+from supabase_db import get_faq_items, get_system_messages
 
 
 class KnowledgeBase:
@@ -14,7 +16,15 @@ class KnowledgeBase:
         self._data, self._mtime = self._load()
 
     def _load(self):
-        # Try Vercel Blob first (persists across all instances)
+        # Try Supabase first (cross-instance persistence)
+        if supabase_configured():
+            try:
+                result = self._build_from_supabase()
+                if result is not None:
+                    return result, "supabase"
+            except Exception:
+                pass
+        # Try Vercel Blob next
         if blob_available():
             try:
                 all_data = blob_read()
@@ -22,13 +32,11 @@ class KnowledgeBase:
                     faq_data = all_data.get("faq")
                     if isinstance(faq_data, dict):
                         return faq_data, "blob"
-                    # Legacy: flat blob with FAQ at top level
                     if faq_data is None and "saudacoes" in all_data:
                         return all_data, "blob"
             except Exception:
                 pass
-
-        # Try /tmp next (admin edits via API persist here on Vercel)
+        # Try /tmp next
         tmp_path = "/tmp/faq_premiumhost.json"
         if os.path.exists(tmp_path):
             try:
@@ -36,7 +44,6 @@ class KnowledgeBase:
                     return json.load(f), os.path.getmtime(tmp_path)
             except Exception:
                 pass
-
         # Fall back to local faq.json
         if not os.path.exists(self.path):
             return {"faq": [], "saudacoes": [], "apresentacoes": [], "precos_disponivel": [],
@@ -48,8 +55,34 @@ class KnowledgeBase:
         except Exception:
             return {}, None
 
+    def _build_from_supabase(self):
+        faq_items = get_faq_items()
+        sys_msgs = get_system_messages()
+        if not faq_items and not any(v for v in sys_msgs.values() if v):
+            return None
+        return {
+            "faq": [{"id": it["id"], "resposta": it.get("resposta") or it.get("answer", ""), "tags": it.get("tags", []), "variacoes": it.get("variacoes", [])} for it in faq_items],
+            "saudacoes": [sys_msgs.get("saudacoes", "")],
+            "apresentacoes": [sys_msgs.get("apresentacoes", "")],
+            "precos_disponivel": [sys_msgs.get("precos_disponivel", "")],
+            "precos_calculado": [sys_msgs.get("precos_calculado", "")],
+            "indisponivel": [sys_msgs.get("indisponivel", "")],
+            "despedidas": [sys_msgs.get("despedidas", "")],
+            "agradecimento": [sys_msgs.get("agradecimento", "")],
+        }
+
     def _ensure_fresh(self):
-        # Check Blob first
+        # Check Supabase first
+        if supabase_configured():
+            try:
+                result = self._build_from_supabase()
+                if result is not None:
+                    self._data = result
+                    self._mtime = "supabase"
+                    return
+            except Exception:
+                pass
+        # Check Blob next
         if blob_available():
             try:
                 all_data = blob_read()
@@ -65,7 +98,6 @@ class KnowledgeBase:
                         return
             except Exception:
                 pass
-
         # Check /tmp
         tmp_path = "/tmp/faq_premiumhost.json"
         if os.path.exists(tmp_path):

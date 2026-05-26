@@ -3,12 +3,36 @@ import json
 import os
 
 from blob_store import blob_get_key
+from supabase_db import configured as supabase_configured
+from supabase_db import get_pricing_config, get_property_overrides, get_date_overrides
 
 
 PRECOS_TMP = "/tmp/precos_premiumhost.json"
 
 
 def _load_overrides():
+    if supabase_configured():
+        try:
+            cfg = get_pricing_config()
+            if cfg:
+                props = get_property_overrides()
+                date_ovr = get_date_overrides()
+                properties = {}
+                for pk, pv in props.items():
+                    p = dict(pv)
+                    p.pop("property_key", None)
+                    p.pop("updated_at", None)
+                    properties[pk] = {k: v for k, v in p.items() if v is not None}
+                date_overrides = []
+                for d in date_ovr:
+                    date_overrides.append({
+                        "start": d["start_date"],
+                        "end": d["end_date"],
+                        "multiplier": float(d["multiplier"]),
+                    })
+                return {"general": cfg, "properties": properties, "date_overrides": date_overrides}
+        except Exception:
+            pass
     blob = blob_get_key("pricing")
     if blob is not None:
         return blob
@@ -29,6 +53,21 @@ class PricingEngine:
         self._prop_overrides = self._overrides.get("properties", {}).get(property_obj.key, {})
         self._general = self._overrides.get("general", {})
         self._date_overrides = self._overrides.get("date_overrides", [])
+        hs_months = self._general.get("high_season_months")
+        if hs_months:
+            self.calendar.high_season_months = hs_months
+        min_default = self._general.get("min_nights_default")
+        min_hs = self._general.get("min_nights_high_season")
+        if min_default is not None or min_hs is not None:
+            cfg = self.calendar.config
+            if "pricing_rules" not in cfg:
+                cfg["pricing_rules"] = {}
+            if "min_nights" not in cfg["pricing_rules"]:
+                cfg["pricing_rules"]["min_nights"] = {}
+            if min_default is not None:
+                cfg["pricing_rules"]["min_nights"]["default"] = min_default
+            if min_hs is not None:
+                cfg["pricing_rules"]["min_nights"]["high_season"] = min_hs
 
     def check_availability(self, checkin, checkout):
         nights = (checkout - checkin).days

@@ -19,6 +19,8 @@ def blob_read():
     try:
         req = urllib.request.Request(BLOB_URL, headers={
             "Authorization": f"Bearer {BLOB_TOKEN}",
+            "Cache-Control": "no-cache",
+            "Pragma": "no-cache",
         })
         with urllib.request.urlopen(req, timeout=10) as r:
             return json.loads(r.read().decode("utf-8"))

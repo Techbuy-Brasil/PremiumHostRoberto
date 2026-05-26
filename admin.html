@@ -118,7 +118,7 @@
 
     async function carregarEstado() {
       var pwd = document.getElementById('senha').value || SENHA;
-      var data = await api('GET', '/api/admin/state?password=' + encodeURIComponent(pwd));
+      var data = await api('GET', '/api/admin/state?password=' + encodeURIComponent(pwd) + '&_=' + Date.now());
       if (!data) {
         document.getElementById('listaDatas').innerHTML = '<p style="color:#888;font-size:0.85rem">Nenhuma data bloqueada via admin.</p>';
         document.getElementById('listaAvailable').innerHTML = '<p style="color:#888;font-size:0.85rem">Nenhuma data forçada como disponível.</p>';

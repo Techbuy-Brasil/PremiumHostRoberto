@@ -18,6 +18,12 @@ if _api_dir not in sys.path:
 from agent import Agent
 from storage import ConversationStore
 from blob_store import blob_get_key, blob_set_key, blob_read, blob_write
+from supabase_db import configured as supabase_configured
+from supabase_db import (get_faq_items, get_system_messages, upsert_faq_items, upsert_system_message,
+                          get_pricing_config, get_property_overrides, get_date_overrides,
+                          upsert_pricing_config, upsert_property_override, upsert_date_overrides,
+                          get_calendar_dates, set_calendar_dates, clear_all_calendar_dates,
+                          get_photo_overrides, upsert_photo_override)
 from pix import gerar_pix_payload
 
 app = FastAPI(title="PremiumHost Roberto - API", version="1.0.0")
@@ -67,7 +73,23 @@ def _save_calendar_state(data: dict):
 
 
 def _sync_calendar_state():
-    # Try blob first (cross-instance)
+    # Try Supabase first (cross-instance persistence)
+    if supabase_configured():
+        try:
+            has_data = False
+            for prop_key in agent.pm.list_properties():
+                cal = get_calendar_dates(prop_key)
+                if cal["blocked"]:
+                    has_data = True
+                    _admin_blocked.setdefault(prop_key, set()).update(cal["blocked"])
+                if cal["available"]:
+                    has_data = True
+                    _admin_available.setdefault(prop_key, set()).update(cal["available"])
+            if has_data:
+                return
+        except Exception:
+            pass
+    # Try blob next
     try:
         blob = blob_get_key("calendar")
         if isinstance(blob, dict):
@@ -75,7 +97,6 @@ def _sync_calendar_state():
                 _admin_blocked.setdefault(key, set()).update(dates)
             for key, dates in blob.get("available", {}).items():
                 _admin_available.setdefault(key, set()).update(dates)
-            # Sync back to /tmp
             _save_calendar_state(blob)
             return
     except Exception:
@@ -110,9 +131,17 @@ def _save_photos_override(data: dict):
 
 
 def _get_photos_for(property_key: str) -> dict:
-    """Return merged photo data: memory override > /tmp override > config seed."""
+    """Return merged photo data: memory > Supabase > /tmp > config seed."""
     if property_key in _admin_photos:
         return _admin_photos[property_key]
+    if supabase_configured():
+        try:
+            all_overrides = get_photo_overrides()
+            if property_key in all_overrides:
+                _admin_photos[property_key] = all_overrides[property_key]
+                return _admin_photos[property_key]
+        except Exception:
+            pass
     overrides = _load_photos_override()
     if property_key in overrides:
         _admin_photos[property_key] = overrides[property_key]
@@ -176,6 +205,17 @@ def get_calendar(property_key: str):
 def _save_blocked_state():
     data = {"blocked": {k: sorted(v) for k, v in _admin_blocked.items()},
             "available": {k: sorted(v) for k, v in _admin_available.items()}}
+    # Save to Supabase (clear all then re-insert to handle removals)
+    if supabase_configured():
+        try:
+            clear_all_calendar_dates()
+            for prop_key, dates in _admin_blocked.items():
+                set_calendar_dates(prop_key, list(dates), "blocked")
+            for prop_key, dates in _admin_available.items():
+                set_calendar_dates(prop_key, list(dates), "available")
+        except Exception:
+            pass
+    # Also save to /tmp and blob as fallback
     _save_calendar_state(data)
     try:
         blob_set_key("calendar", data)
@@ -302,6 +342,13 @@ def admin_update_photos(property_key: str, req: PhotosUpdate, password: str = ""
     if password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     _admin_photos[property_key] = req.categories
+    # Save to Supabase
+    if supabase_configured():
+        try:
+            upsert_photo_override(property_key, req.categories)
+        except Exception:
+            pass
+    # Also save to /tmp
     overrides = _load_photos_override()
     overrides[property_key] = req.categories
     _save_photos_override(overrides)
@@ -324,28 +371,56 @@ PRECOS_DEFAULTS = {
 
 
 def _load_precos_override():
-    # Try Blob first (cross-instance persistence)
-    blob = blob_get_key("pricing")
-    if blob is not None:
-        return blob
-    # Try /tmp next (same instance fallback)
+    # Try Supabase first
+    if supabase_configured():
+        try:
+            cfg = get_pricing_config()
+            if cfg:  # only if seed row exists
+                props = get_property_overrides()
+                date_ovr = get_date_overrides()
+                properties = {}
+                for pk, pv in props.items():
+                    p = dict(pv)
+                    p.pop("property_key", None)
+                    p.pop("updated_at", None)
+                    properties[pk] = {k: v for k, v in p.items() if v is not None}
+                date_overrides = [{"start": d["start_date"], "end": d["end_date"], "multiplier": float(d["multiplier"])} for d in date_ovr]
+                return {"general": cfg, "properties": properties, "date_overrides": date_overrides}
+        except Exception:
+            pass
+    # Try /tmp next
     if os.path.exists(PRECOS_TMP):
         try:
             with open(PRECOS_TMP, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             pass
+    # Try Blob last
+    blob = blob_get_key("pricing")
+    if blob is not None:
+        return blob
     return {}
 
 
 def _save_precos_override(data: dict):
-    # Save to /tmp first (guaranteed on this instance)
+    # Save to Supabase
+    if supabase_configured():
+        try:
+            upsert_pricing_config(data.get("general", {}))
+            valid_prop_keys = {"base_price", "base_guests", "extra_guest_fee", "cleaning_fee"}
+            for key, props in data.get("properties", {}).items():
+                filtered = {k: v for k, v in props.items() if k in valid_prop_keys and v is not None}
+                upsert_property_override(key, filtered)
+            date_ovr = [{"start_date": d["start"], "end_date": d["end"], "multiplier": d.get("multiplier", 1.0)} for d in data.get("date_overrides", [])]
+            upsert_date_overrides(date_ovr)
+        except Exception:
+            pass
+    # Also save to /tmp and blob as fallback
     try:
         with open(PRECOS_TMP, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
-    # Also save to Blob (cross-instance)
     blob_set_key("pricing", data)
 
 
@@ -467,7 +542,25 @@ def admin_get_faq(password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    # Load from Vercel Blob first (persists across all instances)
+    # Try Supabase first
+    if supabase_configured():
+        try:
+            faq_items = get_faq_items()
+            sys_msgs = get_system_messages()
+            if faq_items:
+                return {
+                    "faq": [{"id": it["id"], "resposta": it.get("resposta") or it.get("answer", ""), "tags": it.get("tags", []), "variacoes": it.get("variacoes", [])} for it in faq_items],
+                    "saudacoes": [sys_msgs.get("saudacoes", "")],
+                    "apresentacoes": [sys_msgs.get("apresentacoes", "")],
+                    "precos_disponivel": [sys_msgs.get("precos_disponivel", "")],
+                    "precos_calculado": [sys_msgs.get("precos_calculado", "")],
+                    "indisponivel": [sys_msgs.get("indisponivel", "")],
+                    "despedidas": [sys_msgs.get("despedidas", "")],
+                    "agradecimento": [sys_msgs.get("agradecimento", "")],
+                }
+        except Exception:
+            pass
+    # Fallback: blob
     _bd = blob_read()
     if isinstance(_bd, dict):
         _faq = _bd.get("faq")
@@ -475,14 +568,14 @@ def admin_get_faq(password: str = ""):
             return _faq
         if _faq is None and "saudacoes" in _bd:
             return _bd
-    # Load from /tmp next (admin edits persist here on Vercel)
+    # Fallback: /tmp
     if os.path.exists(FAQ_TMP):
         try:
             with open(FAQ_TMP, "r", encoding="utf-8") as f:
                 return json.load(f)
         except Exception:
             pass
-    # Fall back to local faq.json
+    # Fallback: local faq.json
     faq_path = str(Path(__file__).parent / "faq.json")
     if os.path.exists(faq_path):
         with open(faq_path, "r", encoding="utf-8") as f:
@@ -501,15 +594,38 @@ def admin_update_faq(req: FaqUpdateRequest):
     if req.password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     data = req.data
-    # Save to Vercel Blob first (persists across all instances)
+    # Save to Supabase
+    if supabase_configured():
+        try:
+            raw_items = data.get("faq", [])
+            faq_items = []
+            for item in raw_items:
+                converted = {"id": item["id"], "tags": item.get("tags", [])}
+                if "resposta" in item:
+                    converted["resposta"] = item["resposta"]
+                    converted["question"] = item["resposta"]
+                    converted["answer"] = item["resposta"]
+                elif "question" in item:
+                    converted["question"] = item["question"]
+                    converted["answer"] = item.get("answer", item["question"])
+                if item.get("variacoes"):
+                    converted["variacoes"] = item["variacoes"]
+                faq_items.append(converted)
+            upsert_faq_items(faq_items)
+            for key in ["saudacoes", "apresentacoes", "precos_disponivel", "precos_calculado", "indisponivel", "despedidas", "agradecimento"]:
+                values = data.get(key, [])
+                val = values[0] if isinstance(values, list) and values else values
+                if val:
+                    upsert_system_message(key, val)
+        except Exception:
+            pass
+    # Also save to blob/tmp/file as fallback
     blob_set_key("faq", data)
-    # Save to /tmp so it persists between cold starts on Vercel
     try:
         with open(FAQ_TMP, "w", encoding="utf-8") as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
     except Exception:
         pass
-    # Also save to the actual faq.json if possible (for Git persistence)
     faq_path = str(Path(__file__).parent / "faq.json")
     try:
         with open(faq_path, "w", encoding="utf-8") as f:

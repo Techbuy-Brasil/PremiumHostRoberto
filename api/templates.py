@@ -159,15 +159,19 @@ class ResponseTemplates:
 
     def no_property_match(self):
         return self._r("sem_imovel",
-            "Não consegui identificar qual imóvel você está procurando. "
-            "Temos essas opções:\n\n"
-            "1. **Farol Barra Flat 214** — Barra\n"
-            "2. **Farol Barra Flat 304** — Barra\n"
-            "3. **Ondina Apart Hotel 441** — Ondina\n"
-            "4. **Ondina Apart Hotel 305** — Ondina\n"
-            "5. **The Plaza 407** — Ondina\n"
-            "6. **Smart Convenções 509** — Armação\n\n"
-            "Qual te chamou mais atenção?"
+            "Me diga o que precisa saber:\n\n"
+            "• Como funciona?\n"
+            "• Valor da diária?\n"
+            "• O que está incluso?\n"
+            "• Horário de Check-in e Check-out?\n"
+            "• Piscina está liberada?\n"
+            "• Tem roupa de cama?\n"
+            "• Forma de pagamento?\n"
+            "• Tem estacionamento?\n"
+            "• Tem taxa extra?\n"
+            "• Pode criança ou Pet?\n"
+            "• Pode Visita?\n"
+            "• Se tiver outra dúvida, pode perguntar :)"
         )
 
     def fallback(self):
