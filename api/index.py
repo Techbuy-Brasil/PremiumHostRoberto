@@ -20,7 +20,8 @@ from agent import Agent
 from storage import ConversationStore
 from blob_store import blob_get_key, blob_set_key, blob_read, blob_write
 from supabase_db import configured as supabase_configured
-from supabase_db import (get_faq_items, get_system_messages, upsert_faq_items, upsert_system_message,
+from supabase_db import (_api,
+                          get_faq_items, get_system_messages, upsert_faq_items, upsert_system_message,
                           get_pricing_config, get_property_overrides, get_date_overrides,
                           upsert_pricing_config, upsert_property_override, upsert_date_overrides,
                           get_calendar_dates, set_calendar_dates, clear_all_calendar_dates,

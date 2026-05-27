@@ -3,3 +3,4 @@ desktop.ini
 
 .vercel
 .env*.local
+api/__pycache__/
