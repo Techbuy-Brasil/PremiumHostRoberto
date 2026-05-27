@@ -65,6 +65,14 @@ CREATE TABLE IF NOT EXISTS photo_overrides (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Automatic backups (snapshot before each admin save)
+CREATE TABLE IF NOT EXISTS backups (
+  id SERIAL PRIMARY KEY,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  label TEXT NOT NULL DEFAULT '',
+  snapshot JSONB NOT NULL
+);
+
 -- Disable RLS for simplicity (server-side usage)
 ALTER TABLE faq_items DISABLE ROW LEVEL SECURITY;
 ALTER TABLE system_messages DISABLE ROW LEVEL SECURITY;
@@ -73,6 +81,7 @@ ALTER TABLE property_overrides DISABLE ROW LEVEL SECURITY;
 ALTER TABLE date_overrides DISABLE ROW LEVEL SECURITY;
 ALTER TABLE calendar_dates DISABLE ROW LEVEL SECURITY;
 ALTER TABLE photo_overrides DISABLE ROW LEVEL SECURITY;
+ALTER TABLE backups DISABLE ROW LEVEL SECURITY;
 
 -- Seed: insert default pricing config row
 INSERT INTO pricing_config (id) VALUES (1) ON CONFLICT (id) DO NOTHING;

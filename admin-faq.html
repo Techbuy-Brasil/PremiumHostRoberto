@@ -71,6 +71,7 @@
         <a href="admin.html">Datas</a>
         <a href="admin-photos.html">Fotos</a>
         <a href="admin-precos.html">Preços</a>
+        <a href="admin-backups.html">Backups</a>
         <a href="#" onclick="sair()" style="color:#fff">Sair</a>
       </div>
     </div>
@@ -264,10 +265,10 @@
       const input = card.querySelector('.tag-input input');
       if (!input) return;
       const tag = input.value.trim().toLowerCase();
-      if (!tag) { console.log('adicionarTag: empty tag'); return; }
-      if (!faqData.faq[idx]) { console.log('adicionarTag: no faqData.faq[' + idx + ']'); return; }
+      if (!tag) return;
+      if (!faqData.faq[idx]) return;
       if (!faqData.faq[idx].tags) faqData.faq[idx].tags = [];
-      if (faqData.faq[idx].tags.includes(tag)) { console.log('adicionarTag: duplicate tag'); return; }
+      if (faqData.faq[idx].tags.includes(tag)) return;
       faqData.faq[idx].tags.push(tag);
       input.value = '';
       const tagList = card.querySelector('.tag-list');

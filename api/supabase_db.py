@@ -167,3 +167,69 @@ def get_photo_overrides() -> dict:
 def upsert_photo_override(property_key: str, categories: dict):
     row = {"property_key": property_key, "categories": categories}
     _api("POST", "photo_overrides", row, params={"on_conflict": "property_key"})
+
+
+# ── BACKUPS ──
+
+def create_backup(label: str, snapshot: dict):
+    _api("POST", "backups", {"label": label, "snapshot": snapshot})
+
+
+def list_backups(limit: int = 20) -> list:
+    rows = _api("GET", f"backups?order=id.desc&limit={limit}") or []
+    return [{"id": r["id"], "created_at": r["created_at"], "label": r["label"]} for r in rows]
+
+
+def get_backup(backup_id: int) -> dict:
+    rows = _api("GET", f"backups?id=eq.{backup_id}") or []
+    return rows[0] if rows else None
+
+
+def delete_backup(backup_id: int):
+    _api("DELETE", "backups", params={"id": f"eq.{backup_id}"})
+
+
+def _restore_table(table: str, rows: list, id_field: str = "id"):
+    """Helper: clear table and re-insert rows."""
+    _api("DELETE", table, params={id_field: "neq.0"})
+    for row in rows:
+        _api("POST", table, row)
+
+
+def restore_backup(backup_id: int) -> str:
+    """Restore a backup snapshot into the live tables. Returns label of restored backup."""
+    bk = get_backup(backup_id)
+    if not bk:
+        raise ValueError("Backup not found")
+    snap = bk["snapshot"]
+
+    # Restore FAQ
+    if "faq" in snap:
+        upsert_faq_items(snap["faq"])
+    # Restore system messages
+    if "system_messages" in snap:
+        for key, val in snap["system_messages"].items():
+            upsert_system_message(key, val)
+    # Restore pricing config
+    if "pricing_config" in snap:
+        upsert_pricing_config(snap["pricing_config"])
+    # Restore property overrides
+    if "property_overrides" in snap:
+        for key, data in snap["property_overrides"].items():
+            upsert_property_override(key, data)
+    # Restore date overrides
+    if "date_overrides" in snap:
+        items = [{"start_date": d["start_date"], "end_date": d["end_date"], "multiplier": d.get("multiplier", 1.0)} for d in snap["date_overrides"]]
+        upsert_date_overrides(items)
+    # Restore calendar dates
+    if "calendar_dates" in snap:
+        clear_all_calendar_dates()
+        for row in snap["calendar_dates"]:
+            set_calendar_dates(row["property_key"], [row["date"]], row["status"])
+    # Restore photo overrides
+    if "photo_overrides" in snap:
+        _api("DELETE", "photo_overrides", params={"property_key": "neq."})
+        for pk, cats in snap["photo_overrides"].items():
+            upsert_photo_override(pk, cats)
+
+    return bk["label"]

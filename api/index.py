@@ -10,6 +10,7 @@ from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime, timedelta
 
 _api_dir = str(Path(__file__).parent)
 if _api_dir not in sys.path:
@@ -27,6 +28,137 @@ from supabase_db import (get_faq_items, get_system_messages, upsert_faq_items, u
 from pix import gerar_pix_payload
 
 app = FastAPI(title="PremiumHost Roberto - API", version="1.0.0")
+
+# ── BACKUP HELPERS ──
+
+def _collect_snapshot():
+    """Collect all current data into a dict for backup."""
+    snap = {}
+    if supabase_configured():
+        try:
+            faq = get_faq_items()
+            if faq: snap["faq_items"] = faq
+            sys_msgs = get_system_messages()
+            if sys_msgs: snap["system_messages"] = sys_msgs
+            pc = get_pricing_config()
+            if pc: snap["pricing_config"] = pc
+            po = get_property_overrides()
+            if po: snap["property_overrides"] = {k: dict(v) for k, v in po.items()}
+            do = get_date_overrides()
+            if do: snap["date_overrides"] = do
+            cal = []
+            for pk in agent.pm.list_properties():
+                for st in ("blocked", "available"):
+                    cd = get_calendar_dates(pk, st)
+                    for d in cd.get(st, set()):
+                        cal.append({"property_key": pk, "date": d, "status": st})
+            if cal: snap["calendar_dates"] = cal
+            ph = get_photo_overrides()
+            if ph: snap["photo_overrides"] = ph
+        except Exception as e:
+            print(f"Backup snapshot warn: {e}", flush=True)
+    return snap
+
+
+def _create_backup(label: str):
+    """Save a snapshot to Blob under backup_<timestamp>_<label>."""
+    snap = _collect_snapshot()
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    key = f"backup_{ts}_{label}"
+    try:
+        blob_set_key(key, snap)
+        return key
+    except Exception as e:
+        print(f"Backup save error: {e}", flush=True)
+        return None
+
+
+def _list_backups() -> list[dict]:
+    """List all backup keys from the blob, sorted newest first."""
+    try:
+        data = blob_read()
+        if not isinstance(data, dict):
+            return []
+        backups = []
+        for k in data:
+            if k.startswith("backup_"):
+                parts = k.split("_", 3)
+                ts = parts[1] + "_" + parts[2] if len(parts) >= 3 else ""
+                label = parts[3] if len(parts) >= 4 else ""
+                backups.append({"key": k, "created_at": ts, "label": label})
+        backups.sort(key=lambda b: b["created_at"], reverse=True)
+        return backups
+    except Exception as e:
+        print(f"Backup list error: {e}", flush=True)
+        return []
+
+
+def _get_backup(key: str) -> dict:
+    try:
+        return blob_get_key(key)
+    except Exception:
+        return None
+
+
+def _restore_backup(key: str) -> str:
+    """Restore a backup snapshot into Supabase tables. Returns the label."""
+    snap = _get_backup(key)
+    if not snap:
+        raise ValueError("Backup not found")
+    label = key.split("_", 3)[3] if len(key.split("_", 3)) >= 4 else key
+
+    if supabase_configured():
+        # FAQ items
+        if snap.get("faq_items"):
+            upsert_faq_items(snap["faq_items"])
+        # System messages
+        if snap.get("system_messages"):
+            for msg_key, val in snap["system_messages"].items():
+                upsert_system_message(msg_key, val)
+        # Pricing config
+        if snap.get("pricing_config"):
+            upsert_pricing_config(snap["pricing_config"])
+        # Property overrides
+        if snap.get("property_overrides"):
+            for pk, data in snap["property_overrides"].items():
+                upsert_property_override(pk, data)
+        # Date overrides
+        if snap.get("date_overrides"):
+            items = [{"start_date": d["start_date"], "end_date": d["end_date"], "multiplier": d.get("multiplier", 1.0)} for d in snap["date_overrides"]]
+            upsert_date_overrides(items)
+        # Calendar dates
+        if snap.get("calendar_dates"):
+            clear_all_calendar_dates()
+            for row in snap["calendar_dates"]:
+                set_calendar_dates(row["property_key"], [row["date"]], row["status"])
+        # Photo overrides
+        if snap.get("photo_overrides"):
+            _api("DELETE", "photo_overrides", params={"property_key": "neq."})
+            for pk, cats in snap["photo_overrides"].items():
+                upsert_photo_override(pk, cats)
+
+    return label
+
+
+def _cleanup_old_backups():
+    """Delete backups older than 90 days."""
+    import re
+    try:
+        data = blob_read()
+        if not isinstance(data, dict):
+            return
+        cutoff = (datetime.now() - timedelta(days=90)).strftime("%Y%m%d")
+        changed = False
+        for k in list(data.keys()):
+            if k.startswith("backup_"):
+                m = re.match(r"backup_(\d{8})_", k)
+                if m and m.group(1) < cutoff:
+                    del data[k]
+                    changed = True
+        if changed:
+            blob_write(data)
+    except Exception:
+        pass
 
 app.add_middleware(
     CORSMiddleware,
@@ -175,6 +307,61 @@ def health():
     return {"status": "online", "projeto": "PremiumHost Roberto"}
 
 
+# ── BACKUP ENDPOINTS ──
+
+@app.get("/api/admin/backups")
+def admin_list_backups(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    _cleanup_old_backups()
+    return JSONResponse(content=_list_backups())
+
+
+@app.post("/api/admin/backups/create")
+def admin_create_backup(label: str = "", password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    lbl = label.strip() or "manual"
+    key = _create_backup(lbl)
+    if not key:
+        raise HTTPException(status_code=500, detail="Erro ao criar backup")
+    return JSONResponse(content={"key": key, "label": lbl})
+
+
+@app.post("/api/admin/backups/restore/{backup_key}")
+def admin_restore_backup(backup_key: str, password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    try:
+        label = _restore_backup(backup_key)
+        return JSONResponse(content={"status": "ok", "label": label})
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao restaurar: {e}")
+
+
+@app.post("/api/admin/backups/delete/{backup_key}")
+def admin_delete_backup(backup_key: str, password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    try:
+        data = blob_read()
+        if isinstance(data, dict) and backup_key in data:
+            del data[backup_key]
+            blob_write(data)
+            return JSONResponse(content={"status": "ok"})
+        raise HTTPException(status_code=404, detail="Backup nao encontrado")
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao deletar: {e}")
+
+
 @app.get("/api/calendar/{property_key}")
 def get_calendar(property_key: str):
     config = agent.pm.config
@@ -205,6 +392,7 @@ def get_calendar(property_key: str):
 def _save_blocked_state():
     data = {"blocked": {k: sorted(v) for k, v in _admin_blocked.items()},
             "available": {k: sorted(v) for k, v in _admin_available.items()}}
+    _create_backup("calendario_automatico")
     # Save to Supabase (clear all then re-insert to handle removals)
     if supabase_configured():
         try:
@@ -342,6 +530,7 @@ def admin_update_photos(property_key: str, req: PhotosUpdate, password: str = ""
     if password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     _admin_photos[property_key] = req.categories
+    _create_backup("fotos_automatico")
     # Save to Supabase
     if supabase_configured():
         try:
@@ -469,6 +658,7 @@ def admin_update_precos(req: PrecosUpdate):
     if req.password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
 
+    _create_backup("precos_automatico")
     override = _load_precos_override()
     override["general"] = req.general
     override["properties"] = req.properties
@@ -594,6 +784,7 @@ def admin_update_faq(req: FaqUpdateRequest):
     if req.password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     data = req.data
+    _create_backup("faq_automatico")
     # Save to Supabase
     if supabase_configured():
         try:
