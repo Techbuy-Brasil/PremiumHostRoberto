@@ -60,40 +60,79 @@ def _collect_snapshot():
     return snap
 
 
-def _create_backup(label: str):
-    """Save a snapshot to Blob under backup_<timestamp>_<label>."""
-    snap = _collect_snapshot()
+BACKUP_PREFIX = "_backup_"
+
+
+def _backup_key(label: str) -> str:
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
-    key = f"backup_{ts}_{label}"
-    try:
-        blob_set_key(key, snap)
-        return key
-    except Exception as e:
-        print(f"Backup save error: {e}", flush=True)
-        return None
+    return f"{BACKUP_PREFIX}{ts}_{label}"
+
+
+def _create_backup(label: str):
+    """Save a snapshot to Supabase system_messages (key=_backup_<ts>_<label>)."""
+    snap = _collect_snapshot()
+    key = _backup_key(label)
+    ok = False
+    if supabase_configured():
+        try:
+            upsert_system_message(key, json.dumps(snap, ensure_ascii=False))
+            ok = True
+        except Exception as e:
+            print(f"Backup Supabase error: {e}", flush=True)
+    if not ok:
+        try:
+            blob_set_key(key, snap)
+            ok = True
+        except Exception as e:
+            print(f"Backup blob error: {e}", flush=True)
+    return key if ok else None
 
 
 def _list_backups() -> list[dict]:
-    """List all backup keys from the blob, sorted newest first."""
-    try:
-        data = blob_read()
-        if not isinstance(data, dict):
-            return []
-        backups = []
-        for k in data:
-            if k.startswith("backup_"):
-                parts = k.split("_", 3)
-                ts = parts[1] + "_" + parts[2] if len(parts) >= 3 else ""
-                label = parts[3] if len(parts) >= 4 else ""
+    """List all backups from Supabase system_messages, newest first."""
+    backups = []
+    if supabase_configured():
+        try:
+            rows = _api("GET", "system_messages?order=key.desc") or []
+            for r in rows:
+                k = r["key"]
+                if not k.startswith(BACKUP_PREFIX):
+                    continue
+                rest = k[len(BACKUP_PREFIX):]
+                parts = rest.split("_", 2)
+                ts = parts[0] + "_" + parts[1] if len(parts) >= 2 else ""
+                label = parts[2] if len(parts) >= 3 else ""
                 backups.append({"key": k, "created_at": ts, "label": label})
-        backups.sort(key=lambda b: b["created_at"], reverse=True)
-        return backups
-    except Exception as e:
-        print(f"Backup list error: {e}", flush=True)
-        return []
+        except Exception as e:
+            print(f"Backup list error: {e}", flush=True)
+    # Fallback: scan Blob keys
+    if not backups:
+        try:
+            data = blob_read()
+            if isinstance(data, dict):
+                for k in data:
+                    if k.startswith(BACKUP_PREFIX):
+                        rest = k[len(BACKUP_PREFIX):]
+                        parts = rest.split("_", 2)
+                        ts = parts[0] + "_" + parts[1] if len(parts) >= 2 else ""
+                        label = parts[2] if len(parts) >= 3 else ""
+                        backups.append({"key": k, "created_at": ts, "label": label})
+                backups.sort(key=lambda b: b["created_at"], reverse=True)
+        except Exception:
+            pass
+    return backups
 
 
 def _get_backup(key: str) -> dict:
+    if supabase_configured():
+        try:
+            rows = _api("GET", f"system_messages?key=eq.{key}") or []
+            if rows:
+                val = rows[0]["value"]
+                if val:
+                    return json.loads(val)
+        except Exception:
+            pass
     try:
         return blob_get_key(key)
     except Exception:
@@ -105,33 +144,28 @@ def _restore_backup(key: str) -> str:
     snap = _get_backup(key)
     if not snap:
         raise ValueError("Backup not found")
-    label = key.split("_", 3)[3] if len(key.split("_", 3)) >= 4 else key
+    rest = key[len(BACKUP_PREFIX):]
+    parts = rest.split("_", 2)
+    label = parts[2] if len(parts) >= 3 else key
 
     if supabase_configured():
-        # FAQ items
         if snap.get("faq_items"):
             upsert_faq_items(snap["faq_items"])
-        # System messages
         if snap.get("system_messages"):
             for msg_key, val in snap["system_messages"].items():
                 upsert_system_message(msg_key, val)
-        # Pricing config
         if snap.get("pricing_config"):
             upsert_pricing_config(snap["pricing_config"])
-        # Property overrides
         if snap.get("property_overrides"):
             for pk, data in snap["property_overrides"].items():
                 upsert_property_override(pk, data)
-        # Date overrides
         if snap.get("date_overrides"):
             items = [{"start_date": d["start_date"], "end_date": d["end_date"], "multiplier": d.get("multiplier", 1.0)} for d in snap["date_overrides"]]
             upsert_date_overrides(items)
-        # Calendar dates
         if snap.get("calendar_dates"):
             clear_all_calendar_dates()
             for row in snap["calendar_dates"]:
                 set_calendar_dates(row["property_key"], [row["date"]], row["status"])
-        # Photo overrides
         if snap.get("photo_overrides"):
             _api("DELETE", "photo_overrides", params={"property_key": "neq."})
             for pk, cats in snap["photo_overrides"].items():
@@ -141,22 +175,33 @@ def _restore_backup(key: str) -> str:
 
 
 def _cleanup_old_backups():
-    """Delete backups older than 90 days."""
-    import re
+    """Delete backups older than 90 days from Supabase."""
+    cutoff = (datetime.now() - timedelta(days=90)).strftime("%Y%m%d")
+    if supabase_configured():
+        try:
+            rows = _api("GET", "system_messages?select=key") or []
+            for r in rows:
+                k = r["key"]
+                if not k.startswith(BACKUP_PREFIX):
+                    continue
+                m = re.match(r"^_backup_(\d{8})_", k)
+                if m and m.group(1) < cutoff:
+                    _api("DELETE", "system_messages", params={"key": f"eq.{k}"})
+        except Exception:
+            pass
+    # Also clean up old Blob backups
     try:
         data = blob_read()
-        if not isinstance(data, dict):
-            return
-        cutoff = (datetime.now() - timedelta(days=90)).strftime("%Y%m%d")
-        changed = False
-        for k in list(data.keys()):
-            if k.startswith("backup_"):
-                m = re.match(r"backup_(\d{8})_", k)
-                if m and m.group(1) < cutoff:
-                    del data[k]
-                    changed = True
-        if changed:
-            blob_write(data)
+        if isinstance(data, dict):
+            changed = False
+            for k in list(data.keys()):
+                if k.startswith(BACKUP_PREFIX):
+                    m = re.match(r"^_backup_(\d{8})_", k)
+                    if m and m.group(1) < cutoff:
+                        del data[k]
+                        changed = True
+            if changed:
+                blob_write(data)
     except Exception:
         pass
 
@@ -307,6 +352,24 @@ def health():
     return {"status": "online", "projeto": "PremiumHost Roberto"}
 
 
+@app.get("/api/debug/backups")
+def debug_backups(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        raise HTTPException(status_code=403, detail="Senha incorreta")
+    result = {"backup_prefix": BACKUP_PREFIX}
+    if supabase_configured():
+        try:
+            rows = _api("GET", "system_messages") or []
+            result["system_msg_count"] = len(rows)
+            result["all_keys"] = [r["key"] for r in rows]
+            result["_backup_keys"] = [r["key"] for r in rows if r["key"].startswith(BACKUP_PREFIX)]
+            result["_backup_values_len"] = [len(r.get("value", "")) for r in rows if r["key"].startswith(BACKUP_PREFIX)]
+        except Exception as e:
+            result["error"] = str(e)
+    return JSONResponse(content=result)
+
+
 # ── BACKUP ENDPOINTS ──
 
 @app.get("/api/admin/backups")
@@ -349,17 +412,27 @@ def admin_delete_backup(backup_key: str, password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    try:
-        data = blob_read()
-        if isinstance(data, dict) and backup_key in data:
-            del data[backup_key]
-            blob_write(data)
-            return JSONResponse(content={"status": "ok"})
+    deleted = False
+    if supabase_configured():
+        try:
+            rows = _api("GET", f"system_messages?key=eq.{backup_key}&select=key") or []
+            if rows:
+                _api("DELETE", "system_messages", params={"key": f"eq.{backup_key}"})
+                deleted = True
+        except Exception:
+            pass
+    if not deleted:
+        try:
+            data = blob_read()
+            if isinstance(data, dict) and backup_key in data:
+                del data[backup_key]
+                blob_write(data)
+                deleted = True
+        except Exception:
+            pass
+    if not deleted:
         raise HTTPException(status_code=404, detail="Backup nao encontrado")
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao deletar: {e}")
+    return JSONResponse(content={"status": "ok"})
 
 
 @app.get("/api/calendar/{property_key}")
