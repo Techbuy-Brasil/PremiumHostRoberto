@@ -353,24 +353,6 @@ def health():
     return {"status": "online", "projeto": "PremiumHost Roberto"}
 
 
-@app.get("/api/debug/backups")
-def debug_backups(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
-        raise HTTPException(status_code=403, detail="Senha incorreta")
-    result = {"backup_prefix": BACKUP_PREFIX}
-    if supabase_configured():
-        try:
-            rows = _api("GET", "system_messages") or []
-            result["system_msg_count"] = len(rows)
-            result["all_keys"] = [r["key"] for r in rows]
-            result["_backup_keys"] = [r["key"] for r in rows if r["key"].startswith(BACKUP_PREFIX)]
-            result["_backup_values_len"] = [len(r.get("value", "")) for r in rows if r["key"].startswith(BACKUP_PREFIX)]
-        except Exception as e:
-            result["error"] = str(e)
-    return JSONResponse(content=result)
-
-
 # ── BACKUP ENDPOINTS ──
 
 @app.get("/api/admin/backups")
