@@ -829,6 +829,15 @@
         }
       }
 
+      // Detectar parâmetro ?openChat=1 da landing page e abrir chat automaticamente
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('openChat') === '1') {
+        setTimeout(() => {
+          widget.classList.add('open');
+          input.focus();
+        }, 500);
+      }
+
       function closeChat() {
         widget.classList.remove('open');
       }
