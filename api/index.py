@@ -18,7 +18,7 @@ if _api_dir not in sys.path:
 
 from agent import Agent
 from storage import ConversationStore
-from blob_store import blob_get_key, blob_set_key, blob_read, blob_write
+from blob_store import blob_get_key, blob_set_key, blob_read, blob_write, blob_available
 from supabase_db import configured as supabase_configured
 from supabase_db import (_api,
                           get_faq_items, get_system_messages, upsert_faq_items, upsert_system_message,
@@ -70,57 +70,73 @@ def _backup_key(label: str) -> str:
 
 
 def _create_backup(label: str):
-    """Save a snapshot to Supabase system_messages (key=_backup_<ts>_<label>)."""
+    """Save a snapshot to all available stores. Returns the backup key, or None if failed."""
     snap = _collect_snapshot()
     key = _backup_key(label)
     ok = False
+    # Try Supabase
     if supabase_configured():
         try:
             upsert_system_message(key, json.dumps(snap, ensure_ascii=False))
             ok = True
         except Exception as e:
             print(f"Backup Supabase error: {e}", flush=True)
-    if not ok:
+    # Try Blob
+    if blob_available():
         try:
             blob_set_key(key, snap)
             ok = True
         except Exception as e:
             print(f"Backup blob error: {e}", flush=True)
-    return key if ok else None
+    if not ok:
+        print("Backup: nenhum storage disponivel!", flush=True)
+        return None
+    return key
 
 
 def _list_backups() -> list[dict]:
-    """List all backups from Supabase system_messages, newest first."""
+    """List all backups, merging from all available stores."""
+    seen_keys = set()
     backups = []
+
+    # Try Supabase
     if supabase_configured():
         try:
-            rows = _api("GET", "system_messages?order=key.desc") or []
+            rows = _api("GET", "system_messages") or []
             for r in rows:
                 k = r["key"]
                 if not k.startswith(BACKUP_PREFIX):
                     continue
+                if k in seen_keys:
+                    continue
+                seen_keys.add(k)
                 rest = k[len(BACKUP_PREFIX):]
                 parts = rest.split("_", 2)
                 ts = parts[0] + "_" + parts[1] if len(parts) >= 2 else ""
                 label = parts[2] if len(parts) >= 3 else ""
                 backups.append({"key": k, "created_at": ts, "label": label})
         except Exception as e:
-            print(f"Backup list error: {e}", flush=True)
-    # Fallback: scan Blob keys
-    if not backups:
-        try:
-            data = blob_read()
-            if isinstance(data, dict):
-                for k in data:
-                    if k.startswith(BACKUP_PREFIX):
-                        rest = k[len(BACKUP_PREFIX):]
-                        parts = rest.split("_", 2)
-                        ts = parts[0] + "_" + parts[1] if len(parts) >= 2 else ""
-                        label = parts[2] if len(parts) >= 3 else ""
-                        backups.append({"key": k, "created_at": ts, "label": label})
-                backups.sort(key=lambda b: b["created_at"], reverse=True)
-        except Exception:
-            pass
+            print(f"Backup list Supabase error: {e}", flush=True)
+
+    # Try Blob (merge, no overwrite)
+    try:
+        data = blob_read()
+        if isinstance(data, dict):
+            for k in data:
+                if not k.startswith(BACKUP_PREFIX):
+                    continue
+                if k in seen_keys:
+                    continue
+                seen_keys.add(k)
+                rest = k[len(BACKUP_PREFIX):]
+                parts = rest.split("_", 2)
+                ts = parts[0] + "_" + parts[1] if len(parts) >= 2 else ""
+                label = parts[2] if len(parts) >= 3 else ""
+                backups.append({"key": k, "created_at": ts, "label": label})
+    except Exception:
+        pass
+
+    backups.sort(key=lambda b: b.get("created_at", ""), reverse=True)
     return backups
 
 
