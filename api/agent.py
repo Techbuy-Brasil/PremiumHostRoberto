@@ -346,6 +346,19 @@ class Agent:
         if not info.get("property") and not self.current_property and memory.get("property_key"):
             self.current_property = self.pm.get_property(memory["property_key"])
 
+        # Persist current known info to memory (before any early return)
+        partial = {}
+        if info.get("checkin"):
+            partial["checkin"] = info["checkin"].isoformat() if hasattr(info["checkin"], "isoformat") else info["checkin"]
+        if info.get("checkout"):
+            partial["checkout"] = info["checkout"].isoformat() if hasattr(info["checkout"], "isoformat") else info["checkout"]
+        if info.get("guests"):
+            partial["guests"] = info["guests"]
+        if info.get("property"):
+            partial["property_key"] = info["property"].key
+        if partial:
+            self._save_memory(gid, partial)
+
         # --- CHECK FAQ FIRST (before property gate) ---
         has_quote_info = bool(info.get("checkin") and info.get("checkout"))
 
@@ -371,16 +384,6 @@ class Agent:
                 self.current_property = prop
 
         if not prop:
-            # Save any partial info to memory before asking for property
-            partial_memory = {}
-            if info.get("checkin"):
-                partial_memory["checkin"] = info["checkin"].isoformat() if hasattr(info["checkin"], "isoformat") else info["checkin"]
-            if info.get("checkout"):
-                partial_memory["checkout"] = info["checkout"].isoformat() if hasattr(info["checkout"], "isoformat") else info["checkout"]
-            if info.get("guests"):
-                partial_memory["guests"] = info["guests"]
-            if partial_memory:
-                self._save_memory(gid, partial_memory)
             other_props = self.get_all_properties_for_alternatives()
             return self.templates.ask_property()
 
