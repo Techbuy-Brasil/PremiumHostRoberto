@@ -4,8 +4,8 @@ import urllib.request
 import urllib.error
 
 SENDGRID_API_KEY = os.environ.get("SENDGRID_API_KEY", "")
-FROM_EMAIL = os.environ.get("FROM_EMAIL", "fotosflatssalvador@gmail.com")
 NOTIFY_EMAIL = os.environ.get("NOTIFY_EMAIL", "fotosflatssalvador@gmail.com")
+FROM_EMAIL = NOTIFY_EMAIL
 
 LAST_ERROR = ""
 
