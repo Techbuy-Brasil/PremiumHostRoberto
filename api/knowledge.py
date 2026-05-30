@@ -46,8 +46,15 @@ class KnowledgeBase:
                 pass
         # Fall back to local faq.json
         if not os.path.exists(self.path):
-            return {"faq": [], "saudacoes": [], "apresentacoes": [], "precos_disponivel": [],
-                    "precos_calculado": [], "indisponivel": [], "despedidas": [], "agradecimento": []}, None
+            return {"faq": [], "saudacoes": [], "saudacoes_nome": [], "apresentacoes": [],
+                    "precos_disponivel": [], "precos_calculado": [], "precos_cta": [],
+                    "indisponivel": [], "indisponivel_alternativas": [], "despedidas": [],
+                    "agradecimento": [], "need_info_intro": [], "need_info_outro": [],
+                    "confirmar_reserva": [], "pix_pagamento": [], "pix_info": [],
+                    "alternativas_datas_intro": [], "alternativas_datas_outro": [],
+                    "alternativas_imoveis_intro": [], "alternativas_imoveis_outro": [],
+                    "excesso_capacidade": [], "datas_invalidas": [], "menu_faq": [],
+                    "pergunta_imovel": [], "fallback": []}, None
         try:
             mtime = os.path.getmtime(self.path) if os.path.exists(self.path) else None
             with open(self.path, "r", encoding="utf-8") as f:
@@ -63,12 +70,29 @@ class KnowledgeBase:
         return {
             "faq": [{"id": it["id"], "resposta": it.get("resposta") or it.get("answer", ""), "tags": it.get("tags", []), "variacoes": it.get("variacoes", [])} for it in faq_items],
             "saudacoes": [sys_msgs.get("saudacoes", "")],
+            "saudacoes_nome": [sys_msgs.get("saudacoes_nome", "")],
             "apresentacoes": [sys_msgs.get("apresentacoes", "")],
             "precos_disponivel": [sys_msgs.get("precos_disponivel", "")],
             "precos_calculado": [sys_msgs.get("precos_calculado", "")],
+            "precos_cta": [sys_msgs.get("precos_cta", "")],
             "indisponivel": [sys_msgs.get("indisponivel", "")],
+            "indisponivel_alternativas": [sys_msgs.get("indisponivel_alternativas", "")],
             "despedidas": [sys_msgs.get("despedidas", "")],
             "agradecimento": [sys_msgs.get("agradecimento", "")],
+            "need_info_intro": [sys_msgs.get("need_info_intro", "")],
+            "need_info_outro": [sys_msgs.get("need_info_outro", "")],
+            "confirmar_reserva": [sys_msgs.get("confirmar_reserva", "")],
+            "pix_pagamento": [sys_msgs.get("pix_pagamento", "")],
+            "pix_info": [sys_msgs.get("pix_info", "")],
+            "alternativas_datas_intro": [sys_msgs.get("alternativas_datas_intro", "")],
+            "alternativas_datas_outro": [sys_msgs.get("alternativas_datas_outro", "")],
+            "alternativas_imoveis_intro": [sys_msgs.get("alternativas_imoveis_intro", "")],
+            "alternativas_imoveis_outro": [sys_msgs.get("alternativas_imoveis_outro", "")],
+            "excesso_capacidade": [sys_msgs.get("excesso_capacidade", "")],
+            "datas_invalidas": [sys_msgs.get("datas_invalidas", "")],
+            "menu_faq": [sys_msgs.get("menu_faq", "")],
+            "pergunta_imovel": [sys_msgs.get("pergunta_imovel", "")],
+            "fallback": [sys_msgs.get("fallback", "")],
         }
 
     def _ensure_fresh(self):
