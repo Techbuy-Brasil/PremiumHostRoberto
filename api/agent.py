@@ -377,6 +377,17 @@ class Agent:
         if info.get("name"):
             self.store.update_preferences(gid, {"name": info["name"]})
 
+        # --- FAQ CHECK (based ONLY on current message, not memory) ---
+        has_quote_in_current_msg = bool(info.get("checkin") and info.get("checkout"))
+        if not has_quote_in_current_msg:
+            faq_topic = self._detect_faq_intent(text_stripped)
+            if faq_topic:
+                if faq_topic == "menu":
+                    return self.templates.faq_menu()
+                resposta = self.templates.faq_resposta(faq_topic)
+                if resposta:
+                    return resposta
+
         # Merge with saved memory
         memory = self._get_memory(gid)
         if not info.get("checkin") and memory.get("checkin"):
@@ -400,18 +411,6 @@ class Agent:
             partial["property_key"] = info["property"].key
         if partial:
             self._save_memory(gid, partial)
-
-        # --- CHECK FAQ FIRST (before property gate) ---
-        has_quote_info = bool(info.get("checkin") and info.get("checkout"))
-
-        if not has_quote_info:
-            faq_topic = self._detect_faq_intent(text_stripped)
-            if faq_topic:
-                if faq_topic == "menu":
-                    return self.templates.faq_menu()
-                resposta = self.templates.faq_resposta(faq_topic)
-                if resposta:
-                    return resposta
 
         # --- PIX INFO (before property gate too) ---
         if self._detect_pix_intent(text_stripped):
