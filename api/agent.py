@@ -48,23 +48,23 @@ class Agent:
 
     def _extract_name_phone(self, text):
         """Extract name and phone from user message. Returns (name, phone) or (None, None)."""
-        phone_patterns = [
-            r"(?:\+?55)?\s*\(?\d{2}\)?\s*\d{4,5}-?\d{4}",
-            r"(?:whatsapp|whats|tel|telefone|cel|celular)[:\s]*(\+?[\d\s()-]{8,})",
-        ]
         phone = None
-        for p in phone_patterns:
-            m = re.search(p, text, re.IGNORECASE)
-            if m:
-                phone = m.group(0).strip() if m.lastindex else m.group(0).strip()
-                break
-        # Name: assume first words before phone, minimum 2 words
-        if phone:
-            before = text[:text.find(phone)].strip()
+        phone_pat = r"(?:\+?55)?\s*\(?\d{2}\)?\s*\d{4,5}-?\d{4}"
+        m = re.search(phone_pat, text)
+        if m:
+            phone = m.group(0).strip()
+        if not phone:
+            return None, None
+        # Name: try extract_name patterns first
+        name = self.extract_name(text)
+        if not name:
+            before = text[:text.find(m.group(0))].strip()
             words = [w for w in before.split() if len(w) > 1 and not re.search(r"\d", w)]
-            if len(words) >= 2:
-                return " ".join(words[:3]), phone
-        return None, None
+            fillers = {"meu", "minha", "nome", "eh", "e", "de", "da", "do", "em", "para", "com", "por", "os", "as", "um", "uma", "no", "na", "sou", "o", "a", "te", "seu", "sua"}
+            words = [w for w in words if w.lower() not in fillers]
+            if words:
+                name = " ".join(words[:2])
+        return name or "Cliente", phone
         topics = []
         text_lower = text.lower()
         if re.search(r"check[-\s]?in|entrada|chegad|acessar|chave|codigo|early", text_lower):
