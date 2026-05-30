@@ -960,3 +960,32 @@ def admin_leads(password: str = ""):
         return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
     # Return empty leads list for now (conversation leads not persisted)
     return JSONResponse(content={"leads": []})
+
+
+# ── DEBUG ──
+
+@app.get("/api/debug/backups")
+def debug_backups(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
+    result = {"backup_keys": [], "supabase_rows": None, "blob_keys": None}
+    if supabase_configured():
+        try:
+            rows = _api("GET", "system_messages") or []
+            result["supabase_rows"] = [{"key": r["key"], "len_value": len(r.get("value", ""))} for r in rows if r["key"].startswith(BACKUP_PREFIX)]
+        except Exception as e:
+            result["supabase_error"] = str(e)
+    try:
+        data = blob_read()
+        if isinstance(data, dict):
+            result["blob_keys"] = [k for k in data if k.startswith(BACKUP_PREFIX)]
+    except Exception as e:
+        result["blob_error"] = str(e)
+    total = []
+    if result["supabase_rows"]:
+        total.extend([r["key"] for r in result["supabase_rows"]])
+    if result["blob_keys"]:
+        total.extend(result["blob_keys"])
+    result["merged"] = list(set(total))
+    return JSONResponse(content=result)
