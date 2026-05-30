@@ -25,8 +25,7 @@ from supabase_db import (_api,
                           get_pricing_config, get_property_overrides, get_date_overrides,
                           upsert_pricing_config, upsert_property_override, upsert_date_overrides,
                           get_calendar_dates, set_calendar_dates, clear_all_calendar_dates,
-                          get_photo_overrides, upsert_photo_override,
-                          save_backup)
+                           get_photo_overrides, upsert_photo_override)
 from pix import gerar_pix_payload
 
 app = FastAPI(title="PremiumHost Roberto - API", version="1.0.0")
@@ -63,79 +62,73 @@ def _collect_snapshot():
 
 
 def _create_backup(label: str):
-    """Save a snapshot to the backups table. Returns the backup label, or None if failed."""
+    """Save a snapshot to system_messages table. Returns the backup key, or None if failed."""
     snap = _collect_snapshot()
-    lbl = label.strip() or "manual"
-    ok = False
+    key = "_backup_" + datetime.now().strftime("%Y%m%d_%H%M%S") + "_" + (label.strip() or "manual")
     if supabase_configured():
         try:
-            result = save_backup(lbl, snap)
-            print(f"Backup save_backup result: {result}", flush=True)
-            if result:
-                ok = True
-            else:
-                print("Backup: save_backup returned None/False", flush=True)
+            upsert_system_message(key, json.dumps(snap, ensure_ascii=False))
+            print(f"Backup saved: {key}", flush=True)
+            return key
         except Exception as e:
-            print(f"Backup Supabase error: {e}", flush=True)
-    if not ok:
-        print("Backup: nenhum storage disponivel!", flush=True)
-        return None
-    return lbl
+            print(f"Backup error: {e}", flush=True)
+    print("Backup: Supabase not configured", flush=True)
+    return None
 
 
 def _list_backups() -> list[dict]:
-    """List all backups from the backups table, newest first."""
+    """List all backups from system_messages table, newest first."""
     if not supabase_configured():
         return []
     try:
-        rows = _api("GET", "backups?order=created_at.desc") or []
+        rows = _api("GET", "system_messages?order=key.desc") or []
         result = []
         for r in rows:
-            result.append({
-                "id": r.get("id", 0),
-                "key": str(r.get("id", 0)),
-                "created_at": r.get("created_at", ""),
-                "label": r.get("label", ""),
-            })
+            k = r["key"]
+            if not k.startswith("_backup_"):
+                continue
+            rest = k[len("_backup_"):]
+            parts = rest.split("_", 2)
+            ts = parts[0] + "_" + parts[1] if len(parts) >= 2 else ""
+            label = parts[2] if len(parts) >= 3 else ""
+            result.append({"key": k, "created_at": ts, "label": label})
         return result
     except Exception as e:
         print(f"Backup list error: {e}", flush=True)
         return []
 
 
-def _get_backup(backup_id: int) -> dict:
-    """Get a backup snapshot by ID from the backups table."""
+def _get_backup(key: str) -> dict:
+    """Get a backup snapshot by key from system_messages."""
     if supabase_configured():
         try:
-            from supabase_db import get_backup
-            return get_backup(backup_id)
+            rows = _api("GET", f"system_messages?key=eq.{key}") or []
+            if rows:
+                val = rows[0]["value"]
+                if val:
+                    return json.loads(val)
         except Exception as e:
             print(f"Get backup error: {e}", flush=True)
     return None
 
 
-def _restore_backup(backup_id: int) -> str:
-    """Restore a backup. Returns the label."""
-    if supabase_configured():
-        try:
-            from supabase_db import restore_backup
-            return restore_backup(backup_id)
-        except Exception:
-            pass
-    raise ValueError("Backup not found or Supabase not configured")
-
-
-def _restore_backup(backup_id: int) -> str:
+def _restore_backup(key: str) -> str:
     """Restore a backup snapshot into Supabase tables. Returns the label."""
+    snap = _get_backup(key)
+    if not snap:
+        raise ValueError("Backup not found")
+    rest = key[len("_backup_"):] if key.startswith("_backup_") else key
+    parts = rest.split("_", 2)
+    label = parts[2] if len(parts) >= 3 else parts[0] if parts else "unknown"
+    # Restore using supabase_db's restore_backup_legacy
     if supabase_configured():
         try:
-            from supabase_db import restore_backup
-            return restore_backup(backup_id)
-        except ValueError:
-            raise
+            from supabase_db import restore_backup_legacy
+            restore_backup_legacy(snap)
         except Exception as e:
+            print(f"Restore error: {e}", flush=True)
             raise ValueError(f"Erro ao restaurar: {e}")
-    raise ValueError("Supabase not configured")
+    return label
 
     if supabase_configured():
         if snap.get("faq_items"):
@@ -164,13 +157,24 @@ def _restore_backup(backup_id: int) -> str:
 
 
 def _cleanup_old_backups():
-    """Delete backups older than 90 days from backups table."""
-    cutoff = (datetime.now() - timedelta(days=90)).isoformat()
-    if supabase_configured():
-        try:
-            _api("DELETE", "backups", params={"created_at": f"lt.{cutoff}"})
-        except Exception:
-            pass
+    """Delete backups older than 90 days from system_messages."""
+    if not supabase_configured():
+        return
+    cutoff = (datetime.now() - timedelta(days=90))
+    try:
+        rows = _api("GET", "system_messages") or []
+        for r in rows:
+            k = r["key"]
+            if not k.startswith("_backup_"):
+                continue
+            # key format: _backup_YYYYMMDD_HHMMSS_label
+            date_str = k[len("_backup_"):].split("_", 2)[0]
+            if len(date_str) == 8 and date_str.isdigit():
+                dt = datetime.strptime(date_str, "%Y%m%d")
+                if dt < cutoff:
+                    _api("DELETE", "system_messages", params={"key": f"eq.{k}"})
+    except Exception:
+        pass
 
 app.add_middleware(
     CORSMiddleware,
@@ -342,48 +346,33 @@ def admin_create_backup(label: str = "", password: str = ""):
     return JSONResponse(content={"key": result, "label": lbl})
 
 
-@app.post("/api/admin/backups/restore/{backup_id}")
-def admin_restore_backup(backup_id: int, password: str = ""):
+@app.post("/api/admin/backups/restore/{backup_key}")
+def admin_restore_backup(backup_key: str, password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
-        raise HTTPException(status_code=403, detail="Senha incorreta")
+        raise HTTPException(status_code=403, detail="Senha invalida")
     try:
-        label = _restore_backup(backup_id)
-        return JSONResponse(content={"status": "ok", "label": label})
+        label = _restore_backup(backup_key)
+        return JSONResponse(content={"ok": True, "label": label})
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro ao restaurar: {e}")
 
 
-@app.post("/api/admin/backups/delete/{backup_id}")
-def admin_delete_backup(backup_id: int, password: str = ""):
+@app.post("/api/admin/backups/delete/{backup_key}")
+def admin_delete_backup(backup_key: str, password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    deleted = False
-    if supabase_configured():
-        try:
-            from supabase_db import delete_backup
-            delete_backup(backup_id)
-            deleted = True
+    try:
+        if supabase_configured():
             rows = _api("GET", f"system_messages?key=eq.{backup_key}&select=key") or []
             if rows:
                 _api("DELETE", "system_messages", params={"key": f"eq.{backup_key}"})
-                deleted = True
-        except Exception:
-            pass
-    if not deleted:
-        try:
-            data = blob_read()
-            if isinstance(data, dict) and backup_key in data:
-                del data[backup_key]
-                blob_write(data)
-                deleted = True
-        except Exception:
-            pass
-    if not deleted:
-        raise HTTPException(status_code=404, detail="Backup nao encontrado")
+    except Exception as e:
+        print(f"Delete backup error: {e}", flush=True)
+        raise HTTPException(status_code=500, detail="Erro ao excluir backup")
     return JSONResponse(content={"status": "ok"})
 
 
@@ -922,35 +911,11 @@ def debug_backups(password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
-    result = {"supabase_configured": supabase_configured(), "backup_keys": [], "supabase_rows": None, "blob_keys": None}
-    # Test insert into backups table
+    result = {"supabase_configured": supabase_configured(), "backup_keys": []}
     if supabase_configured():
         try:
-            test = _api("POST", "backups", {"label": "teste_insert", "snapshot": {"test": True}})
-            result["test_insert"] = "ok" if test is not None else "falhou"
+            rows = _api("GET", "system_messages?order=key.desc") or []
+            result["backup_keys"] = [r["key"] for r in rows if r["key"].startswith("_backup_")]
         except Exception as e:
-            result["test_insert_error"] = str(e)
-        # Test read backups table
-        try:
-            bk_rows = _api("GET", "backups") or []
-            result["backups_table_rows"] = len(bk_rows)
-        except Exception as e:
-            result["backups_table_error"] = str(e)
-        # Test write to system_messages
-        try:
-            msg_test = _api("POST", "system_messages", {"key": "_debug_test_", "value": "hello"}, params={"on_conflict": "key"})
-            result["test_system_msg"] = "ok" if msg_test is not None else "falhou"
-        except Exception as e:
-            result["test_system_msg_error"] = str(e)
-        try:
-            rows = _api("GET", "system_messages") or []
-            result["supabase_rows"] = [{"key": r["key"], "len_value": len(r.get("value", ""))} for r in rows if r["key"].startswith("_backup_")]
-        except Exception as e:
-            result["supabase_error"] = str(e)
-    try:
-        data = blob_read()
-        if isinstance(data, dict):
-            result["blob_keys"] = [k for k in data if k.startswith("_backup_")]
-    except Exception as e:
-        result["blob_error"] = str(e)
+            result["error"] = str(e)
     return JSONResponse(content=result)
