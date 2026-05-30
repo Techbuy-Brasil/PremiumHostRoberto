@@ -930,6 +930,18 @@ def debug_backups(password: str = ""):
             result["test_insert"] = "ok" if test is not None else "falhou"
         except Exception as e:
             result["test_insert_error"] = str(e)
+        # Test read backups table
+        try:
+            bk_rows = _api("GET", "backups") or []
+            result["backups_table_rows"] = len(bk_rows)
+        except Exception as e:
+            result["backups_table_error"] = str(e)
+        # Test write to system_messages
+        try:
+            msg_test = _api("POST", "system_messages", {"key": "_debug_test_", "value": "hello"}, params={"on_conflict": "key"})
+            result["test_system_msg"] = "ok" if msg_test is not None else "falhou"
+        except Exception as e:
+            result["test_system_msg_error"] = str(e)
         try:
             rows = _api("GET", "system_messages") or []
             result["supabase_rows"] = [{"key": r["key"], "len_value": len(r.get("value", ""))} for r in rows if r["key"].startswith("_backup_")]
