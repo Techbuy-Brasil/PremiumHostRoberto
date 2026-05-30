@@ -191,32 +191,20 @@ class ResponseTemplates:
         )
 
     def pix_payment(self, property_name, checkin_str, checkout_str, total, signal, guest_name, pix_code=None, pix_qr_url=None):
-        lines = [
+        return (
             f"Perfeito, {guest_name}! Sua reserva do {property_name} "
             f"de {checkin_str} a {checkout_str} no valor de R$ {total:.0f} "
-            "esta quase confirmada!",
-            "",
-            f"Para garantir, preciso do sinal de **R$ {signal:.0f}** (50%) via PIX.",
-        ]
-        if pix_qr_url:
-            lines.append(f"\n![QR Code PIX]({pix_qr_url})")
-        if pix_code:
-            lines.append(f"\n**Ou copie o codigo PIX abaixo:**")
-            lines.append(f"`{pix_code}`")
-        lines.extend([
-            "",
-            "**Chave PIX (manual):** `premiumhostroberto@gmail.com`",
-            "(Nubank — Roberto Alves)",
-            "",
-            "Após o pagamento, me avise aqui que ja confirmo sua reserva "
+            "esta quase confirmada!\n\n"
+            f"Para garantir, preciso do sinal de **R$ {signal:.0f}** (50%) via PIX.\n\n"
+            "Chave Pix Aleatoria\n\n"
+            "**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n\n"
+            "Apos o pagamento, me avise aqui que ja confirmo sua reserva "
             "e envio as instrucoes de acesso! :)"
-        ])
-        return "\n".join(lines)
+        )
 
     def pix_info(self):
         return (
-            "Para pagamento via PIX, a chave é:\n"
-            "**premiumhostroberto@gmail.com**\n"
-            "(Nubank — Roberto Alves)\n\n"
-            "Me avisa quando fizer o pagamento que já confirmo tudo! :)"
+            "Para pagamento via PIX:\n\n"
+            "**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n\n"
+            "Me avisa quando fizer o pagamento que ja confirmo tudo! :)"
         )
