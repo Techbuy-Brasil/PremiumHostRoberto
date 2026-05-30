@@ -385,11 +385,13 @@ class Agent:
 
         # --- PROPERTY IDENTIFICATION ---
         prop = info.get("property") or self.current_property
+        prop_identified_now = False
         if not prop:
             detected = self.identify_property(message)
             if detected:
                 prop = detected
                 self.current_property = prop
+                prop_identified_now = True
 
         if not prop:
             # Try numbered selection (1-5 matching the listing order)
@@ -398,7 +400,9 @@ class Agent:
             stripped = text_stripped.strip()
             if stripped in num_map:
                 prop = self.pm.get_property(num_map[stripped])
-            if not prop:
+            if prop:
+                prop_identified_now = True
+            else:
                 other_props = self.get_all_properties_for_alternatives()
                 return self.templates.ask_property()
 
@@ -418,10 +422,9 @@ class Agent:
 
         # If only guests is missing and message is a bare number, use it
         # (but only if the same number wasn't already used for property identification)
-        prop_from_msg = info.get("property") is not None
-        if missing == ["guests"] and not info.get("guests"):
+        if missing == ["guests"] and not info.get("guests") and not prop_identified_now:
             is_standalone_num = re.match(r"^\s*(\d{1,2})\s*$", text_stripped)
-            if is_standalone_num and not prop_from_msg:
+            if is_standalone_num:
                 info["guests"] = int(is_standalone_num.group(1))
                 missing = self.missing_info(info)
 
