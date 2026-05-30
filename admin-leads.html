@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Leads - PremiumHost Roberto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: Inter, sans-serif; background: #f5f3f0; margin: 0; }
+    .topo { background: #1a1a2e; color: #fff; padding: 14px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+    .topo h1 { font-family: 'Cormorant Garamond', serif; font-size: 1.2rem; margin: 0; color: #c8a96a; }
+    .topo a { color: #c8a96a; text-decoration: none; font-size: .82rem; }
+    .topo a:hover { text-decoration: underline; }
+    .container { max-width: 960px; margin: 0 auto; padding: 24px 16px 60px; }
+    .login-box { max-width: 360px; margin: 80px auto; text-align: center; }
+    .login-box h2 { font-family: 'Cormorant Garamond', serif; color: #1a1a2e; }
+    .login-box input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem; margin-bottom: 12px; }
+    .login-box button { width: 100%; }
+    .erro { color: #e74c3c; font-size: .85rem; display: none; margin-top: 8px; }
+    .card { background: #fff; border-radius: 10px; padding: 16px 20px; margin-bottom: 12px; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+    .card .top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+    .card .nome { font-weight: 600; font-size: 1rem; color: #1a1a2e; }
+    .card .phone { font-size: .85rem; color: #555; margin-top: 2px; }
+    .card .detalhes { font-size: .8rem; color: #888; margin-top: 8px; display: flex; flex-wrap: wrap; gap: 12px; }
+    .card .detalhes span { display: inline-flex; align-items: center; gap: 4px; }
+    .status { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: .72rem; font-weight: 600; }
+    .status-lead_reserva { background: #d4edda; color: #155724; }
+    .status-pre_reserva { background: #fff3cd; color: #856404; }
+    .status-consultou_preco { background: #cce5ff; color: #004085; }
+    .status-imovel_indisponivel { background: #f8d7da; color: #721c24; }
+    .status-faltou_datas { background: #e2e3e5; color: #383d41; }
+    .status-faltou_contato { background: #e2e3e5; color: #383d41; }
+    .status-abandonou_reserva { background: #f5c6cb; color: #721c24; }
+    .acoes { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .btn { padding: 10px 24px; border: none; border-radius: 6px; font-size: .85rem; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: #1a1a2e; color: #fff; }
+    .btn-primary:hover { background: #2a2a4e; }
+    .btn-secondary { background: #e8e0d4; color: #1a1a2e; }
+    .vazio { text-align: center; color: #999; font-size: .85rem; padding: 40px 0; }
+    .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; font-size: .85rem; display: none; z-index: 1000; color: #fff; }
+    .toast.success { background: #27ae60; }
+    .toast.error { background: #e74c3c; }
+    .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+    .stat-box { background: #fff; border-radius: 10px; padding: 16px 20px; flex: 1; min-width: 120px; text-align: center; box-shadow: 0 1px 6px rgba(0,0,0,.07); }
+    .stat-box .num { font-size: 1.6rem; font-weight: 700; color: #1a1a2e; }
+    .stat-box .label { font-size: .72rem; color: #888; text-transform: uppercase; letter-spacing: .5px; margin-top: 4px; }
+    .total-card { color: #c8a96a; }
+    @media (max-width: 600px) { .topo { flex-direction: column; align-items: flex-start; } }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+
+    <div class="topo" id="topo" style="display:none">
+      <div>
+        <h1>Leads de reservas</h1>
+        <span style="font-size:.72rem;opacity:.6">Hóspedes que interagiram com o chat</span>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <a href="admin.html">Datas</a>
+        <a href="admin-precos.html">Preços</a>
+        <a href="admin-faq.html">FAQ</a>
+        <a href="admin-photos.html">Fotos</a>
+        <a href="admin-backups.html">Backups</a>
+        <a href="painel.html">Painel</a>
+        <a href="#" onclick="sair()" style="color:#fff">Sair</a>
+      </div>
+    </div>
+
+    <div class="login-box" id="loginBox">
+      <h2>Leads</h2>
+      <p style="color:#888;font-size:.85rem;margin-bottom:20px">Senha de admin para visualizar leads</p>
+      <input type="password" id="senhaInput" placeholder="Senha" onkeydown="if(event.key==='Enter')entrar()">
+      <button class="btn btn-primary" onclick="entrar()">Entrar</button>
+      <p class="erro" id="loginErro"></p>
+    </div>
+
+    <div class="container" id="conteudo" style="display:none">
+
+      <div class="acoes">
+        <button class="btn btn-secondary" onclick="carregar()">Recarregar</button>
+      </div>
+
+      <div id="stats" class="stats"></div>
+      <div id="lista"></div>
+
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+  </div>
+
+  <script>
+    const API = 'https://premiumhost-roberto.vercel.app';
+    let password = '';
+
+    function toast(msg, ok) {
+      const t = document.getElementById('toast');
+      t.className = 'toast ' + (ok ? 'success' : 'error');
+      t.textContent = msg;
+      t.style.display = 'block';
+      setTimeout(function() { t.style.display = 'none'; }, 4000);
+    }
+
+    function entrar() {
+      const pwd = document.getElementById('senhaInput').value;
+      if (!pwd) return;
+      password = pwd;
+      fetch(API + '/api/admin/leads?password=' + encodeURIComponent(password) + '&_=' + Date.now())
+        .then(function(r) { if (!r.ok) throw new Error('Senha incorreta'); return r.json(); })
+        .then(function() {
+          document.getElementById('loginBox').style.display = 'none';
+          document.getElementById('conteudo').style.display = 'block';
+          document.getElementById('topo').style.display = 'flex';
+          carregar();
+        })
+        .catch(function(e) {
+          document.getElementById('loginErro').textContent = e.message;
+          document.getElementById('loginErro').style.display = 'block';
+          password = '';
+        });
+    }
+
+    function sair() {
+      password = '';
+      document.getElementById('loginBox').style.display = 'block';
+      document.getElementById('conteudo').style.display = 'none';
+      document.getElementById('topo').style.display = 'none';
+      document.getElementById('senhaInput').value = '';
+    }
+
+    function esc(s) {
+      if (!s) return '';
+      return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function statusLabel(st) {
+      var map = {
+        'lead_reserva': 'Lead (confirmou dados)',
+        'pre_reserva': 'Pré-reserva',
+        'consultou_preco': 'Consultou preço',
+        'imovel_indisponivel': 'Imóvel indisponível',
+        'faltou_datas': 'Faltaram datas',
+        'faltou_contato': 'Faltou contato',
+        'abandonou_reserva': 'Abandonou',
+      };
+      return map[st] || st || 'Visitou';
+    }
+
+    function statusClass(st) {
+      return 'status-' + (st || 'abandonou_reserva');
+    }
+
+    function formatDate(ts) {
+      if (!ts) return '';
+      var d = new Date(ts);
+      return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+    }
+
+    function formatMoney(v) {
+      if (!v && v !== 0) return '-';
+      return 'R$ ' + Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+    }
+
+    function carregar() {
+      fetch(API + '/api/admin/leads?password=' + encodeURIComponent(password) + '&_=' + Date.now())
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          var leads = data.leads || [];
+          var el = document.getElementById('lista');
+          var statsEl = document.getElementById('stats');
+
+          if (!leads.length) {
+            el.innerHTML = '<div class="vazio">Nenhum lead encontrado. Os leads são capturados automaticamente quando hóspedes fornecem nome e WhatsApp no chat.</div>';
+            statsEl.innerHTML = '';
+            return;
+          }
+
+          var total = leads.length;
+          var reservas = leads.filter(function(l) { return l.status === 'lead_reserva'; }).length;
+          var consultas = leads.filter(function(l) { return l.status === 'consultou_preco'; }).length;
+          var abandonos = leads.filter(function(l) { return l.status === 'abandonou_reserva' || l.status === 'faltou_datas' || l.status === 'faltou_contato'; }).length;
+
+          // Buscar estatísticas de cliques na landing page
+          fetch(API + '/api/admin/landing-stats?password=' + encodeURIComponent(password) + '&_=' + Date.now())
+            .then(function(r) { return r.json(); })
+            .then(function(clickData) {
+              var clickStats = clickData.stats || { today: { btn_chat: 0, btn_site: 0 } };
+              var todayStats = clickStats.today || { btn_chat: 0, btn_site: 0 };
+
+              statsEl.innerHTML =
+                '<div class="stat-box"><div class="num">' + total + '</div><div class="label">Total leads</div></div>' +
+                '<div class="stat-box"><div class="num total-card">' + reservas + '</div><div class="label">Confirmaram dados</div></div>' +
+                '<div class="stat-box"><div class="num">' + consultas + '</div><div class="label">Consultaram preço</div></div>' +
+                '<div class="stat-box"><div class="num">' + abandonos + '</div><div class="label">Abandonaram</div></div>' +
+                '<div class="stat-box" style="background: #f0f7ff; border: 2px solid #0066cc;"><div class="num" style="color: #0066cc;">' + todayStats.btn_chat + '</div><div class="label">Cliques - Chat (hoje)</div></div>' +
+                '<div class="stat-box" style="background: #fff9e6; border: 2px solid #cc9900;"><div class="num" style="color: #cc9900;">' + todayStats.btn_site + '</div><div class="label">Cliques - Site (hoje)</div></div>';
+            })
+            .catch(function() {
+              statsEl.innerHTML =
+                '<div class="stat-box"><div class="num">' + total + '</div><div class="label">Total leads</div></div>' +
+                '<div class="stat-box"><div class="num total-card">' + reservas + '</div><div class="label">Confirmaram dados</div></div>' +
+                '<div class="stat-box"><div class="num">' + consultas + '</div><div class="label">Consultaram preço</div></div>' +
+                '<div class="stat-box"><div class="num">' + abandonos + '</div><div class="label">Abandonaram</div></div>';
+            });
+
+          var html = '<div style="font-size:.78rem;color:#888;margin-bottom:12px">' + leads.length + ' lead(s) encontrado(s).</div>';
+          leads.forEach(function(l) {
+            var checkin = l.checkin || '';
+            var checkout = l.checkout || '';
+            html += '<div class="card">';
+            html += '  <div class="top">';
+            html += '    <div>';
+            html += '      <div class="nome">' + esc(l.name || 'Anônimo') + '</div>';
+            html += '      <div class="phone">' + esc(l.phone || '-') + '</div>';
+            html += '    </div>';
+            html += '    <span class="status ' + statusClass(l.status) + '">' + statusLabel(l.status) + '</span>';
+            html += '  </div>';
+            html += '  <div class="detalhes">';
+            if (l.property_name) html += '    <span>' + esc(l.property_name) + '</span>';
+            if (checkin) html += '    <span>Check-in: ' + checkin.split('T')[0] + '</span>';
+            if (checkout) html += '    <span>Check-out: ' + checkout.split('T')[0] + '</span>';
+            if (l.guests) html += '    <span>' + l.guests + ' hóspedes</span>';
+            if (l.total) html += '    <span>' + formatMoney(l.total) + '</span>';
+            html += '    <span style="margin-left:auto;color:#aaa;font-size:.72rem">' + formatDate(l.created_at) + '</span>';
+            html += '  </div>';
+            html += '</div>';
+          });
+          el.innerHTML = html;
+        })
+        .catch(function(e) { toast('Erro: ' + e.message, false); });
+    }
+  </script>
+
+</body>
+</html>

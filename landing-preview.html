@@ -536,12 +536,36 @@
     const chatInput = document.getElementById('chatInput');
     const chatSend = document.getElementById('chatSend');
 
+    // Rastrear cliques nos botões da landing page
+    function trackClick(button) {
+      fetch(API_URL + '/api/landing-click', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          button: button,
+          guest_id: guestId,
+          timestamp: new Date().toISOString()
+        })
+      }).catch(() => {});
+    }
+
     function openChat() {
+      trackClick('btn_chat');
       chatModal.classList.add('active');
       chatMessages.innerHTML = '<div class="chat-msg bot"><div class="msg-content">Oi, tudo bem? Sou Roberto, como posso te ajudar? :)</div><div class="msg-time">agora</div></div>';
       setTimeout(() => chatInput.focus(), 300);
       scrollToBottom();
     }
+
+    // Rastrear clique no botão de site
+    document.addEventListener('DOMContentLoaded', () => {
+      const btnSite = document.querySelector('.btn-site');
+      if (btnSite) {
+        btnSite.addEventListener('click', () => {
+          trackClick('btn_site');
+        });
+      }
+    });
 
     function closeChat() {
       chatModal.classList.remove('active');
