@@ -148,10 +148,16 @@
 
     function formatDate(ts) {
       if (!ts) return '';
+      // Handle Supabase ISO date format: "2026-05-28T18:15:34.123Z"
+      var d = new Date(ts);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+      }
+      // Fallback for old format: "20260528_181534"
       var parts = ts.split('_');
       if (parts.length < 2) return ts;
-      var d = parts[0], t = parts[1];
-      return d.substring(0,4) + '/' + d.substring(4,6) + '/' + d.substring(6,8) + ' ' + t.substring(0,2) + ':' + t.substring(2,4) + ':' + t.substring(4,6);
+      var dd = parts[0], tt = parts[1];
+      return dd.substring(0,4) + '/' + dd.substring(4,6) + '/' + dd.substring(6,8) + ' ' + tt.substring(0,2) + ':' + tt.substring(2,4) + ':' + tt.substring(4,6);
     }
 
     function labelDisplay(lbl) {

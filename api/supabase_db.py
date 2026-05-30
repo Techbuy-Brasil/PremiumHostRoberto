@@ -235,6 +235,17 @@ def restore_backup(backup_id: int) -> str:
     return bk["label"]
 
 
+# ── BACKUPS TABLE ──
+
+def save_backup(label: str, snapshot: dict) -> bool:
+    """Save a backup to the backups table. Returns True on success."""
+    result = _api("POST", "backups", {
+        "label": label,
+        "snapshot": snapshot
+    })
+    return result is not None
+
+
 # ── LANDING PAGE CLICKS ──
 
 def log_landing_click(button: str, guest_id: str):
