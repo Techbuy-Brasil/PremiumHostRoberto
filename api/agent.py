@@ -456,10 +456,36 @@ class Agent:
             name, phone = self._extract_name_phone(text_stripped)
             if name and phone:
                 q = self._last_quote
+                guests = info.get("guests", 2)
+                signal = q["total"] / 2
                 self._save_lead(name, phone, q["property"].name,
-                                q["checkin"], q["checkout"], q["total"],
-                                info.get("guests", 2))
-                return self.templates.pix_info()
+                                q["checkin"], q["checkout"], q["total"], guests)
+                # Send email notification
+                try:
+                    from email_notify import send_lead_notification, configured as email_configured
+                    if email_configured():
+                        send_lead_notification(
+                            self.current_guest or "anon", name, phone,
+                            q["property"].name, str(q["checkin"]), str(q["checkout"]),
+                            guests, q["total"], "pre_reserva"
+                        )
+                except Exception as e:
+                    print(f"Email notify error: {e}", flush=True)
+                # Generate PIX payload for 50% signal
+                try:
+                    from pix import gerar_pix_payload
+                    pix_code = gerar_pix_payload(signal)
+                    import urllib.parse
+                    pix_qr_url = f"https://api.qrserver.com/v1/create-qr-code/?size=300x300&data={urllib.parse.quote(pix_code)}"
+                except Exception:
+                    pix_code = None
+                    pix_qr_url = None
+                return self.templates.pix_payment(
+                    q["property"].name,
+                    q["checkin"].strftime("%d/%m/%Y"),
+                    q["checkout"].strftime("%d/%m/%Y"),
+                    q["total"], signal, name, pix_code, pix_qr_url
+                )
 
         # --- PRICING FLOW ---
         missing = self.missing_info(info)
