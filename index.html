@@ -530,7 +530,11 @@
 
   <script>
     const API_URL = '';
-    let guestId = 'web_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    let guestId = localStorage.getItem('ph_guest_id');
+    if (!guestId) {
+      guestId = 'web_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+      localStorage.setItem('ph_guest_id', guestId);
+    }
     const chatModal = document.getElementById('chatModal');
     const chatMessages = document.getElementById('chatMessages');
     const chatInput = document.getElementById('chatInput');
