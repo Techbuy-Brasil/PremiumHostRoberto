@@ -70,10 +70,11 @@ def _create_backup(label: str):
     if supabase_configured():
         try:
             result = save_backup(lbl, snap)
+            print(f"Backup save_backup result: {result}", flush=True)
             if result:
                 ok = True
             else:
-                print("Backup: save_backup returned None", flush=True)
+                print("Backup: save_backup returned None/False", flush=True)
         except Exception as e:
             print(f"Backup Supabase error: {e}", flush=True)
     if not ok:
