@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PremiumHost Roberto – Administradora de Temporada em Salvador</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    .pix-modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); overflow: auto; }
+    .pix-modal-content { background: #fff; margin: 5% auto; padding: 32px; border-radius: 12px; max-width: 500px; width: 90%; position: relative; }
+    .pix-modal-close { position: absolute; right: 16px; top: 12px; font-size: 1.8rem; cursor: pointer; color: #999; }
+    .pix-modal h2 { font-family: 'Cormorant Garamond', serif; color: #1a1a1a; margin-bottom: 16px; }
+    .pix-resumo { background: #f9f6f0; padding: 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.9rem; line-height: 1.8; }
+    .pix-resumo strong { color: #c8a96a; }
+    .pix-qr { text-align: center; margin: 20px 0; }
+    .pix-qr canvas { border: 2px solid #c8a96a; border-radius: 8px; padding: 8px; background: #fff; }
+    .pix-codigo { background: #f5f3f0; padding: 10px; border-radius: 6px; font-size: 0.75rem; word-break: break-all; margin: 12px 0; font-family: monospace; cursor: pointer; }
+    .pix-codigo:hover { background: #eee; }
+    .btn-pix-pagar { display: block; width: 100%; background: #28a745; color: #fff; border: none; padding: 14px; font-size: 1rem; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 12px; }
+    .btn-pix-pagar:hover { background: #218838; }
+    .btn-reservar { display: inline-block; background: #c8a96a; color: #1a1a1a !important; padding: 8px 16px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; border: none; cursor: pointer; }
+    .btn-reservar:hover { background: #b89650; }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER / NAV ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <a href="#" class="logo"><img src="/logo-white.png" alt="PremiumHost" class="logo-img">PremiumHost<span> Roberto</span></a>
+      <nav class="nav" id="nav">
+        <a href="#apartamentos">Apartamentos</a>
+        <a href="#consulta">Disponibilidade</a>
+        <a href="#sobre">Sobre</a>
+        <a href="duvidas.html">Tire Dúvidas</a>
+        <a href="#contato">Contato</a>
+      </nav>
+      <a href="https://wa.me/5571992900979" target="_blank" class="btn-whatsapp">WhatsApp</a>
+      <button class="hamburger" id="hamburger" aria-label="Menu">&#9776;</button>
+    </div>
+  </header>
+
+  <!-- ===== HERO ===== -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <img src="/logo-white.png" alt="PremiumHost Roberto" class="hero-logo">
+      <h1>PremiumHost Roberto</h1>
+      <p class="hero-subtitle">@farolbarraflat — Administradora de Apartamentos de Temporada</p>
+      <p class="hero-desc">Salvador, Bahia — Sua melhor experiência em hospedagem começa aqui.</p>
+      <div class="hero-separator">
+        <span>&#9670;</span>
+      </div>
+      <a href="#apartamentos" class="btn-outline">Conheça nossos apartamentos</a>
+    </div>
+  </section>
+
+  <!-- ===== SOBRE ===== -->
+  <section class="sobre" id="sobre">
+    <div class="container">
+      <div class="section-label">Sobre Nós</div>
+      <div class="sobre-grid">
+        <div class="sobre-texto">
+          <h2>Excelência em <span class="gold">hospedagem temporária</span> em Salvador</h2>
+          <p>A PremiumHost Roberto nasceu da paixão por receber bem. Administramos apartamentos de temporada nas melhores localizações de Salvador — Da Barra, Ondina a Armação — oferecendo conforto, segurança e uma experiência memorável para seus hóspedes.</p>
+          <p>Cada propriedade é cuidadosamente selecionada e equipada para garantir o máximo em conforto. Do check-in ao check-out, cuidamos de cada detalhe para que sua estadia seja perfeita.</p>
+          <ul class="sobre-lista">
+            <li>&#10003; Atendimento personalizado</li>
+            <li>&#10003; Apartamentos completos e equipados</li>
+            <li>&#10003; Localizações privilegiadas</li>
+            <li>&#10003; Suporte durante toda a estadia</li>
+          </ul>
+        </div>
+        <div class="sobre-imagem">
+          <img src="https://www.brasilmergulho.com/wp-content/uploads/2021/11/Farol-da-Barra.jpg" alt="Vista de Salvador">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CONSULTA DE DISPONIBILIDADE ===== -->
+  <section class="consulta" id="consulta">
+    <div class="container">
+      <div class="section-label">Disponibilidade</div>
+      <h2 class="section-title">Consulte <span class="gold">disponibilidade</span></h2>
+      <p class="section-desc">Informe as datas e quantidade de hóspedes para verificar quais apartamentos estão disponíveis.</p>
+
+      <form class="consulta-form" id="consultaForm">
+        <div class="consulta-fields">
+          <div class="consulta-field">
+            <label for="checkin">Check-in</label>
+            <input type="date" id="checkin" required>
+          </div>
+          <div class="consulta-field">
+            <label for="checkout">Check-out</label>
+            <input type="date" id="checkout" required>
+          </div>
+          <div class="consulta-field">
+            <label for="hospedes">Hóspedes</label>
+            <select id="hospedes">
+              <option value="1">1 hóspede</option>
+              <option value="2" selected>2 hóspedes</option>
+              <option value="3">3 hóspedes</option>
+              <option value="4">4 hóspedes</option>
+              <option value="5">5 hóspedes</option>
+              <option value="6">6 hóspedes</option>
+            </select>
+          </div>
+          <button type="submit" class="consulta-btn" id="consultaBtn">
+            <span class="consulta-btn-text">Buscar</span>
+            <span class="consulta-btn-loading">Buscando...</span>
+          </button>
+        </div>
+      </form>
+
+      <div class="consulta-resultados" id="consultaResultados"></div>
+    </div>
+  </section>
+
+  <!-- ===== SEPARADOR ===== -->
+  <div class="separator">
+    <span>&#9670;</span>
+  </div>
+
+  <!-- ===== APARTAMENTOS ===== -->
+  <section class="apartamentos" id="apartamentos">
+    <div class="container">
+      <div class="section-label">Nossos Apartamentos</div>
+      <h2 class="section-title">Escolha seu destino <span class="gold">em Salvador</span></h2>
+      <p class="section-desc">Apartamentos completos, prontos para receber você com todo conforto e praticidade.</p>
+
+      <div class="cards-grid">
+
+        <!-- Card 1 -->
+        <div class="card">
+          <div class="card-img">
+            <img src="https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720" alt="Farol Barra Flat 214">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Farol da Barra</span>
+            <h3>Farol Barra Flat, 214</h3>
+            <div class="card-info">
+              <span>&#128101; 6 hóspedes</span>
+              <span>&#128716; 2 quartos</span>
+              <span>&#128703; 1 banheiro</span>
+            </div>
+            <p>2 Camas de Casal, 2 Camas auxiliar de Solteiro. Ar condicionado, cozinha equipada.</p>
+            <a href="barra-flat-214.html" class="card-btn">Ver disponibilidade</a>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card">
+          <div class="card-img">
+            <img src="https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=1200" alt="Ondina Apart Hotel 441">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Ondina</span>
+            <h3>Ondina Apart Hotel, 441</h3>
+            <div class="card-info">
+              <span>&#128101; 6 hóspedes</span>
+              <span>&#128716; 2 quartos</span>
+              <span>&#128703; 1 banheiro</span>
+            </div>
+            <p>2 Camas de Casal, 2 Camas auxiliar de Solteiro. Ar condicionado, cozinha equipada.</p>
+            <a href="ondina-apt-441.html" class="card-btn">Ver disponibilidade</a>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card">
+          <div class="card-img">
+            <img src="https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=1200" alt="Ondina Apart Hotel 305">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Ondina</span>
+            <h3>Ondina Apart Hotel, 305</h3>
+            <div class="card-info">
+              <span>&#128101; 4 hóspedes</span>
+              <span>&#128716; 1 quarto</span>
+              <span>&#128703; 1 banheiro</span>
+            </div>
+            <p>1 Cama de Casal, 1 Sofá cama. Ar condicionado, cozinha equipada.</p>
+            <a href="ondina-apt-305.html" class="card-btn">Ver disponibilidade</a>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card">
+          <div class="card-img">
+            <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/1d8a9acb-6f2b-40ed-b3ef-040a8c6fd3fd.jpeg?im_w=1200" alt="Smart Convenções 509">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Smart Convenções</span>
+            <h3>Smart Convenções, 509</h3>
+            <div class="card-info">
+              <span>&#128101; 2 hóspedes</span>
+              <span>&#128716; Studio</span>
+              <span>&#128703; 1 banheiro</span>
+            </div>
+            <p>1 Cama de Casal. Ar condicionado, cozinha equipada.</p>
+            <a href="smar-convencoes-509.html" class="card-btn">Ver disponibilidade</a>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="card">
+          <div class="card-img">
+            <img src="https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/c43c0e8e-a42f-4293-9b87-99e835a9df42.jpeg?im_w=1200" alt="The Plaza Ondina">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Ondina</span>
+            <h3>The Plaza 407</h3>
+            <div class="card-info">
+              <span>&#128101; 4 hóspedes</span>
+              <span>&#128716; 1 quarto</span>
+              <span>&#128703; 1 banheiro</span>
+            </div>
+            <p>1 Cama de Casal, 1 Sofá cama. Cozinha equipada, ar condicionado.</p>
+            <a href="plaza-ondina-407.html" class="card-btn">Ver disponibilidade</a>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="card">
+          <div class="card-img">
+            <img src="https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720" alt="Farol Barra Flat 304">
+          </div>
+          <div class="card-body">
+            <span class="card-tag">Farol da Barra</span>
+            <h3>Farol Barra Flat, 304 – Vista Mar</h3>
+            <div class="card-info">
+              <span>&#128101; 4 hóspedes</span>
+              <span>&#128716; Studio</span>
+              <span>&#128703; 1 banheiro</span>
+            </div>
+            <p>1 Cama de Casal, 1 Cama de Solteiro, 1 Sofá cama. Ar condicionado, cozinha equipada.</p>
+            <a href="barra-flat-304.html" class="card-btn">Ver disponibilidade</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== SEPARADOR ===== -->
+  <div class="separator">
+    <span>&#9670;</span>
+  </div>
+
+  <!-- ===== COMODIDADES ===== -->
+  <section class="comodidades">
+    <div class="container">
+      <div class="section-label">Comodidades</div>
+      <h2 class="section-title">Tudo que você precisa <span class="gold">para sua estadia</span></h2>
+      <div class="comodidades-grid">
+        <div class="comodidade-item">
+          <div class="comodidade-icon">&#127958;</div>
+          <h4>Praias próximas</h4>
+          <p>Localização privilegiada perto das melhores praias e Pontos turisticos de Salvador</p>
+        </div>
+        <div class="comodidade-item">
+          <div class="comodidade-icon">&#127857;</div>
+          <h4>Cozinha equipada</h4>
+          <p>Cozinha completa para preparar suas refeições com liberdade</p>
+        </div>
+        <div class="comodidade-item">
+          <div class="comodidade-icon">&#127777;</div>
+          <h4>Ar condicionado</h4>
+          <p>Todos os apartamentos com ar condicionado para seu conforto</p>
+        </div>
+        <div class="comodidade-item">
+          <div class="comodidade-icon">&#128179;</div>
+          <h4>Wi-Fi gratuito</h4>
+          <p>Conexão de internet em todas as unidades</p>
+        </div>
+        <div class="comodidade-item">
+          <div class="comodidade-icon">&#128737;</div>
+          <h4>Segurança 24h</h4>
+          <p>Condomínios com portaria e câmeras de segurança</p>
+        </div>
+        <div class="comodidade-item">
+          <div class="comodidade-icon">&#128247;</div>
+          <h4>Suporte online</h4>
+          <p>Suporte rápido via WhatsApp durante toda a estadia</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== AVALIAÇÕES AIRBNB ===== -->
+  <section class="avaliacoes" id="avaliacoes">
+    <div class="container">
+      <div class="section-label">Airbnb</div>
+      <div class="separator">
+        <span>&#9670;</span>
+      </div>
+      <h2 class="section-title">Avaliações Reais</h2>
+      <div class="avaliacoes-stats">
+        <div class="stat-item">
+          <div class="stat-nota">4.91</div>
+          <div class="stat-label">Nota Geral</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-nota">+200</div>
+          <div class="stat-label">Hóspedes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-nota">4.9</div>
+          <div class="stat-label">Limpeza</div>
+        </div>
+      </div>
+      <div class="avaliacoes-grid">
+        <div class="avaliacao-card">
+          <div class="avaliacao-estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="avaliacao-texto">"Apartamento impecável, localização perfeita e atendimento rápido."</p>
+          <div class="avaliacao-autor">
+            <span class="avaliacao-nome">Mariana</span>
+            <span class="avaliacao-data">Outubro 2025</span>
+          </div>
+        </div>
+        <div class="avaliacao-card">
+          <div class="avaliacao-estrelas">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p class="avaliacao-texto">"Melhor custo-benefício da região. Muito limpo e organizado."</p>
+          <div class="avaliacao-autor">
+            <span class="avaliacao-nome">Carlos</span>
+            <span class="avaliacao-data">Setembro 2025</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== CTA ===== -->
+  <section class="cta">
+    <div class="cta-overlay"></div>
+    <div class="container">
+      <div class="cta-content">
+        <h2>Venha viver o melhor de Salvador</h2>
+        <div class="separator cta-sep">
+          <span>&#9670;</span>
+        </div>
+        <p>Reserve agora seu apartamento e tenha uma experiência inesquecível</p>
+        <a href="https://wa.me/5571992900979" target="_blank" class="btn-whatsapp btn-large">Fale conosco no WhatsApp</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== PIX MODAL ===== -->
+  <div class="pix-modal" id="pixModal">
+    <div class="pix-modal-content">
+      <span class="pix-modal-close" onclick="fecharPixModal()">&times;</span>
+      <h2>Reservar Apartamento</h2>
+      <div class="pix-resumo" id="pixResumo"></div>
+      <div class="pix-qr" id="pixQrContainer"></div>
+      <div class="pix-codigo" id="pixCodigo" onclick="copiarPix()" title="Clique para copiar"></div>
+      <button class="btn-pix-pagar" onclick="enviarWhatsPix()">Já paguei - Confirmar reserva</button>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" id="contato">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>PremiumHost<span class="gold"> Roberto</span></h3>
+          <p>Administradora de apartamentos de temporada em Salvador, BA. Sua melhor experiência em hospedagem começa aqui.</p>
+        </div>
+        <div class="footer-contato">
+          <h4>Contato</h4>
+          <p>&#128205; Salvador, Bahia</p>
+          <p>&#128231; premiumhostroberto@gmail.com</p>
+          <p>&#128222; (71) 99290-0979</p>
+          <a href="https://wa.me/5571992900979" target="_blank" class="footer-whatsapp">&#128172; Fale pelo WhatsApp</a>
+        </div>
+        <div class="footer-links">
+          <h4>Links</h4>
+          <a href="#apartamentos">Apartamentos</a>
+          <a href="#sobre">Sobre</a>
+          <a href="#contato">Contato</a>
+          <a href="duvidas.html">Tire Dúvidas</a>
+        </div>
+        <div class="footer-social">
+          <h4>Redes Sociais</h4>
+          <div class="social-icons">
+            <a href="https://www.instagram.com/farolbarraflat/" target="_blank" aria-label="Instagram">&#127754;</a>
+            <a href="https://wa.me/5571992900979" target="_blank" aria-label="WhatsApp">&#128241;</a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 PremiumHost Roberto — Todos os direitos reservados. Salvador, Bahia.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ===== WHATSAPP-STYLE CHAT WIDGET ===== -->
+  <div class="chat-widget" id="chatWidget">
+    <button class="chat-toggle" id="chatToggle" aria-label="Abrir chat">
+      <svg class="chat-toggle-icon" viewBox="0 0 24 24" fill="white">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+      </svg>
+      <span class="chat-toggle-close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        </svg>
+      </span>
+    </button>
+    <div class="chat-panel" id="chatPanel">
+      <div class="chat-header">
+        <div class="chat-header-info">
+          <div class="chat-avatar">
+            <svg viewBox="0 0 24 24" fill="white">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="chat-header-title">PremiumHost Roberto</div>
+            <div class="chat-header-sub">online</div>
+          </div>
+        </div>
+        <button class="chat-close" id="chatClose" aria-label="Fechar chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+      <div class="chat-messages" id="chatMessages">
+        <div class="chat-msg bot">
+          <div class="msg-content">
+            Oi, tudo bem? Sou Roberto, como posso te ajudar? :)
+          </div>
+          <div class="msg-time">agora</div>
+        </div>
+      </div>
+      <div class="chat-input-area">
+        <input type="text" class="chat-input" id="chatInput" placeholder="Digite uma mensagem" autocomplete="off">
+        <button class="chat-send" id="chatSend" aria-label="Enviar">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* ===== WHATSAPP-STYLE CHAT WIDGET ===== */
+    :root {
+      --wa-green: #075e54;
+      --wa-green-dark: #054d44;
+      --wa-teal: #128c7e;
+      --wa-teal-light: #25d366;
+      --wa-bg: #efeae2;
+      --wa-bg-dark: #e5ddd5;
+      --wa-msg-user: #d9fdd3;
+      --wa-msg-bot: #fff;
+      --wa-header-text: #fff;
+      --wa-text: #111b21;
+      --wa-text-secondary: #667781;
+      --wa-input-bg: #f0f2f5;
+    }
+
+    .chat-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    /* Floating action button - WhatsApp green */
+    .chat-toggle {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--wa-teal);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .chat-toggle:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+      background: #0b9a89;
+    }
+
+    .chat-toggle .chat-toggle-icon {
+      width: 32px;
+      height: 32px;
+    }
+
+    .chat-toggle-close {
+      display: none;
+    }
+
+    .chat-widget.open .chat-toggle svg:not(.chat-toggle-close) {
+      display: none;
+    }
+
+    .chat-widget.open .chat-toggle-close {
+      display: block;
+    }
+
+    .chat-toggle-close svg {
+      width: 24px;
+      height: 24px;
+      color: #fff;
+    }
+
+    /* Panel */
+    .chat-panel {
+      position: absolute;
+      bottom: 76px;
+      right: 0;
+      width: 380px;
+      height: 540px;
+      background: var(--wa-bg);
+      border-radius: 10px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+      animation: waSlideUp 0.25s ease;
+    }
+
+    .chat-widget.open .chat-panel {
+      display: flex;
+    }
+
+    @keyframes waSlideUp {
+      from { opacity: 0; transform: translateY(12px) scale(0.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* Header - WhatsApp green */
+    .chat-header {
+      background: var(--wa-green);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .chat-header-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+    }
+
+    .chat-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chat-avatar svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .chat-header-title {
+      color: var(--wa-header-text);
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .chat-header-sub {
+      color: rgba(255,255,255,0.75);
+      font-size: 0.75rem;
+      font-weight: 400;
+    }
+
+    .chat-close {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.7);
+      cursor: pointer;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+
+    .chat-close:hover { color: #fff; }
+
+    .chat-close svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Messages area - WhatsApp chat background */
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      background: var(--wa-bg);
+      scroll-behavior: smooth;
+      background-image: url('data:image/svg+xml;utf8,<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="wa" patternUnits="userSpaceOnUse" width="4" height="4"><circle cx="2" cy="2" r="1.2" fill="rgba(0,0,0,0.03)"/></pattern></defs><rect width="100%" height="100%" fill="url(%23wa)"/></svg>');
+    }
+
+    .chat-messages::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .chat-messages::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .chat-messages::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.15);
+      border-radius: 3px;
+    }
+
+    /* Message bubbles */
+    .chat-msg {
+      display: flex;
+      flex-direction: column;
+      max-width: 88%;
+      animation: waMsgIn 0.2s ease;
+      position: relative;
+    }
+
+    @keyframes waMsgIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .chat-msg.bot {
+      align-self: flex-start;
+    }
+
+    .chat-msg.user {
+      align-self: flex-end;
+    }
+
+    .msg-content {
+      padding: 8px 12px;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      position: relative;
+      word-wrap: break-word;
+    }
+
+    .chat-msg.bot .msg-content {
+      background: var(--wa-msg-bot);
+      color: var(--wa-text);
+      border-radius: 8px 8px 8px 2px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+    }
+
+    .chat-msg.user .msg-content {
+      background: var(--wa-msg-user);
+      color: var(--wa-text);
+      border-radius: 8px 8px 2px 8px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+    }
+
+    /* Timestamp */
+    .msg-time {
+      font-size: 0.65rem;
+      color: var(--wa-text-secondary);
+      margin-top: 2px;
+      padding: 0 4px;
+    }
+
+    .chat-msg.user .msg-time {
+      text-align: right;
+    }
+
+    /* Typing indicator - WhatsApp style */
+    .chat-typing {
+      display: none;
+      align-self: flex-start;
+      padding: 10px 14px;
+      background: var(--wa-msg-bot);
+      border-radius: 8px 8px 8px 2px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+    }
+
+    .chat-typing.active {
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .chat-typing span {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #8796a1;
+      animation: waTyping 1.4s infinite;
+    }
+
+    .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+    .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes waTyping {
+      0%, 60%, 100% { transform: translateY(0); background: #8796a1; }
+      30% { transform: translateY(-5px); background: #667781; }
+    }
+
+    /* Input area - WhatsApp style */
+    .chat-input-area {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      background: #f0f2f5;
+    }
+
+    .chat-input {
+      flex: 1;
+      border: none;
+      border-radius: 24px;
+      padding: 10px 16px;
+      font-size: 0.875rem;
+      font-family: inherit;
+      outline: none;
+      background: #fff;
+      color: var(--wa-text);
+    }
+
+    .chat-input::placeholder {
+      color: var(--wa-text-secondary);
+    }
+
+    .chat-send {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: var(--wa-teal);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .chat-send:hover {
+      background: #0b9a89;
+    }
+
+    .chat-send svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    .chat-send:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Responsive */
+    @media (max-width: 480px) {
+      .chat-panel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 0;
+      }
+
+      .chat-widget {
+        bottom: 16px;
+        right: 16px;
+      }
+    }
+  </style>
+
+  <script>
+    // Shared config
+    const API_URL = '';
+    const WHATSAPP_NUM = '5571992900979';
+    const CALENDAR_PROPERTIES = [
+      { key: 'farol_barra_flat_214', name: 'Farol Barra Flat, 214', img: 'https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720', tag: 'Farol da Barra', info: '2 quartos · 1 banheiro · 6 hóspedes máx', endpoint: '/api/calendar/farol_barra_flat_214' },
+      { key: 'ondina_apt_hotel_441', name: 'Ondina Apart Hotel, 441', img: 'https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=1200', tag: 'Ondina', info: '2 quartos · 1 banheiro · 6 hóspedes máx', endpoint: '/api/calendar/ondina_apt_hotel_441' },
+      { key: 'ondina_apt_hotel_305', name: 'Ondina Apart Hotel, 305', img: 'https://a0.muscache.com/im/pictures/10a86fe6-04af-47fb-991d-edc6e40cb562.jpg?im_w=1200', tag: 'Ondina', info: '1 quarto · 1 banheiro · 4 hóspedes máx', endpoint: '/api/calendar/ondina_apt_hotel_305' },
+      { key: 'smart_convencoes_509', name: 'Smart Convenções, 509', img: 'https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTMyMDI0MjI2ODQ2MDIwNDc1Ng%3D%3D/original/1d8a9acb-6f2b-40ed-b3ef-040a8c6fd3fd.jpeg?im_w=1200', tag: 'Smart Convenções', info: 'Studio · 1 banheiro · 2 hóspedes máx', endpoint: '/api/calendar/smart_convencoes_509' },
+      { key: 'the_plaza_407', name: 'The Plaza 407', img: 'https://a0.muscache.com/im/pictures/hosting/Hosting-1544328946353777106/original/c43c0e8e-a42f-4293-9b87-99e835a9df42.jpeg?im_w=1200', tag: 'Ondina', info: '1 quarto · 1 banheiro · 4 hóspedes máx', endpoint: '/api/calendar/the_plaza_407' },
+      { key: 'farol_barra_flat_304', name: 'Farol Barra Flat, 304 – Vista Mar', img: 'https://a0.muscache.com/im/pictures/7cf1eab8-da51-4fd9-bc1d-4d5b0658dadc.jpg?im_w=720', tag: 'Farol da Barra', info: 'Studio · 1 banheiro · 4 hóspedes máx', endpoint: '/api/calendar/farol_barra_flat_304' }
+    ];
+
+    // === CHAT WIDGET ===
+    (function() {
+
+      const toggle = document.getElementById('chatToggle');
+      const panel = document.getElementById('chatPanel');
+      const widget = document.getElementById('chatWidget');
+      const closeBtn = document.getElementById('chatClose');
+      const messages = document.getElementById('chatMessages');
+      const input = document.getElementById('chatInput');
+      const sendBtn = document.getElementById('chatSend');
+
+      let guestId = localStorage.getItem('ph_guest_id');
+      if (!guestId) {
+        guestId = 'web_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+        localStorage.setItem('ph_guest_id', guestId);
+      }
+
+      function toggleChat() {
+        widget.classList.toggle('open');
+        if (widget.classList.contains('open')) {
+          setTimeout(() => input.focus(), 300);
+        }
+      }
+
+      // Detectar parâmetro ?openChat=1 da landing page e abrir chat automaticamente
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('openChat') === '1') {
+        setTimeout(() => {
+          widget.classList.add('open');
+          input.focus();
+        }, 500);
+      }
+
+      function closeChat() {
+        widget.classList.remove('open');
+      }
+
+      toggle.addEventListener('click', toggleChat);
+      closeBtn.addEventListener('click', closeChat);
+
+      function scrollToBottom() {
+        messages.scrollTop = messages.scrollHeight;
+      }
+
+      function addMessage(text, type) {
+        const div = document.createElement('div');
+        div.className = 'chat-msg ' + type;
+        const content = document.createElement('div');
+        content.className = 'msg-content';
+        content.innerHTML = text.replace(/\n/g, '<br>');
+        div.appendChild(content);
+        const time = document.createElement('div');
+        time.className = 'msg-time';
+        const now = new Date();
+        time.textContent = now.getHours().toString().padStart(2, '0') + ':' + now.getMinutes().toString().padStart(2, '0');
+        div.appendChild(time);
+        messages.appendChild(div);
+        scrollToBottom();
+      }
+
+      function showTyping() {
+        let typing = document.querySelector('.chat-typing');
+        if (!typing) {
+          typing = document.createElement('div');
+          typing.className = 'chat-typing';
+          typing.innerHTML = '<span></span><span></span><span></span>';
+          messages.appendChild(typing);
+        }
+        typing.classList.add('active');
+        scrollToBottom();
+      }
+
+      function hideTyping() {
+        const typing = document.querySelector('.chat-typing');
+        if (typing) typing.classList.remove('active');
+      }
+
+      async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        input.value = '';
+        sendBtn.disabled = true;
+        addMessage(text, 'user');
+        showTyping();
+
+        try {
+          const res = await fetch(API_URL + '/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              message: text,
+              guest_id: guestId,
+              platform: 'web'
+            })
+          });
+
+          if (!res.ok) throw new Error('Erro ' + res.status);
+          const data = await res.json();
+          hideTyping();
+          addMessage(data.response, 'bot');
+        } catch (err) {
+          hideTyping();
+          addMessage('Desculpe, não consegui me conectar ao servidor. Tente novamente ou entre em contato pelo WhatsApp.', 'bot');
+        } finally {
+          sendBtn.disabled = false;
+          input.focus();
+        }
+      }
+
+      sendBtn.addEventListener('click', sendMessage);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') sendMessage();
+      });
+    })();
+
+    // === CONSULTA DE DISPONIBILIDADE ===
+    (function() {
+      const form = document.getElementById('consultaForm');
+      const resultados = document.getElementById('consultaResultados');
+      const btn = document.getElementById('consultaBtn');
+      const checkin = document.getElementById('checkin');
+      const checkout = document.getElementById('checkout');
+
+      // Set min dates
+      const hoje = new Date();
+      const hojeStr = hoje.toISOString().split('T')[0];
+      checkin.setAttribute('min', hojeStr);
+      checkin.addEventListener('change', () => {
+        checkout.setAttribute('min', checkin.value);
+        if (checkout.value && checkout.value <= checkin.value) {
+          checkout.value = '';
+        }
+      });
+
+      function formatDate(str) {
+        const d = new Date(str + 'T12:00:00');
+        return d.toLocaleDateString('pt-BR');
+      }
+
+      function getDatesBetween(start, end) {
+        const dates = [];
+        let d = new Date(start + 'T12:00:00');
+        const endD = new Date(end + 'T12:00:00');
+        while (d < endD) {
+          dates.push(d.toISOString().split('T')[0]);
+          d.setDate(d.getDate() + 1);
+        }
+        return dates;
+      }
+
+      function getNoites(start, end) {
+        const s = new Date(start + 'T12:00:00');
+        const e = new Date(end + 'T12:00:00');
+        return Math.round((e - s) / (86400000));
+      }
+
+      async function fetchOcupados(endpoint) {
+        try {
+          const res = await fetch(endpoint);
+          if (!res.ok) return null;
+          return await res.json();
+        } catch {
+          return null;
+        }
+      }
+
+      async function fetchCotacao(propKey, checkinStr, checkoutStr, guests) {
+        try {
+          const res = await fetch(API_URL + '/api/cotacao', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              property_key: propKey,
+              checkin: checkinStr,
+              checkout: checkoutStr,
+              guests: guests
+            })
+          });
+          if (!res.ok) return null;
+          return await res.json();
+        } catch {
+          return null;
+        }
+      }
+
+      function criarResultadoCard(prop, estado, cotacao, noites) {
+        const div = document.createElement('div');
+        div.className = 'resultado-card ' + (estado === 'livre' ? 'disponivel' : 'indisponivel');
+
+        const statusMap = {
+          'livre': '<span class="resultado-status livre">Disponível</span>',
+          'ocupado': '<span class="resultado-status ocupado">Ocupado</span>',
+          'consultar': '<span class="resultado-status consultar">Consulte</span>'
+        };
+
+        let precoHtml = '';
+        let btnHtml = '';
+
+        if (estado === 'livre' && cotacao && cotacao.disponivel) {
+          precoHtml = `
+            <div class="resultado-card-preco">R$ ${cotacao.total.toLocaleString('pt-BR', {minimumFractionDigits: 2})} <small>total</small></div>
+            <div class="resultado-card-noites">R$ ${cotacao.media_noite.toLocaleString('pt-BR', {minimumFractionDigits: 2})} / noite · ${noites} noites</div>
+          `;
+          btnHtml = `
+            <button class="btn-reservar" onclick="abrirPixModal('${prop.key}','${prop.name.replace(/'/g,"\\'")}',${cotacao.total},'${formatDate(checkin.value)}','${formatDate(checkout.value)}',${document.getElementById('hospedes').value})">Reservar</button>
+            <a href="https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent('Olá! Gostaria de reservar o ' + prop.name + ' das ' + formatDate(checkin.value) + ' ao ' + formatDate(checkout.value) + ' para ' + document.getElementById('hospedes').value + ' pessoas.')}" target="_blank" class="card-btn" style="display:inline-block;margin-top:4px">Reservar via WhatsApp</a>
+          `;
+        } else if (estado === 'livre') {
+          precoHtml = `<div class="resultado-card-preco">Disponível <small>consulte preço</small></div>`;
+          btnHtml = `<a href="https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent('Olá! Gostaria de informações sobre o ' + prop.name + ' para ' + document.getElementById('hospedes').value + ' pessoas, do ' + formatDate(checkin.value) + ' ao ' + formatDate(checkout.value) + '.')}" target="_blank" class="card-btn">Consultar via WhatsApp</a>`;
+        } else {
+          precoHtml = `<div class="resultado-card-preco"><small>Indisponível para este período</small></div>`;
+          btnHtml = `<a href="https://wa.me/${WHATSAPP_NUM}?text=${encodeURIComponent('Olá! Gostaria de saber sobre disponibilidade alternativa para ' + prop.name + '.')}" target="_blank" class="card-btn disabled">Indisponível</a>`;
+        }
+
+        div.innerHTML = `
+          <div class="resultado-card-img">
+            <img src="${prop.img}" alt="${prop.name}" loading="lazy">
+          </div>
+          <div class="resultado-card-body">
+            <div class="resultado-card-header">
+              <h4>${prop.name}</h4>
+              ${statusMap[estado]}
+            </div>
+            <div class="resultado-card-info">${prop.tag} · ${prop.info}</div>
+            ${precoHtml}
+            ${btnHtml}
+          </div>
+        `;
+        return div;
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const checkinVal = checkin.value;
+        const checkoutVal = checkout.value;
+        const hospedes = parseInt(document.getElementById('hospedes').value);
+
+        if (!checkinVal || !checkoutVal) return;
+        if (checkoutVal <= checkinVal) {
+          resultados.innerHTML = '<div class="consulta-erro">A data de check-out deve ser posterior à data de check-in.</div>';
+          return;
+        }
+
+        resultados.innerHTML = '';
+        btn.classList.add('loading');
+
+        const noites = getNoites(checkinVal, checkoutVal);
+        const checkinApi = formatDate(checkinVal);
+        const checkoutApi = formatDate(checkoutVal);
+
+        const grid = document.createElement('div');
+        grid.className = 'consulta-resultados-grid';
+
+        let algumaInfo = false;
+
+        for (const prop of CALENDAR_PROPERTIES) {
+          let estado = 'consultar';
+          let cotacao = null;
+
+          // Check guest capacity
+          const maxGuests = parseInt(prop.info.match(/(\d+) hóspedes?/)?.[1] || '99');
+          if (hospedes > maxGuests) {
+            estado = 'ocupado';
+            algumaInfo = true;
+            grid.appendChild(criarResultadoCard(prop, estado, null, noites));
+            continue;
+          }
+
+          // Try calendar endpoint if available
+          if (prop.endpoint) {
+            const ocupados = await fetchOcupados(prop.endpoint);
+            if (ocupados && Array.isArray(ocupados)) {
+              const periodo = getDatesBetween(checkinVal, checkoutVal);
+              const temConflito = periodo.some(d => ocupados.includes(d));
+              estado = temConflito ? 'ocupado' : 'livre';
+            }
+          }
+
+          // Try to get pricing from API
+          if (estado === 'livre') {
+            cotacao = await fetchCotacao(prop.key, checkinApi, checkoutApi, hospedes);
+            if (cotacao && !cotacao.disponivel) {
+              estado = 'ocupado';
+            }
+          }
+
+          algumaInfo = true;
+          grid.appendChild(criarResultadoCard(prop, estado, cotacao, noites));
+        }
+
+        btn.classList.remove('loading');
+
+        if (!algumaInfo) {
+          resultados.innerHTML = '<div class="consulta-resultados vazio">Nenhum resultado encontrado. Tente alterar as datas ou o número de hóspedes.</div>';
+          return;
+        }
+
+        const title = document.createElement('h3');
+        const disponiveis = grid.querySelectorAll('.disponivel').length;
+        if (disponiveis > 0) {
+          title.innerHTML = `${disponiveis} apartamento${disponiveis > 1 ? 's' : ''} disponível${disponiveis > 1 ? 'is' : ''} para <span class="gold">${formatDate(checkinVal)}</span> a <span class="gold">${formatDate(checkoutVal)}</span> · ${hospedes} hóspede${hospedes > 1 ? 's' : ''}`;
+        } else {
+          title.innerHTML = `Nenhum apartamento disponível para este período`;
+        }
+
+        resultados.appendChild(title);
+        resultados.appendChild(grid);
+        resultados.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+
+    })();   // end chat/disp IIFE
+
+    // === PIX MODAL (global) ===
+    let bookingInfo = null;
+
+    function abrirPixModal(propKey, propName, total, checkinStr, checkoutStr, hospedes) {
+        bookingInfo = { propKey, propName, total, checkin: checkinStr, checkout: checkoutStr, hospedes };
+        var resumo = document.getElementById('pixResumo');
+        var entrada = total / 2;
+        resumo.innerHTML = '<strong>' + propName + '</strong><br>' +
+          checkinStr + ' a ' + checkoutStr + ' · ' + hospedes + ' hóspede' + (hospedes > 1 ? 's' : '') +
+          '<br><br>Valor total: <strong>R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong>' +
+          '<br>Entrada (50%): <strong style="color:#c8a96a">R$ ' + entrada.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong>' +
+          '<br><br><small style="color:#888">Restante (50%): deverá ser pago até o dia do check-in</small>';
+
+        // Fetch PIX payload
+        fetch(API_URL + '/api/pix/payload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ total: total, property_name: propName, checkin: checkinStr, checkout: checkoutStr }),
+        })
+          .then(function(r) { return r.json(); })
+          .then(function(data) {
+            // Render QR code
+            var qrContainer = document.getElementById('pixQrContainer');
+            qrContainer.innerHTML = '';
+            var qrDiv = document.createElement('div');
+            qrDiv.style.display = 'inline-block';
+            qrContainer.appendChild(qrDiv);
+            if (typeof QRCode !== 'undefined') {
+              new QRCode(qrDiv, { text: data.payload, width: 200, height: 200 });
+            } else {
+              qrDiv.textContent = 'Erro ao gerar QR Code';
+            }
+            // Show copy-paste code
+            var codigo = document.getElementById('pixCodigo');
+            codigo.textContent = 'PIX Copia e Cola (clique para copiar): ' + data.payload;
+            codigo.style.display = 'block';
+          })
+          .catch(function() {
+            document.getElementById('pixQrContainer').innerHTML = '<p style="color:red">Erro ao gerar PIX. Tente novamente.</p>';
+          });
+
+        document.getElementById('pixModal').style.display = 'block';
+      }
+
+      function fecharPixModal() {
+        document.getElementById('pixModal').style.display = 'none';
+      }
+
+      function copiarPix() {
+        var codigo = document.getElementById('pixCodigo');
+        var texto = codigo.textContent.replace('PIX Copia e Cola (clique para copiar): ', '');
+        navigator.clipboard.writeText(texto).then(function() {
+          var original = codigo.textContent;
+          codigo.textContent = 'Copiado!';
+          setTimeout(function() { codigo.textContent = original; }, 2000);
+        });
+      }
+
+      function enviarWhatsPix() {
+        if (!bookingInfo) return;
+        var msg = 'Ol\u00e1 Roberto! Acabei de fazer o PIX da entrada para confirmar a reserva do ' +
+          bookingInfo.propName + ' das ' + bookingInfo.checkin + ' ao ' + bookingInfo.checkout +
+          ' para ' + bookingInfo.hospedes + ' h\u00f3spede' + (bookingInfo.hospedes > 1 ? 's' : '') +
+          '. Valor total: R$ ' + bookingInfo.total.toFixed(2) +
+          '. Segue comprovante abaixo.';
+        window.open('https://wa.me/' + WHATSAPP_NUM + '?text=' + encodeURIComponent(msg), '_blank');
+      }
+
+    document.getElementById('pixModal').addEventListener('click', function(e) {
+      if (e.target === this) fecharPixModal();
+    });
+  </script>
+  <script src="style.js"></script>
+
+</body>
+</html>
