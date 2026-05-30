@@ -40,7 +40,7 @@ def _collect_snapshot():
             faq = get_faq_items()
             if faq: snap["faq_items"] = faq
             sys_msgs = get_system_messages()
-            if sys_msgs: snap["system_messages"] = sys_msgs
+            if sys_msgs: snap["system_messages"] = {k: v for k, v in sys_msgs.items() if not k.startswith("_backup_")}
             pc = get_pricing_config()
             if pc: snap["pricing_config"] = pc
             po = get_property_overrides()
@@ -68,8 +68,13 @@ def _create_backup(label: str):
     if supabase_configured():
         try:
             upsert_system_message(key, json.dumps(snap, ensure_ascii=False))
-            print(f"Backup saved: {key}", flush=True)
-            return key
+            # Verify the upsert took effect
+            verify = _api("GET", f"system_messages?key=eq.{key}&select=key") or []
+            if verify:
+                print(f"Backup saved: {key}", flush=True)
+                return key
+            else:
+                print(f"Backup NOT found after upsert: {key}", flush=True)
         except Exception as e:
             print(f"Backup error: {e}", flush=True)
     print("Backup: Supabase not configured", flush=True)
