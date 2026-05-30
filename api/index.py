@@ -125,11 +125,28 @@ def _restore_backup(key: str) -> str:
     rest = key[len("_backup_"):] if key.startswith("_backup_") else key
     parts = rest.split("_", 2)
     label = parts[2] if len(parts) >= 3 else parts[0] if parts else "unknown"
-    # Restore using supabase_db's restore_backup_legacy
     if supabase_configured():
         try:
-            from supabase_db import restore_backup_legacy
-            restore_backup_legacy(snap)
+            from supabase_db import upsert_faq_items, upsert_system_message, upsert_pricing_config, upsert_property_override, upsert_date_overrides, upsert_photo_override, set_calendar_dates, clear_all_calendar_dates
+            if "faq_items" in snap:
+                upsert_faq_items(snap["faq_items"])
+            if "system_messages" in snap:
+                for k, v in snap["system_messages"].items():
+                    upsert_system_message(k, v)
+            if "pricing_config" in snap:
+                upsert_pricing_config(snap["pricing_config"])
+            if "property_overrides" in snap:
+                for pk, data in snap["property_overrides"].items():
+                    upsert_property_override(pk, data)
+            if "date_overrides" in snap:
+                upsert_date_overrides(snap["date_overrides"])
+            if "photo_overrides" in snap:
+                for pk, cats in snap["photo_overrides"].items():
+                    upsert_photo_override(pk, cats)
+            if "calendar_dates" in snap:
+                clear_all_calendar_dates()
+                for entry in snap["calendar_dates"]:
+                    set_calendar_dates(entry["property_key"], [entry["date"]], entry["status"])
         except Exception as e:
             print(f"Restore error: {e}", flush=True)
             raise ValueError(f"Erro ao restaurar: {e}")
