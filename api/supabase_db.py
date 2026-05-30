@@ -249,26 +249,31 @@ def save_backup(label: str, snapshot: dict) -> bool:
 # ── LANDING PAGE CLICKS ──
 
 def log_landing_click(button: str, guest_id: str):
-    """Log a click on landing page button."""
-    _api("POST", "landing_clicks", {
-        "button": button,
-        "guest_id": guest_id,
-        "created_at": None  # Use server timestamp
-    })
+    """Log a click on landing page button. Stores in system_messages with _click_ prefix."""
+    from datetime import datetime
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    key = f"_click_{ts}_{guest_id}_{button}"
+    _api("POST", "system_messages", {"key": key, "value": json.dumps({
+        "button": button, "guest_id": guest_id, "created_at": datetime.now().isoformat()
+    })})
 
 
 def get_landing_clicks_today() -> dict:
     """Get landing page clicks for today (counts by button)."""
     from datetime import datetime, timedelta
-    today = datetime.now().strftime("%Y-%m-%d")
-    
-    # Get clicks created today using Supabase filter format
-    rows = _api("GET", "landing_clicks", params={"created_at": f"gte.{today}"}) or []
+    today_prefix = "_click_" + datetime.now().strftime("%Y%m%d")
+    rows = _api("GET", "system_messages") or []
     
     stats = {"btn_chat": 0, "btn_site": 0}
     for row in rows:
-        button = row.get("button", "")
-        if button in stats:
-            stats[button] += 1
+        key = row.get("key", "")
+        if key.startswith(today_prefix):
+            try:
+                val = json.loads(row.get("value", "{}"))
+                button = val.get("button", "")
+                if button in stats:
+                    stats[button] += 1
+            except Exception:
+                pass
     
     return stats
