@@ -147,13 +147,6 @@ class Agent:
                 for kw, pk in property_map.items():
                     if kw == key_name or kw.startswith(key_name):
                         return self.pm.get_property(pk)
-
-        # Numbered selection (1-5 matching the ask_property() list order)
-        num_map = {"1": "farol_barra_flat_214", "2": "farol_barra_flat_304",
-                   "3": "ondina_apt_hotel_441", "4": "the_plaza_407", "5": "smart_convencoes_509"}
-        if text_lower.strip() in num_map:
-            return self.pm.get_property(num_map[text_lower.strip()])
-
         return None
 
     def extract_dates(self, text):
@@ -399,8 +392,15 @@ class Agent:
                 self.current_property = prop
 
         if not prop:
-            other_props = self.get_all_properties_for_alternatives()
-            return self.templates.ask_property()
+            # Try numbered selection (1-5 matching the listing order)
+            num_map = {"1": "farol_barra_flat_214", "2": "farol_barra_flat_304",
+                       "3": "ondina_apt_hotel_441", "4": "the_plaza_407", "5": "smart_convencoes_509"}
+            stripped = text_stripped.strip()
+            if stripped in num_map:
+                prop = self.pm.get_property(num_map[stripped])
+            if not prop:
+                other_props = self.get_all_properties_for_alternatives()
+                return self.templates.ask_property()
 
         self.current_property = prop
 
