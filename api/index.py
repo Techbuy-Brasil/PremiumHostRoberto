@@ -922,8 +922,14 @@ def debug_backups(password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
-    result = {"backup_keys": [], "supabase_rows": None, "blob_keys": None}
+    result = {"supabase_configured": supabase_configured(), "backup_keys": [], "supabase_rows": None, "blob_keys": None}
+    # Test insert into backups table
     if supabase_configured():
+        try:
+            test = _api("POST", "backups", {"label": "teste_insert", "snapshot": {"test": True}})
+            result["test_insert"] = "ok" if test is not None else "falhou"
+        except Exception as e:
+            result["test_insert_error"] = str(e)
         try:
             rows = _api("GET", "system_messages") or []
             result["supabase_rows"] = [{"key": r["key"], "len_value": len(r.get("value", ""))} for r in rows if r["key"].startswith("_backup_")]
@@ -935,10 +941,4 @@ def debug_backups(password: str = ""):
             result["blob_keys"] = [k for k in data if k.startswith("_backup_")]
     except Exception as e:
         result["blob_error"] = str(e)
-    total = []
-    if result["supabase_rows"]:
-        total.extend([r["key"] for r in result["supabase_rows"]])
-    if result["blob_keys"]:
-        total.extend(result["blob_keys"])
-    result["merged"] = list(set(total))
     return JSONResponse(content=result)
