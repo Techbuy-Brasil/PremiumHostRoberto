@@ -970,3 +970,19 @@ def admin_leads(password: str = ""):
     return JSONResponse(content={"leads": leads})
 
 
+@app.get("/api/admin/check-email")
+def admin_check_email(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
+    try:
+        import email_notify
+        return JSONResponse(content={
+            "configured": email_notify.configured(),
+            "from_email": email_notify.FROM_EMAIL,
+            "notify_email": email_notify.NOTIFY_EMAIL,
+            "last_error": email_notify.LAST_ERROR,
+        })
+    except Exception as e:
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+

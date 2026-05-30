@@ -461,13 +461,17 @@ class Agent:
                                 q["checkin"], q["checkout"], q["total"], guests)
                 # Send email notification
                 try:
-                    from email_notify import send_lead_notification, configured as email_configured
-                    if email_configured():
-                        send_lead_notification(
+                    import email_notify
+                    if email_notify.configured():
+                        ok = email_notify.send_lead_notification(
                             self.current_guest or "anon", name, phone,
                             q["property"].name, str(q["checkin"]), str(q["checkout"]),
                             guests, q["total"], "pre_reserva"
                         )
+                        if not ok:
+                            print(f"Email notify failed: {email_notify.LAST_ERROR}", flush=True)
+                    else:
+                        print("Email notify: SENDGRID_API_KEY not configured", flush=True)
                 except Exception as e:
                     print(f"Email notify error: {e}", flush=True)
                 # Generate PIX payload for 50% signal
