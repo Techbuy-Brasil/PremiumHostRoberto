@@ -222,7 +222,6 @@ class Agent:
             r"(\d+)\s*(?:hóspedes|hospedes|pessoas|adultos|convidados)",
             r"(?:para|somos|seremos|serão|vão|vamos)\s+(\d+)",
             r"(?:sou|é)\s+(\d+)\s+(?:pessoas?|hospedes|hóspedes)",
-            r"^(\d{1,2})$",
         ]
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
@@ -416,6 +415,13 @@ class Agent:
 
         # --- PRICING FLOW ---
         missing = self.missing_info(info)
+
+        # If only guests is missing and message is a bare number, use it
+        if missing == ["guests"] and not info.get("guests"):
+            num_match = re.match(r"^\s*(\d{1,2})\s*$", text_stripped)
+            if num_match:
+                info["guests"] = int(num_match.group(1))
+                missing = self.missing_info(info)
 
         if missing:
             extra = ""
