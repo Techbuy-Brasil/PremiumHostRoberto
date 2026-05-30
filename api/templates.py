@@ -157,21 +157,15 @@ class ResponseTemplates:
             "É só perguntar! :)"
         )
 
-    def no_property_match(self):
-        return self._r("sem_imovel",
-            "Me diga o que precisa saber:\n\n"
-            "• Como funciona?\n"
-            "• Valor da diária?\n"
-            "• O que está incluso?\n"
-            "• Horário de Check-in e Check-out?\n"
-            "• Piscina está liberada?\n"
-            "• Tem roupa de cama?\n"
-            "• Forma de pagamento?\n"
-            "• Tem estacionamento?\n"
-            "• Tem taxa extra?\n"
-            "• Pode criança ou Pet?\n"
-            "• Pode Visita?\n"
-            "• Se tiver outra dúvida, pode perguntar :)"
+    def ask_property(self):
+        return self._r("pergunta_imovel",
+            "Entendi! Qual imóvel você está interessado?\n\n"
+            "• Farol da Barra Flat 214\n"
+            "• Farol da Barra Flat 304\n"
+            "• Ondina Apart Hotel 441\n"
+            "• The Plaza 407\n"
+            "• Smart Convenções 509\n\n"
+            "Me fala qual deles que eu faço as contas pra você! :)"
         )
 
     def fallback(self):

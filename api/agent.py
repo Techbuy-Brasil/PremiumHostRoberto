@@ -371,8 +371,18 @@ class Agent:
                 self.current_property = prop
 
         if not prop:
+            # Save any partial info to memory before asking for property
+            partial_memory = {}
+            if info.get("checkin"):
+                partial_memory["checkin"] = info["checkin"].isoformat() if hasattr(info["checkin"], "isoformat") else info["checkin"]
+            if info.get("checkout"):
+                partial_memory["checkout"] = info["checkout"].isoformat() if hasattr(info["checkout"], "isoformat") else info["checkout"]
+            if info.get("guests"):
+                partial_memory["guests"] = info["guests"]
+            if partial_memory:
+                self._save_memory(gid, partial_memory)
             other_props = self.get_all_properties_for_alternatives()
-            return self.templates.no_property_match()
+            return self.templates.ask_property()
 
         self.current_property = prop
 
