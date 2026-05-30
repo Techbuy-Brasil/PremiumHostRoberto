@@ -30,7 +30,41 @@ class Agent:
         prefs["conversation_memory"] = memory
         self.store.update_preferences(guest_id, prefs)
 
-    def _detect_known_topics(self, text):
+    def _save_lead(self, name, phone, property_name, checkin, checkout, total, guests, status="pre_reserva"):
+        """Save a lead to Supabase system_messages."""
+        try:
+            from supabase_db import upsert_system_message
+            import json
+            key = f"_lead_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{self.current_guest or 'anon'}"
+            data = {
+                "nome": name, "phone": phone,
+                "property": property_name, "checkin": str(checkin), "checkout": str(checkout),
+                "total": total, "guests": guests, "status": status,
+                "created_at": datetime.now().isoformat()
+            }
+            upsert_system_message(key, json.dumps(data, ensure_ascii=False))
+        except Exception as e:
+            print(f"Save lead error: {e}", flush=True)
+
+    def _extract_name_phone(self, text):
+        """Extract name and phone from user message. Returns (name, phone) or (None, None)."""
+        phone_patterns = [
+            r"(?:\+?55)?\s*\(?\d{2}\)?\s*\d{4,5}-?\d{4}",
+            r"(?:whatsapp|whats|tel|telefone|cel|celular)[:\s]*(\+?[\d\s()-]{8,})",
+        ]
+        phone = None
+        for p in phone_patterns:
+            m = re.search(p, text, re.IGNORECASE)
+            if m:
+                phone = m.group(0).strip() if m.lastindex else m.group(0).strip()
+                break
+        # Name: assume first words before phone, minimum 2 words
+        if phone:
+            before = text[:text.find(phone)].strip()
+            words = [w for w in before.split() if len(w) > 1 and not re.search(r"\d", w)]
+            if len(words) >= 2:
+                return " ".join(words[:3]), phone
+        return None, None
         topics = []
         text_lower = text.lower()
         if re.search(r"check[-\s]?in|entrada|chegad|acessar|chave|codigo|early", text_lower):
@@ -416,6 +450,16 @@ class Agent:
                 self._last_quote["checkout"].strftime("%d/%m/%Y"),
                 self._last_quote["total"],
             )
+
+        # --- LEAD DETECTION (user providing personal info after booking confirmation) ---
+        if hasattr(self, '_last_quote'):
+            name, phone = self._extract_name_phone(text_stripped)
+            if name and phone:
+                q = self._last_quote
+                self._save_lead(name, phone, q["property"].name,
+                                q["checkin"], q["checkout"], q["total"],
+                                info.get("guests", 2))
+                return self.templates.pix_info()
 
         # --- PRICING FLOW ---
         missing = self.missing_info(info)

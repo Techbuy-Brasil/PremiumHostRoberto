@@ -935,8 +935,22 @@ def admin_leads(password: str = ""):
     cfg = agent.pm.config
     if password != cfg.get("admin_password", ""):
         return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
-    # Return empty leads list for now (conversation leads not persisted)
-    return JSONResponse(content={"leads": []})
+    leads = []
+    if supabase_configured():
+        try:
+            rows = _api("GET", "system_messages?order=key.desc") or []
+            for r in rows:
+                if not r["key"].startswith("_lead_"):
+                    continue
+                try:
+                    data = json.loads(r["value"])
+                    data["id"] = r["key"]
+                    leads.append(data)
+                except Exception:
+                    pass
+        except Exception:
+            pass
+    return JSONResponse(content={"leads": leads})
 
 
 # ── DEBUG ──

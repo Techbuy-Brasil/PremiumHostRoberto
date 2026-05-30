@@ -184,8 +184,8 @@ class ResponseTemplates:
             f"Perfeito! Quer confirmar a reserva do {property_name} "
             f"de {checkin_str} a {checkout_str} no valor de R$ {total:.0f}? :)\n\n"
             "Se sim, vou precisar de:\n"
-            "• Nome completo\n• CPF\n"
-            "• Sinal de 50% via PIX ou cartão\n\n"
+            "• Nome completo\n• Número de WhatsApp\n"
+            "• Sinal de 50% via PIX\n\n"
             "Após o pagamento, envio a confirmação com todas as instruções "
             "de acesso! Pode me passar os dados?"
         )
