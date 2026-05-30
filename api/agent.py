@@ -114,23 +114,28 @@ class Agent:
             "farol barra flat": "farol_barra_flat_214",
             "barra flat 214": "farol_barra_flat_214",
             "flat 214": "farol_barra_flat_214",
+            "214": "farol_barra_flat_214",
             "farol barra flat 304": "farol_barra_flat_304",
             "barra flat 304": "farol_barra_flat_304",
             "flat 304": "farol_barra_flat_304",
+            "304": "farol_barra_flat_304",
             "ondina apart hotel 441": "ondina_apt_hotel_441",
             "ondina apt 441": "ondina_apt_hotel_441",
             "apart hotel 441": "ondina_apt_hotel_441",
             "ondina 441": "ondina_apt_hotel_441",
+            "441": "ondina_apt_hotel_441",
             "ondina apart hotel 305": "ondina_apt_hotel_305",
             "ondina apt 305": "ondina_apt_hotel_305",
             "ondina 305": "ondina_apt_hotel_305",
             "the plaza 407": "the_plaza_407",
             "plaza 407": "the_plaza_407",
             "plaza": "the_plaza_407",
+            "407": "the_plaza_407",
             "smart convencoes 509": "smart_convencoes_509",
             "smart convenções 509": "smart_convencoes_509",
             "smart 509": "smart_convencoes_509",
             "convencoes 509": "smart_convencoes_509",
+            "509": "smart_convencoes_509",
         }
 
         for keyword, prop_key in property_map.items():
@@ -142,6 +147,13 @@ class Agent:
                 for kw, pk in property_map.items():
                     if kw == key_name or kw.startswith(key_name):
                         return self.pm.get_property(pk)
+
+        # Numbered selection (1-5 matching the ask_property() list order)
+        num_map = {"1": "farol_barra_flat_214", "2": "farol_barra_flat_304",
+                   "3": "ondina_apt_hotel_441", "4": "the_plaza_407", "5": "smart_convencoes_509"}
+        if text_lower.strip() in num_map:
+            return self.pm.get_property(num_map[text_lower.strip()])
+
         return None
 
     def extract_dates(self, text):
@@ -210,6 +222,7 @@ class Agent:
             r"(\d+)\s*(?:hóspedes|hospedes|pessoas|adultos|convidados)",
             r"(?:para|somos|seremos|serão|vão|vamos)\s+(\d+)",
             r"(?:sou|é)\s+(\d+)\s+(?:pessoas?|hospedes|hóspedes)",
+            r"^(\d{1,2})$",
         ]
         for pattern in patterns:
             match = re.search(pattern, text, re.IGNORECASE)
