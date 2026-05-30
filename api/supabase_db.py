@@ -227,12 +227,12 @@ def restore_backup(backup_id: int) -> str:
         for row in snap["calendar_dates"]:
             set_calendar_dates(row["property_key"], [row["date"]], row["status"])
     # Restore photo overrides
-     if "photo_overrides" in snap:
-         _api("DELETE", "photo_overrides", params={"property_key": "neq."})
-         for pk, cats in snap["photo_overrides"].items():
-             upsert_photo_override(pk, cats)
+    if "photo_overrides" in snap:
+        _api("DELETE", "photo_overrides", params={"property_key": "neq."})
+        for pk, cats in snap["photo_overrides"].items():
+            upsert_photo_override(pk, cats)
 
-     return bk["label"]
+    return bk["label"]
 
 
 # ── LANDING PAGE CLICKS ──
