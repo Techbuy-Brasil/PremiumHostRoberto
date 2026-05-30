@@ -731,10 +731,51 @@ def list_properties():
     return result
 
 
+def _static_pix_brcode() -> str:
+    """Generate static PIX BR Code (without amount) for QR display."""
+    try:
+        from pix import PIX_TEMPLATE_BEFORE, PIX_TEMPLATE_AFTER, _crc16_ccitt
+        payload = PIX_TEMPLATE_BEFORE + PIX_TEMPLATE_AFTER
+        crc = _crc16_ccitt(payload.encode("utf-8") + b"6304")
+        return payload + f"6304{crc:04X}"
+    except Exception:
+        return ""
+
+
+def _enrich_qr_codes(text: str) -> str:
+    """Append QR code images to text when WhatsApp number or PIX key is mentioned."""
+    import urllib.parse
+    has_whatsapp = "99290-0979" in text or "(71) 99290-0979" in text or "992900979" in text
+    has_pix = "b1b74e94-2687-4ea1-831b-6351b97e7929" in text
+
+    if not has_whatsapp and not has_pix:
+        return text
+
+    # Avoid re-enriching if QR already present
+    if '<img' in text and ('qrserver' in text or 'whatsapp-qr' in text):
+        return text
+
+    enriched = text
+    if has_whatsapp:
+        wa_url = "https://wa.me/5571992900979"
+        wa_qr = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(wa_url)}"
+        enriched += f'\n\n<a href="{wa_url}" target="_blank"><img src="{wa_qr}" alt="WhatsApp" style="max-width:200px;border-radius:8px;display:block"></a>'
+
+    if has_pix:
+        brcode = _static_pix_brcode()
+        if brcode:
+            pix_qr = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(brcode)}"
+            enriched += f'\n\n<img src="{pix_qr}" alt="QR Code PIX" style="max-width:200px;border-radius:8px;display:block">'
+
+    return enriched
+
+
 @app.post("/api/chat")
 def chat(req: MessageRequest):
     guest_id = req.guest_id or req.guest_name or "anon"
     response = agent.respond(req.message, req.guest_name, guest_id)
+    # Enrich response with QR codes
+    response = _enrich_qr_codes(response)
     return {"response": response, "guest_id": guest_id}
 
 
