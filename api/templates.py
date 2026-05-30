@@ -177,18 +177,20 @@ class ResponseTemplates:
 
     def pix_payment(self, property_name, checkin_str, checkout_str, total, signal, guest_name, pix_code=None, pix_qr_url=None):
         msg = self._r("pix_pagamento",
-            "Perfeito, {guest}! Sua reserva do {nome} "
-            "de {checkin} a {checkout} no valor de R$ {total:.0f} "
-            "esta quase confirmada!\n\n"
-            "Para garantir, preciso do sinal de **R$ {signal:.0f}** (50%) via PIX.\n\n"
-            "Chave Pix Aleatoria\n\n"
-            "**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n\n"
-            "Apos o pagamento, me avise aqui que ja confirmo sua reserva "
-            "e envio as instrucoes de acesso! :)",
+            "Pra garantir sua reserva e simples 😄\n\n"
+            "Voce faz **50% via Pix** e o restante paga no dia da hospedagem.\n\n"
+            "Se optar por **cartao**, acrescenta 20% no valor e pode dividir ate 6 vezes. "
+            "Para pagamento em cartao envie mensagem direto para o "
+            "WhatsApp 71-99290-0979 (ou volte para pagina principal, "
+            "clique no Botao do WhatsApp no canto inferior direito da tela).\n\n"
+            "Se for no **Pix**, e so me enviar o comprovante para "
+            "WhatsApp 71-99290-0979 com nome completo e cidade 👍\n"
+            "Em seguida voce recebera o resumo e instrucoes do check-in.\n\n"
+            "**Chave Pix Aleatoria**\n"
+            "**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n"
+            "**Chave PIX e-mail:** robertotechbuy15@gmail.com",
             guest=guest_name, nome=property_name, checkin=checkin_str,
             checkout=checkout_str, total=total, signal=signal)
-        if pix_qr_url:
-            msg += f"\n\n<img src=\"{pix_qr_url}\" alt=\"QR Code PIX\" style=\"max-width:250px;border-radius:8px\">"
         return msg
 
     def pix_info(self):

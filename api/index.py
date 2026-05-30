@@ -752,20 +752,22 @@ def _enrich_qr_codes(text: str) -> str:
         return text
 
     # Avoid re-enriching if QR already present
-    if '<img' in text and ('qrserver' in text or 'whatsapp-qr' in text):
+    if '<img' in text and 'qrserver' in text:
         return text
 
     enriched = text
-    if has_whatsapp:
-        wa_url = "https://wa.me/5571992900979"
-        wa_qr = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(wa_url)}"
-        enriched += f'\n\n<a href="{wa_url}" target="_blank"><img src="{wa_qr}" alt="WhatsApp" style="max-width:200px;border-radius:8px;display:block"></a>'
-
     if has_pix:
         brcode = _static_pix_brcode()
         if brcode:
             pix_qr = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(brcode)}"
-            enriched += f'\n\n<img src="{pix_qr}" alt="QR Code PIX" style="max-width:200px;border-radius:8px;display:block">'
+            enriched += f'\n\n<p style="font-weight:bold;margin:8px 0 4px">QR Code PIX — escaneie para pagar</p>'
+            enriched += f'\n<img src="{pix_qr}" alt="QR Code PIX" style="max-width:200px;border-radius:8px;display:block">'
+
+    if has_whatsapp:
+        wa_url = "https://wa.me/5571992900979"
+        wa_qr = f"https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={urllib.parse.quote(wa_url)}"
+        enriched += f'\n\n<p style="font-weight:bold;margin:8px 0 4px">QR Code WhatsApp — fale conosco</p>'
+        enriched += f'\n<a href="{wa_url}" target="_blank"><img src="{wa_qr}" alt="WhatsApp" style="max-width:200px;border-radius:8px;display:block"></a>'
 
     return enriched
 
