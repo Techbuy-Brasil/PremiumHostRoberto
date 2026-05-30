@@ -417,10 +417,12 @@ class Agent:
         missing = self.missing_info(info)
 
         # If only guests is missing and message is a bare number, use it
+        # (but only if the same number wasn't already used for property identification)
+        prop_from_msg = info.get("property") is not None
         if missing == ["guests"] and not info.get("guests"):
-            num_match = re.match(r"^\s*(\d{1,2})\s*$", text_stripped)
-            if num_match:
-                info["guests"] = int(num_match.group(1))
+            is_standalone_num = re.match(r"^\s*(\d{1,2})\s*$", text_stripped)
+            if is_standalone_num and not prop_from_msg:
+                info["guests"] = int(is_standalone_num.group(1))
                 missing = self.missing_info(info)
 
         if missing:
