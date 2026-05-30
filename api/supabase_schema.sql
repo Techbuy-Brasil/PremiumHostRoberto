@@ -65,6 +65,14 @@ CREATE TABLE IF NOT EXISTS photo_overrides (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- Landing page clicks tracking
+CREATE TABLE IF NOT EXISTS landing_clicks (
+  id SERIAL PRIMARY KEY,
+  button TEXT NOT NULL,
+  guest_id TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Automatic backups (snapshot before each admin save)
 CREATE TABLE IF NOT EXISTS backups (
   id SERIAL PRIMARY KEY,
@@ -81,6 +89,7 @@ ALTER TABLE property_overrides DISABLE ROW LEVEL SECURITY;
 ALTER TABLE date_overrides DISABLE ROW LEVEL SECURITY;
 ALTER TABLE calendar_dates DISABLE ROW LEVEL SECURITY;
 ALTER TABLE photo_overrides DISABLE ROW LEVEL SECURITY;
+ALTER TABLE landing_clicks DISABLE ROW LEVEL SECURITY;
 ALTER TABLE backups DISABLE ROW LEVEL SECURITY;
 
 -- Seed: insert default pricing config row
