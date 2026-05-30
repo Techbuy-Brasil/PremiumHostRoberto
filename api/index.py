@@ -787,33 +787,33 @@ def admin_get_faq(password: str = ""):
             faq_items = get_faq_items()
             sys_msgs = get_system_messages()
             if faq_items:
-                return {
+                # Load defaults from local faq.json so blank keys show their defaults
+                defaults = {}
+                faq_defaults_path = str(Path(__file__).parent / "faq.json")
+                if os.path.exists(faq_defaults_path):
+                    try:
+                        with open(faq_defaults_path, "r", encoding="utf-8") as f:
+                            defaults = json.load(f)
+                    except Exception:
+                        pass
+                result = {
                     "faq": [{"id": it["id"], "resposta": it.get("resposta") or it.get("answer", ""), "tags": it.get("tags", []), "variacoes": it.get("variacoes", [])} for it in faq_items],
-                    "saudacoes": [sys_msgs.get("saudacoes", "")],
-                    "saudacoes_nome": [sys_msgs.get("saudacoes_nome", "")],
-                    "apresentacoes": [sys_msgs.get("apresentacoes", "")],
-                    "precos_disponivel": [sys_msgs.get("precos_disponivel", "")],
-                    "precos_calculado": [sys_msgs.get("precos_calculado", "")],
-                    "precos_cta": [sys_msgs.get("precos_cta", "")],
-                    "indisponivel": [sys_msgs.get("indisponivel", "")],
-                    "indisponivel_alternativas": [sys_msgs.get("indisponivel_alternativas", "")],
-                    "despedidas": [sys_msgs.get("despedidas", "")],
-                    "agradecimento": [sys_msgs.get("agradecimento", "")],
-                    "pergunta_imovel": [sys_msgs.get("pergunta_imovel", "")],
-                    "need_info_intro": [sys_msgs.get("need_info_intro", "")],
-                    "need_info_outro": [sys_msgs.get("need_info_outro", "")],
-                    "confirmar_reserva": [sys_msgs.get("confirmar_reserva", "")],
-                    "pix_pagamento": [sys_msgs.get("pix_pagamento", "")],
-                    "pix_info": [sys_msgs.get("pix_info", "")],
-                    "alternativas_datas_intro": [sys_msgs.get("alternativas_datas_intro", "")],
-                    "alternativas_datas_outro": [sys_msgs.get("alternativas_datas_outro", "")],
-                    "alternativas_imoveis_intro": [sys_msgs.get("alternativas_imoveis_intro", "")],
-                    "alternativas_imoveis_outro": [sys_msgs.get("alternativas_imoveis_outro", "")],
-                    "excesso_capacidade": [sys_msgs.get("excesso_capacidade", "")],
-                    "datas_invalidas": [sys_msgs.get("datas_invalidas", "")],
-                    "menu_faq": [sys_msgs.get("menu_faq", "")],
-                    "fallback": [sys_msgs.get("fallback", "")],
                 }
+                template_keys = ["saudacoes", "saudacoes_nome", "apresentacoes", "precos_disponivel",
+                    "precos_calculado", "precos_cta", "indisponivel", "indisponivel_alternativas",
+                    "despedidas", "agradecimento", "pergunta_imovel", "need_info_intro", "need_info_outro",
+                    "confirmar_reserva", "pix_pagamento", "pix_info", "alternativas_datas_intro",
+                    "alternativas_datas_outro", "alternativas_imoveis_intro", "alternativas_imoveis_outro",
+                    "excesso_capacidade", "datas_invalidas", "menu_faq", "fallback"]
+                for key in template_keys:
+                    val = sys_msgs.get(key, "")
+                    if val:
+                        result[key] = [val]
+                    elif key in defaults and isinstance(defaults[key], list) and defaults[key]:
+                        result[key] = defaults[key]
+                    else:
+                        result[key] = [""]
+                return result
         except Exception:
             pass
     # Fallback: blob

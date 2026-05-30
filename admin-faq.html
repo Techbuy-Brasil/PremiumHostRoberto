@@ -168,15 +168,42 @@
 
       // Render template messages section
       const templateKeys = ['sem_imovel', 'menu_faq', 'fallback', 'saudacoes', 'saudacoes_nome', 'apresentacoes', 'precos_disponivel', 'precos_calculado', 'precos_cta', 'indisponivel', 'indisponivel_alternativas', 'despedidas', 'agradecimento', 'pergunta_imovel', 'need_info_intro', 'need_info_outro', 'confirmar_reserva', 'pix_pagamento', 'pix_info', 'alternativas_datas_intro', 'alternativas_datas_outro', 'alternativas_imoveis_intro', 'alternativas_imoveis_outro', 'excesso_capacidade', 'datas_invalidas'];
+      const templateLabels = {
+        'saudacoes': 'Saudação inicial (sem nome)',
+        'saudacoes_nome': 'Saudação inicial (com nome do hóspede)',
+        'apresentacoes': 'Mensagem de boas-vindas / apresentação',
+        'precos_disponivel': 'Imóvel disponível — introdução',
+        'precos_calculado': 'Imóvel disponível — cálculo de preço',
+        'precos_cta': 'Imóvel disponível — call to action (CTA)',
+        'indisponivel': 'Imóvel indisponível — aviso',
+        'indisponivel_alternativas': 'Imóvel indisponível — sugestão de alternativas',
+        'menu_faq': 'Menu de FAQ / "o que posso ajudar?"',
+        'fallback': 'Resposta genérica (fallback)',
+        'sem_imovel': 'Quando não identifica o imóvel',
+        'pergunta_imovel': 'Perguntar qual imóvel o hóspede quer',
+        'despedidas': 'Mensagem de despedida / encerramento',
+        'agradecimento': 'Resposta a "obrigado"',
+        'need_info_intro': 'Faltam informações — introdução',
+        'need_info_outro': 'Faltam informações — finalização',
+        'confirmar_reserva': 'Confirmar reserva com o hóspede',
+        'pix_pagamento': 'Instruções de pagamento via PIX',
+        'pix_info': 'Informação da chave PIX (quando perguntado)',
+        'alternativas_datas_intro': 'Sugerir datas alternativas — introdução',
+        'alternativas_datas_outro': 'Sugerir datas alternativas — finalização',
+        'alternativas_imoveis_intro': 'Sugerir outros imóveis — introdução',
+        'alternativas_imoveis_outro': 'Sugerir outros imóveis — finalização',
+        'excesso_capacidade': 'Capacidade excedida no imóvel',
+        'datas_invalidas': 'Datas inválidas (check-out ≤ check-in)',
+      };
       const tmplSection = document.createElement('div');
       tmplSection.style.marginTop = '32px';
-      tmplSection.innerHTML = '<h2 style="border-top:2px solid #c8a96a;padding-top:20px;font-size:1.1rem;margin-bottom:12px">Mensagens do sistema (editável)</h2>';
+      tmplSection.innerHTML = '<h2 style="border-top:2px solid #c8a96a;padding-top:20px;font-size:1.1rem;margin-bottom:12px">Mensagens do sistema (editável)</h2><p style="font-size:.8rem;color:#888;margin-bottom:16px">Estas mensagens são usadas automaticamente pelo Roberto em cada momento da conversa. Edite à vontade!</p>';
       templateKeys.forEach(function(key) {
         var items = data[key] || [];
         var block = document.createElement('div');
         block.className = 'card';
         block.style.marginBottom = '12px';
-        var label = key.replace(/_/g,' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
+        var label = templateLabels[key] || key.replace(/_/g,' ').replace(/\b\w/g, function(l) { return l.toUpperCase(); });
         var html = '<h3 style="font-size:.9rem;margin-bottom:6px;color:#c8a96a">' + label + '</h3>';
         html += '<div class="tmpl-list" data-key="' + key + '">';
         items.forEach(function(v, vi) {
