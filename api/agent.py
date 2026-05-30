@@ -98,6 +98,9 @@ class Agent:
     def identify_guest(self, guest_name, guest_id=None):
         if not guest_id:
             guest_id = guest_name.lower().replace(" ", "_")
+        # Reset per-user state when guest changes
+        if guest_id != self.current_guest:
+            self.current_property = None
         self.current_guest = guest_id
         if guest_name:
             self.store.update_preferences(guest_id, {"name": guest_name, "last_contact": datetime.now().isoformat()})
