@@ -790,12 +790,29 @@ def admin_get_faq(password: str = ""):
                 return {
                     "faq": [{"id": it["id"], "resposta": it.get("resposta") or it.get("answer", ""), "tags": it.get("tags", []), "variacoes": it.get("variacoes", [])} for it in faq_items],
                     "saudacoes": [sys_msgs.get("saudacoes", "")],
+                    "saudacoes_nome": [sys_msgs.get("saudacoes_nome", "")],
                     "apresentacoes": [sys_msgs.get("apresentacoes", "")],
                     "precos_disponivel": [sys_msgs.get("precos_disponivel", "")],
                     "precos_calculado": [sys_msgs.get("precos_calculado", "")],
+                    "precos_cta": [sys_msgs.get("precos_cta", "")],
                     "indisponivel": [sys_msgs.get("indisponivel", "")],
+                    "indisponivel_alternativas": [sys_msgs.get("indisponivel_alternativas", "")],
                     "despedidas": [sys_msgs.get("despedidas", "")],
                     "agradecimento": [sys_msgs.get("agradecimento", "")],
+                    "pergunta_imovel": [sys_msgs.get("pergunta_imovel", "")],
+                    "need_info_intro": [sys_msgs.get("need_info_intro", "")],
+                    "need_info_outro": [sys_msgs.get("need_info_outro", "")],
+                    "confirmar_reserva": [sys_msgs.get("confirmar_reserva", "")],
+                    "pix_pagamento": [sys_msgs.get("pix_pagamento", "")],
+                    "pix_info": [sys_msgs.get("pix_info", "")],
+                    "alternativas_datas_intro": [sys_msgs.get("alternativas_datas_intro", "")],
+                    "alternativas_datas_outro": [sys_msgs.get("alternativas_datas_outro", "")],
+                    "alternativas_imoveis_intro": [sys_msgs.get("alternativas_imoveis_intro", "")],
+                    "alternativas_imoveis_outro": [sys_msgs.get("alternativas_imoveis_outro", "")],
+                    "excesso_capacidade": [sys_msgs.get("excesso_capacidade", "")],
+                    "datas_invalidas": [sys_msgs.get("datas_invalidas", "")],
+                    "menu_faq": [sys_msgs.get("menu_faq", "")],
+                    "fallback": [sys_msgs.get("fallback", "")],
                 }
         except Exception:
             pass
@@ -852,7 +869,7 @@ def admin_update_faq(req: FaqUpdateRequest):
                     converted["variacoes"] = item["variacoes"]
                 faq_items.append(converted)
             upsert_faq_items(faq_items)
-            for key in ["saudacoes", "apresentacoes", "precos_disponivel", "precos_calculado", "indisponivel", "despedidas", "agradecimento"]:
+            for key in ["saudacoes", "saudacoes_nome", "apresentacoes", "precos_disponivel", "precos_calculado", "precos_cta", "indisponivel", "indisponivel_alternativas", "despedidas", "agradecimento", "pergunta_imovel", "need_info_intro", "need_info_outro", "confirmar_reserva", "pix_pagamento", "pix_info", "alternativas_datas_intro", "alternativas_datas_outro", "alternativas_imoveis_intro", "alternativas_imoveis_outro", "excesso_capacidade", "datas_invalidas", "menu_faq", "fallback"]:
                 values = data.get(key, [])
                 val = values[0] if isinstance(values, list) and values else values
                 if val:
@@ -953,18 +970,3 @@ def admin_leads(password: str = ""):
     return JSONResponse(content={"leads": leads})
 
 
-# ── DEBUG ──
-
-@app.get("/api/debug/backups")
-def debug_backups(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
-        return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
-    result = {"supabase_configured": supabase_configured(), "backup_keys": []}
-    if supabase_configured():
-        try:
-            rows = _api("GET", "system_messages?order=key.desc") or []
-            result["backup_keys"] = [r["key"] for r in rows if r["key"].startswith("_backup_")]
-        except Exception as e:
-            result["error"] = str(e)
-    return JSONResponse(content=result)

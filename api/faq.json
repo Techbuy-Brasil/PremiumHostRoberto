@@ -185,5 +185,55 @@
   "fallback": [
     "Entendi! Deixa eu ver se posso ajudar...\n\nSe você estiver procurando disponibilidade, me passa: o apartamento, as datas e quantos hóspedes.\nSe for uma dúvida sobre a hospedagem, pode perguntar que eu respondo na hora! :)\n\nOu se preferir, pode falar direto comigo no WhatsApp: (71) 99290-0979",
     "Vamos ver se consigo ajudar! Para simular disponibilidade, preciso saber: qual apartamento, datas e número de hóspedes.\n\nSe tiver qualquer dúvida sobre a hospedagem, é só perguntar também :)"
+  ],
+  "saudacoes_nome": [
+    "Oi {nome}, prazer! Aqui é o Roberto da PremiumHost! Como posso te ajudar com a sua hospedagem em Salvador?",
+    "Fala {nome}! Beleza? Aqui é o Roberto :) Como posso te ajudar?",
+    "Oi {nome}! Bem-vindo à PremiumHost! Aqui é o Roberto. Me conta o que você está procurando!"
+  ],
+  "precos_cta": [
+    "Se quiser, posso simular para outra data ou ver outros imóveis! :)",
+    "Gostou? Se precisar de mais opções ou outras datas, é só falar!",
+    "Quer continuar a simulação? Posso ver outros períodos ou apartamentos!"
+  ],
+  "indisponivel_alternativas": [
+    "\n\nMas calma! Posso sugerir algumas alternativas:\n\n* Datas próximas no mesmo imóvel\n* Outro apartamento nosso — temos opções parecidas\n\nO que você prefere?"
+  ],
+  "pergunta_imovel": [
+    "Qual desses apartamentos te interessou?\n1. **Farol Barra Flat 214**\n2. **Farol Barra Flat 304**\n3. **Ondina Apart Hotel 441**\n4. **Ondina Apart Hotel 305**\n5. **The Plaza 407** — Ondina\n6. **Smart Convenções 509** — Armação\n\nMe fala o número ou o nome! :)",
+    "Temos essas opções disponíveis. Me diz qual você quer saber o preço?\n1. Farol Barra Flat 214\n2. Farol Barra Flat 304\n3. Ondina Apart Hotel 441\n4. Ondina Apart Hotel 305\n5. The Plaza 407\n6. Smart Convenções 509"
+  ],
+  "need_info_intro": [
+    "Claro! Só mais algumas informações pra eu fazer a simulação certinha:\n\n"
+  ],
+  "need_info_outro": [
+    "\nVou esperar aqui!"
+  ],
+  "confirmar_reserva": [
+    "Perfeito! Quer confirmar a reserva do {nome} de {checkin} a {checkout} no valor de R$ {total:.0f}? :)\n\nSe sim, vou precisar de:\n• Nome completo\n• Número de WhatsApp\n• Sinal de 50% via PIX\n\nApós o pagamento, envio a confirmação com todas as instruções de acesso! Pode me passar os dados?"
+  ],
+  "pix_pagamento": [
+    "Perfeito, {guest}! Sua reserva do {nome} de {checkin} a {checkout} no valor de R$ {total:.0f} está quase confirmada!\n\nPara garantir, preciso do sinal de **R$ {signal:.0f}** (50%) via PIX.\n\nChave Pix Aleatória\n\n**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n\nApós o pagamento, me avise aqui que já confirmo sua reserva e envio as instruções de acesso! :)"
+  ],
+  "pix_info": [
+    "Para pagamento via PIX:\n\n**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n\nMe avisa quando fizer o pagamento que já confirmo tudo! :)"
+  ],
+  "alternativas_datas_intro": [
+    "Que tal uma dessas opções no {nome}?\n\n"
+  ],
+  "alternativas_datas_outro": [
+    "\nSe interessou por alguma? Ou prefere ver outros imóveis?"
+  ],
+  "alternativas_imoveis_intro": [
+    "Temos outras opções igualmente legais:\n\n"
+  ],
+  "alternativas_imoveis_outro": [
+    "\nSe interessou por algum? Me fala que eu faço a simulação!"
+  ],
+  "excesso_capacidade": [
+    "Olha, o {nome} comporta no máximo {capacity} hóspedes. Pra {guests} pessoas infelizmente não vai dar :(\n\nMas temos outras opções maiores! O **Farol Barra Flat 214** ou o **Ondina Apart Hotel 441** comportam até 6 pessoas.\n\nQuer que eu veja a disponibilidade pra algum deles?"
+  ],
+  "datas_invalidas": [
+    "A data de check-out precisa ser depois do check-in, hein! :)\n\nPode verificar e me mandar as datas certinhas?"
   ]
 }
