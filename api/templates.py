@@ -176,7 +176,7 @@ class ResponseTemplates:
             total=total)
 
     def pix_payment(self, property_name, checkin_str, checkout_str, total, signal, guest_name, pix_code=None, pix_qr_url=None):
-        return self._r("pix_pagamento",
+        msg = self._r("pix_pagamento",
             "Perfeito, {guest}! Sua reserva do {nome} "
             "de {checkin} a {checkout} no valor de R$ {total:.0f} "
             "esta quase confirmada!\n\n"
@@ -187,6 +187,9 @@ class ResponseTemplates:
             "e envio as instrucoes de acesso! :)",
             guest=guest_name, nome=property_name, checkin=checkin_str,
             checkout=checkout_str, total=total, signal=signal)
+        if pix_qr_url:
+            msg += f"\n\n<img src=\"{pix_qr_url}\" alt=\"QR Code PIX\" style=\"max-width:250px;border-radius:8px\">"
+        return msg
 
     def pix_info(self):
         return self._r("pix_info",
