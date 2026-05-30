@@ -368,6 +368,19 @@ def admin_create_backup(label: str = "", password: str = ""):
     return JSONResponse(content={"key": result, "label": lbl})
 
 
+@app.get("/api/admin/backups/cron")
+def cron_backup():
+    """Triggered by Vercel CRON every 10 days."""
+    cfg = agent.pm.config
+    password = cfg.get("admin_password", "")
+    if not password:
+        return JSONResponse(content={"error": "no password configured"}, status_code=500)
+    result = _create_backup("automatico_10dias")
+    if not result:
+        return JSONResponse(content={"error": "backup failed"}, status_code=500)
+    return JSONResponse(content={"key": result, "label": "automatico_10dias"})
+
+
 @app.post("/api/admin/backups/restore/{backup_key}")
 def admin_restore_backup(backup_key: str, password: str = ""):
     cfg = agent.pm.config
