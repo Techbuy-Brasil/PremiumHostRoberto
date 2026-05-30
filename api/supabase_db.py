@@ -227,9 +227,37 @@ def restore_backup(backup_id: int) -> str:
         for row in snap["calendar_dates"]:
             set_calendar_dates(row["property_key"], [row["date"]], row["status"])
     # Restore photo overrides
-    if "photo_overrides" in snap:
-        _api("DELETE", "photo_overrides", params={"property_key": "neq."})
-        for pk, cats in snap["photo_overrides"].items():
-            upsert_photo_override(pk, cats)
+     if "photo_overrides" in snap:
+         _api("DELETE", "photo_overrides", params={"property_key": "neq."})
+         for pk, cats in snap["photo_overrides"].items():
+             upsert_photo_override(pk, cats)
 
-    return bk["label"]
+     return bk["label"]
+
+
+# ── LANDING PAGE CLICKS ──
+
+def log_landing_click(button: str, guest_id: str):
+    """Log a click on landing page button."""
+    _api("POST", "landing_clicks", {
+        "button": button,
+        "guest_id": guest_id,
+        "created_at": None  # Use server timestamp
+    })
+
+
+def get_landing_clicks_today() -> dict:
+    """Get landing page clicks for today (counts by button)."""
+    from datetime import datetime, timedelta
+    today = datetime.now().strftime("%Y-%m-%d")
+    
+    # Get clicks created today using Supabase filter format
+    rows = _api("GET", "landing_clicks", params={"created_at": f"gte.{today}"}) or []
+    
+    stats = {"btn_chat": 0, "btn_site": 0}
+    for row in rows:
+        button = row.get("button", "")
+        if button in stats:
+            stats[button] += 1
+    
+    return stats

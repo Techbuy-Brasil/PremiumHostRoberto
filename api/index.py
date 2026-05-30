@@ -901,3 +901,46 @@ def gerar_pix(req: PixPayloadRequest):
         "checkin": req.checkin,
         "checkout": req.checkout,
     })
+
+
+# ── LANDING PAGE TRACKING ──
+
+class LandingClickRequest(BaseModel):
+    button: str
+    guest_id: str
+    timestamp: Optional[str] = ""
+
+
+@app.post("/api/landing-click")
+def landing_click(req: LandingClickRequest):
+    if supabase_configured():
+        try:
+            from supabase_db import log_landing_click
+            log_landing_click(req.button, req.guest_id)
+        except Exception as e:
+            print(f"landing-click error: {e}", flush=True)
+    return JSONResponse(content={"status": "ok"})
+
+
+@app.get("/api/admin/landing-stats")
+def admin_landing_stats(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
+    stats = {"today": {"btn_chat": 0, "btn_site": 0}}
+    if supabase_configured():
+        try:
+            from supabase_db import get_landing_clicks_today
+            stats["today"] = get_landing_clicks_today()
+        except Exception as e:
+            print(f"landing-stats error: {e}", flush=True)
+    return JSONResponse(content={"stats": stats})
+
+
+@app.get("/api/admin/leads")
+def admin_leads(password: str = ""):
+    cfg = agent.pm.config
+    if password != cfg.get("admin_password", ""):
+        return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
+    # Return empty leads list for now (conversation leads not persisted)
+    return JSONResponse(content={"leads": []})
