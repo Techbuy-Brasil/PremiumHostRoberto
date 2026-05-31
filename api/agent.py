@@ -65,37 +65,6 @@ class Agent:
             if words:
                 name = " ".join(words[:2])
         return name or "Cliente", phone
-        topics = []
-        text_lower = text.lower()
-        if re.search(r"check[-\s]?in|entrada|chegad|acessar|chave|codigo|early", text_lower):
-            topics.append("checkin")
-        if re.search(r"check[-\s]?out|sa[íi]da|sair|late", text_lower):
-            topics.append("checkout")
-        if re.search(r"incluso|incluído|oferece|tem |possui|comodidades|amenidades|o que tem|o que esta incluso|cozinha|utensilio|roupa de cama|toalha|wifi", text_lower):
-            topics.append("incluso")
-        if re.search(r"pagamento|pagar|pix|cartao|cartão|credito|crédito|parcel|transferencia|deposito|sinal|cancelamento|reembolso|reservar|garantir", text_lower):
-            topics.append("pagamento")
-        if re.search(r"explorar|salvador|o que fazer|turismo|praia|farol|pelourinho|passeio|vizinhança|restaurant|bar", text_lower) and not re.search(r"(?:flat|apart)", text_lower):
-            topics.append("explore")
-        if re.search(r"estacionamento|garagem|vaga|carro|estacionar", text_lower):
-            topics.append("estacionamento")
-        if re.search(r"piscina|lazer|academia|sauna|quadra", text_lower) and not re.search(r"ondina", text_lower):
-            topics.append("piscina")
-        if re.search(r"segurança|seguranca|portaria|e seguro|camera|câmera|perigoso", text_lower):
-            topics.append("seguranca")
-        if re.search(r"aeroporto|chegar|transporte|uber|taxi|táxi|transfer|ssa|distancia", text_lower):
-            topics.append("aeroporto")
-        if re.search(r"pet|pets|cachorro|gato|animal|levar.*animal|aceita.*pet", text_lower):
-            topics.append("pet")
-        if re.search(r"criança|crianças|crianca|criancas|bebe|bebê|familia|família|filho", text_lower):
-            topics.append("crianca")
-        if re.search(r"mercado|supermercado|padaria|farmacia|farmácia|compras|onde comprar", text_lower):
-            topics.append("mercado")
-        if re.search(r"agua|água|luz|energia|conta|consumo|franquia|incluso na diaria", text_lower):
-            topics.append("consumo")
-        if re.search(r"toalha|roupa de cama|roupa de banho|lençol|travesseiro", text_lower):
-            topics.append("toalhas_roupa")
-        return topics
 
     def _detect_faq_intent(self, text):
         """Use KnowledgeBase to find the best FAQ match."""
@@ -388,15 +357,23 @@ class Agent:
                 if resposta:
                     return resposta
 
-        # Merge with saved memory
+        # Detect "outro imóvel", "outra opção", etc. → clear property before memory merge
+        want_other_property = bool(re.search(r"\b(outro|outra|outras|outros|alternativa|outras? opc)[a-z]*\s*(imovel|imóvel|apartamento|opcao|opção)?", text_stripped, re.IGNORECASE))
+        if want_other_property:
+            self.current_property = None
+
+        # Detect "outra data", "outro período" → clear dates
+        clear_dates = bool(re.search(r"\b(outra|outro|outras|outros|diferente|nova|novo)\s*(data|datas|periodo|período|dia|dias)", text_stripped, re.IGNORECASE))
+
+        # Merge with saved memory (skip property_key if user asked for another property, skip dates if asking for other dates)
         memory = self._get_memory(gid)
-        if not info.get("checkin") and memory.get("checkin"):
+        if not info.get("checkin") and memory.get("checkin") and not clear_dates:
             info["checkin"] = date.fromisoformat(memory["checkin"]) if isinstance(memory["checkin"], str) else memory["checkin"]
-        if not info.get("checkout") and memory.get("checkout"):
+        if not info.get("checkout") and memory.get("checkout") and not clear_dates:
             info["checkout"] = date.fromisoformat(memory["checkout"]) if isinstance(memory["checkout"], str) else memory["checkout"]
         if not info.get("guests") and memory.get("guests"):
             info["guests"] = memory["guests"]
-        if not info.get("property") and not self.current_property and memory.get("property_key"):
+        if not info.get("property") and not self.current_property and memory.get("property_key") and not want_other_property:
             self.current_property = self.pm.get_property(memory["property_key"])
 
         # Persist current known info to memory (before any early return)
@@ -417,7 +394,16 @@ class Agent:
             return self.templates.pix_info()
 
         # --- PROPERTY IDENTIFICATION ---
-        prop = info.get("property") or self.current_property
+        # Try numbered selection (1-5) BEFORE falling back to current_property
+        num_map = {"1": "farol_barra_flat_214", "2": "farol_barra_flat_304",
+                   "3": "ondina_apt_hotel_441", "4": "the_plaza_407", "5": "smart_convencoes_509"}
+        stripped = text_stripped.strip()
+        if stripped in num_map:
+            prop_from_num = self.pm.get_property(num_map[stripped])
+        else:
+            prop_from_num = None
+
+        prop = info.get("property") or prop_from_num or self.current_property
         prop_identified_now = False
         if not prop:
             detected = self.identify_property(message)
@@ -427,17 +413,8 @@ class Agent:
                 prop_identified_now = True
 
         if not prop:
-            # Try numbered selection (1-5 matching the listing order)
-            num_map = {"1": "farol_barra_flat_214", "2": "farol_barra_flat_304",
-                       "3": "ondina_apt_hotel_441", "4": "the_plaza_407", "5": "smart_convencoes_509"}
-            stripped = text_stripped.strip()
-            if stripped in num_map:
-                prop = self.pm.get_property(num_map[stripped])
-            if prop:
-                prop_identified_now = True
-            else:
-                other_props = self.get_all_properties_for_alternatives()
-                return self.templates.ask_property()
+            other_props = self.get_all_properties_for_alternatives()
+            return self.templates.ask_property()
 
         self.current_property = prop
 
