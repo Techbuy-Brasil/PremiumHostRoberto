@@ -27,6 +27,7 @@ from supabase_db import (_api,
                           get_calendar_dates, set_calendar_dates, clear_all_calendar_dates,
                            get_photo_overrides, upsert_photo_override)
 from pix import gerar_pix_payload
+from pricing import get_card_surcharge
 import asaas
 
 app = FastAPI(title="PremiumHost Roberto - API", version="1.0.0")
