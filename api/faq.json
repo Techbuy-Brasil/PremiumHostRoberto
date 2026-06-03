@@ -213,7 +213,7 @@
     "Perfeito! Quer confirmar a reserva do {nome} de {checkin} a {checkout} no valor de R$ {total:.0f}? :)\n\nSe sim, vou precisar de:\n• Nome completo\n• Número de WhatsApp\n• Sinal de 50% via PIX\n\nApós o pagamento, envio a confirmação com todas as instruções de acesso! Pode me passar os dados?"
   ],
   "pix_pagamento": [
-    "Perfeito, {guest}! Sua reserva do {nome} de {checkin} a {checkout} no valor de R$ {total:.0f} está quase confirmada!\n\nPara garantir, preciso do sinal de **R$ {signal:.0f}** (50%) via PIX.\n\nChave Pix Aleatória\n\n**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n\nApós o pagamento, me avise aqui que já confirmo sua reserva e envio as instruções de acesso! :)"
+    "Pra garantir sua reserva é simples 😄\n\nVocê faz **50% via Pix** e o restante paga no dia da hospedagem.\n\nSe optar por **cartão**, acrescenta 20% no valor e pode dividir até 6 vezes. É só me dizer **\"cartão\"** aqui no chat que eu já processo o pagamento!\n\nSe for no **Pix**, é só me enviar o comprovante para WhatsApp 71-99290-0979 com nome completo e cidade 👍\nEm seguida você receberá o resumo e instruções do check-in.\n\n**Chave Pix Aleatória**\n**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n**Chave PIX e-mail:** robertotechbuy15@gmail.com"
   ],
   "pix_info": [
     "Para pagamento via PIX:\n\n**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n\nMe avisa quando fizer o pagamento que já confirmo tudo! :)"
