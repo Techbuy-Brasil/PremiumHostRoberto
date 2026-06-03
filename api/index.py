@@ -27,6 +27,7 @@ from supabase_db import (_api,
                           get_calendar_dates, set_calendar_dates, clear_all_calendar_dates,
                            get_photo_overrides, upsert_photo_override)
 from pix import gerar_pix_payload
+import asaas
 
 app = FastAPI(title="PremiumHost Roberto - API", version="1.0.0")
 
@@ -987,6 +988,83 @@ def gerar_pix(req: PixPayloadRequest):
         "checkin": req.checkin,
         "checkout": req.checkout,
     })
+
+
+class CardPayRequest(BaseModel):
+    property_key: str = ""
+    property_name: str = ""
+    checkin: str = ""
+    checkout: str = ""
+    guests: int = 1
+    total: float
+    cpf: str
+    holder_name: str
+    card_number: str
+    expiry_month: str
+    expiry_year: str
+    cvv: str
+    cep: str
+    address_number: str = "0"
+    customer_name: str = ""
+    customer_phone: str = ""
+
+
+@app.post("/api/card/pay")
+def card_pay(req: CardPayRequest):
+    if not asaas.configured():
+        return JSONResponse(content={"success": False, "error": "Asaas nao configurado"}, status_code=503)
+    clean_cpf = re.sub(r"\D", "", req.cpf)
+    if len(clean_cpf) != 11:
+        return JSONResponse(content={"success": False, "error": "CPF invalido"}, status_code=400)
+    card_total = req.total * 1.2
+    customer = asaas.find_customer_by_cpf(clean_cpf)
+    if not customer:
+        customer = asaas.create_customer(
+            name=req.customer_name or req.holder_name,
+            email="",
+            cpf_cnpj=clean_cpf,
+            phone=re.sub(r"\D", "", req.customer_phone),
+            postal_code=re.sub(r"\D", "", req.cep),
+            address_number=re.sub(r"\D", "", req.address_number) or "0",
+        )
+    if not customer or "id" not in customer:
+        return JSONResponse(content={"success": False, "error": asaas.get_last_error() or "Erro ao criar cliente"})
+    from datetime import datetime, timedelta
+    due = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+    desc = f"Reserva {req.property_name}" if req.property_name else "Reserva PremiumHost"
+    if req.checkin and req.checkout:
+        desc += f" - {req.checkin} a {req.checkout}"
+    payment = asaas.create_payment(
+        customer_id=customer["id"],
+        value=card_total,
+        due_date=due,
+        description=desc,
+        installments=1,
+        card_holder_name=req.holder_name,
+        card_number=re.sub(r"\D", "", req.card_number),
+        expiry_month=req.expiry_month.zfill(2),
+        expiry_year=req.expiry_year,
+        ccv=re.sub(r"\D", "", req.cvv),
+        holder_name=req.customer_name or req.holder_name,
+        holder_email="",
+        holder_cpf=clean_cpf,
+        holder_phone=re.sub(r"\D", "", req.customer_phone),
+        holder_postal_code=re.sub(r"\D", "", req.cep),
+        holder_address_number=re.sub(r"\D", "", req.address_number) or "0",
+    )
+    if payment and payment.get("id"):
+        if payment.get("status") in ("CONFIRMED", "RECEIVED"):
+            return JSONResponse(content={
+                "success": True,
+                "payment_id": payment["id"],
+                "value": round(card_total, 2),
+                "message": "Pagamento aprovado com sucesso!",
+            })
+        return JSONResponse(content={
+            "success": False,
+            "error": f"Status: {payment.get('status', 'desconhecido')}",
+        })
+    return JSONResponse(content={"success": False, "error": asaas.get_last_error() or "Erro ao processar pagamento"})
 
 
 # ── LANDING PAGE TRACKING ──
