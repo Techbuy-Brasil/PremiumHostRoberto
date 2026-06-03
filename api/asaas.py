@@ -75,7 +75,9 @@ def create_payment(customer_id: str, value: float, due_date: str, description: s
                    expiry_month: str = "", expiry_year: str = "", ccv: str = "",
                    holder_name: str = "", holder_email: str = "",
                    holder_cpf: str = "", holder_phone: str = "",
-                   holder_postal_code: str = "", holder_address_number: str = "") -> dict:
+                   holder_postal_code: str = "",
+                   holder_address_number: str = "",
+                   holder_address: str = "") -> dict:
     data = {
         "customer": customer_id,
         "billingType": "CREDIT_CARD",
@@ -96,10 +98,13 @@ def create_payment(customer_id: str, value: float, due_date: str, description: s
             "email": holder_email or "fotosflatssalvador@gmail.com",
             "cpfCnpj": re.sub(r"\D", "", holder_cpf),
             "postalCode": re.sub(r"\D", "", holder_postal_code),
-            "addressNumber": holder_address_number or "0",
+            "addressNumber": re.sub(r"\D", "", holder_address_number) or "0",
+            "addressComplement": "Apt",
             "phone": re.sub(r"\D", "", holder_phone) or "71999999999",
         },
     }
+    if holder_address:
+        data["creditCardHolderInfo"]["address"] = holder_address
     return _api("POST", "payments", data)
 
 

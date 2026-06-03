@@ -1055,6 +1055,7 @@ def card_pay(req: CardPayRequest):
             holder_phone=re.sub(r"\D", "", req.customer_phone),
             holder_postal_code=re.sub(r"\D", "", req.cep),
             holder_address_number=re.sub(r"\D", "", req.address_number) or "0",
+            holder_address="Rua Principal",
         )
         if payment and payment.get("id"):
             if payment.get("status") in ("CONFIRMED", "RECEIVED"):
