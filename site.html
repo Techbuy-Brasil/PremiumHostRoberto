@@ -1155,6 +1155,7 @@
         bookingInfo = { propKey, propName, total, checkin: checkinStr, checkout: checkoutStr, hospedes };
         var resumo = document.getElementById('pixResumo');
         var entrada = total / 2;
+        // Reset summary for PIX
         resumo.innerHTML = '<strong>' + propName + '</strong><br>' +
           checkinStr + ' a ' + checkoutStr + ' · ' + hospedes + ' hóspede' + (hospedes > 1 ? 's' : '') +
           '<br><br>Valor total: <strong>R$ ' + total.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong>' +
@@ -1241,6 +1242,17 @@
         document.getElementById('pixSection').style.display = 'none';
         document.getElementById('btnShowCard').style.display = 'none';
         document.getElementById('cardSection').style.display = 'block';
+        // Update summary for card (total com acréscimo, sem 50% entrada)
+        if (bookingInfo) {
+          var cardTotal = bookingInfo.total * 1.2;
+          var installmentVal = (cardTotal / 6).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+          document.getElementById('pixResumo').innerHTML =
+            '<strong>' + bookingInfo.propName + '</strong><br>' +
+            bookingInfo.checkin + ' a ' + bookingInfo.checkout + ' · ' + bookingInfo.hospedes + ' hóspede' + (bookingInfo.hospedes > 1 ? 's' : '') +
+            '<br><br>Valor total: <strong>R$ ' + bookingInfo.total.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong>' +
+            '<br>Total no cartão: <strong style="color:#c8a96a">R$ ' + cardTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong> <span style="font-size:0.8rem;color:#888">(20% acréscimo)</span>' +
+            '<br><small style="color:#888">Parcele em até 6x de R$ ' + installmentVal + '</small>';
+        }
       }
 
       function processarCardPayment() {
