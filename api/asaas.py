@@ -103,6 +103,7 @@ def create_payment(customer_id: str, value: float, due_date: str, description: s
             "phone": re.sub(r"\D", "", holder_phone) or "71999999999",
             "address": holder_address or "Rua Principal",
         },
+    }
     return _api("POST", "payments", data)
 
 
