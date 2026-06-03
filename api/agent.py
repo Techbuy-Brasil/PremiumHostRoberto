@@ -18,7 +18,6 @@ class Agent:
         self.store = ConversationStore()
         self.current_guest = None
         self.current_property = None
-        self._card_state = {}
 
     def _get_memory(self, guest_id):
         """Get remembered conversation context for this guest."""
@@ -29,6 +28,18 @@ class Agent:
         """Save conversation context for this guest."""
         prefs = self.store.get_guest(guest_id).get("preferences", {})
         prefs["conversation_memory"] = memory
+        self.store.update_preferences(guest_id, prefs)
+
+    def _get_card_state(self, guest_id):
+        prefs = self.store.get_guest(guest_id).get("preferences", {})
+        return prefs.get("card_state")
+
+    def _set_card_state(self, guest_id, state):
+        prefs = self.store.get_guest(guest_id).get("preferences", {})
+        if state is None:
+            prefs.pop("card_state", None)
+        else:
+            prefs["card_state"] = state
         self.store.update_preferences(guest_id, prefs)
 
     def _save_lead(self, name, phone, property_name, checkin, checkout, total, guests, status="pre_reserva"):
@@ -109,11 +120,6 @@ class Agent:
         # Reset per-user state when guest changes
         if guest_id != self.current_guest:
             self.current_property = None
-            self._card_state.pop(guest_id, None)
-            # Also clean up old guest card state
-            for old_gid in list(self._card_state.keys()):
-                if old_gid != guest_id:
-                    self._card_state.pop(old_gid, None)
         self.current_guest = guest_id
         if guest_name:
             self.store.update_preferences(guest_id, {"name": guest_name, "last_contact": datetime.now().isoformat()})
@@ -352,15 +358,16 @@ class Agent:
             return self.templates.goodbye()
 
         # --- CARD PAYMENT FLOW (state machine) ---
-        card_state = self._card_state.get(gid)
+        card_state = self._get_card_state(gid)
         if card_state:
             state = card_state.get("step")
             if state == "awaiting_cpf":
-                cpf = re.sub(r"\D", "", text_stripped)
-                if len(cpf) in (11, 14):
+                cpf_match = re.search(r"(\d{11})", text_stripped)
+                if cpf_match:
+                    cpf = cpf_match.group(1)
                     card_state["cpf"] = cpf
                     card_state["step"] = "awaiting_details"
-                    self._card_state[gid] = card_state
+                    self._set_card_state(gid, card_state)
                     return self.templates.card_ask_details()
                 return "CPF invalido! Digite apenas os numeros do CPF (11 digitos):"
 
@@ -372,7 +379,7 @@ class Agent:
                     card_state["expiry"] = parts[2].strip()
                     card_state["cvv"] = re.sub(r"\D", "", parts[3])
                     card_state["step"] = "awaiting_postal"
-                    self._card_state[gid] = card_state
+                    self._set_card_state(gid, card_state)
                     return self.templates.card_ask_postal()
                 return "Nao entendi! Mande neste formato:\n\n**Nome do titular, Numero do cartao, Validade (mes/ano), CVV**\n\nExemplo: Joao Silva, 4111111111111111, 12/2028, 123"
 
@@ -389,7 +396,7 @@ class Agent:
                             import asaas
                             q = getattr(self, '_last_quote', None)
                             if not q:
-                                del self._card_state[gid]
+                                self._set_card_state(gid, None)
                                 return "Desculpe, perdi os dados da reserva. Pode comecar de novo? :)"
                             card_total = q["total"] * 1.2
                             # Parse expiry
@@ -415,7 +422,7 @@ class Agent:
                                 )
                             if not customer or "id" not in customer:
                                 err = asaas.get_last_error()
-                                del self._card_state[gid]
+                                self._set_card_state(gid, None)
                                 return self.templates.card_failed(err or "Erro ao criar cliente no Asaas")
                             # Create payment
                             payment = asaas.create_payment(
@@ -436,33 +443,43 @@ class Agent:
                                 holder_postal_code=cep,
                                 holder_address_number=addr_num,
                             )
-                            del self._card_state[gid]
+                            self._set_card_state(gid, None)
                             if payment and payment.get("id"):
-                                if payment.get("status") == "CONFIRMED":
+                                if payment.get("status") in ("CONFIRMED", "RECEIVED"):
                                     return self.templates.card_approved(payment["id"], card_total, card_state.get("installments", 1))
-                                elif payment.get("status") == "RECEIVED":
-                                    return self.templates.card_approved(payment["id"], card_total, card_state.get("installments", 1))
-                                else:
-                                    return self.templates.card_failed(f"Status: {payment.get('status', 'desconhecido')}")
+                                return self.templates.card_failed(f"Status: {payment.get('status', 'desconhecido')}")
                             err = asaas.get_last_error()
                             return self.templates.card_failed(err or "Erro ao processar pagamento")
                         except Exception as e:
-                            if gid in self._card_state:
-                                del self._card_state[gid]
+                            self._set_card_state(gid, None)
                             print(f"Card payment error: {e}", flush=True)
                             return self.templates.card_failed(str(e))
                     return "CEP invalido! Digite o CEP com 8 digitos (ex: 40000000) e o numero separado por virgula."
                 return "Mande o CEP e numero do endereco separados por virgula (ex: 40000000, 123)"
 
         # --- CARD INTENT DETECTION ---
-        if self._detect_card_intent(text_stripped) and hasattr(self, '_last_quote'):
-            q = self._last_quote
+        if self._detect_card_intent(text_stripped):
+            if not hasattr(self, '_last_quote'):
+                # Try to restore from guest preferences
+                prefs = self.store.get_guest(gid).get("preferences", {})
+                lq = prefs.get("last_quote")
+                if lq:
+                    prop = self.pm.get_property(lq.get("property_key", ""))
+                    if prop:
+                        self._last_quote = {
+                            "checkin": date.fromisoformat(lq["checkin"]) if isinstance(lq["checkin"], str) else lq["checkin"],
+                            "checkout": date.fromisoformat(lq["checkout"]) if isinstance(lq["checkout"], str) else lq["checkout"],
+                            "total": lq["total"],
+                            "property": prop,
+                        }
+            if hasattr(self, '_last_quote'):
+                q = self._last_quote
             card_total = q["total"] * 1.2
-            self._card_state[gid] = {
+            self._set_card_state(gid, {
                 "step": "awaiting_cpf",
                 "installments": 1,
                 "total": card_total,
-            }
+            })
             return self.templates.card_ask_cpf(card_total)
 
         # --- PARSE MESSAGE ---
@@ -665,6 +682,15 @@ class Agent:
             "total": total,
             "property": prop,
         }
+        # Persist last_quote in guest preferences for cross-instance resilience
+        prefs = self.store.get_guest(gid).get("preferences", {})
+        prefs["last_quote"] = {
+            "checkin": checkin.isoformat(),
+            "checkout": checkout.isoformat(),
+            "total": total,
+            "property_key": prop.key,
+        }
+        self.store.update_preferences(gid, prefs)
 
         season_context = self.calendar.describe_period_context(checkin, checkout)
 
