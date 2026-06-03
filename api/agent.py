@@ -474,13 +474,16 @@ class Agent:
                         }
             if hasattr(self, '_last_quote'):
                 q = self._last_quote
-            card_total = q["total"] * 1.2
-            self._set_card_state(gid, {
-                "step": "awaiting_cpf",
-                "installments": 1,
-                "total": card_total,
-            })
-            return self.templates.card_ask_cpf(card_total)
+                card_total = q["total"] * 1.2
+                self._set_card_state(gid, {
+                    "step": "awaiting_cpf",
+                    "installments": 1,
+                    "total": card_total,
+                })
+                return self.templates.card_ask_cpf(card_total)
+            else:
+                # No quote found — ask user to request one first
+                return self.templates.ask_checkin()
 
         # --- PARSE MESSAGE ---
         info = self.parse_message(text_stripped, gid)
