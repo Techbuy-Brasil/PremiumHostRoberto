@@ -633,6 +633,7 @@ PRECOS_DEFAULTS = {
         "high_season_multiplier": 2.0,
         "min_nights_default": 1,
         "min_nights_high_season": 2,
+        "card_surcharge": 1.20,
     },
     "properties": {},
     "date_overrides": [],
@@ -817,7 +818,7 @@ def chat(req: MessageRequest, request: Request = None):
 
 @app.post("/api/cotacao")
 def quote(req: QuoteRequest):
-    from pricing import PricingEngine, _load_overrides
+    from pricing import PricingEngine, _load_overrides, get_card_surcharge
     from datetime import datetime
 
     prop = agent.pm.get_property(req.property_key)
@@ -1016,7 +1017,7 @@ def card_pay(req: CardPayRequest):
     clean_cpf = re.sub(r"\D", "", req.cpf)
     if len(clean_cpf) != 11:
         return JSONResponse(content={"success": False, "error": "CPF invalido"}, status_code=400)
-    card_total = req.total * 1.2
+    card_total = req.total * get_card_surcharge()
     customer = asaas.find_customer_by_cpf(clean_cpf)
     if not customer:
         customer = asaas.create_customer(

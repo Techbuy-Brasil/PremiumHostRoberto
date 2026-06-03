@@ -3,7 +3,7 @@ from datetime import datetime, date, timedelta
 
 from properties import PropertyManager
 from holidays import HolidayCalendar
-from pricing import PricingEngine, _load_overrides
+from pricing import PricingEngine, _load_overrides, get_card_surcharge
 from templates import ResponseTemplates
 from storage import ConversationStore
 from knowledge import KnowledgeBase
@@ -398,7 +398,7 @@ class Agent:
                             if not q:
                                 self._set_card_state(gid, None)
                                 return "Desculpe, perdi os dados da reserva. Pode comecar de novo? :)"
-                            card_total = q["total"] * 1.2
+                            card_total = q["total"] * get_card_surcharge()
                             # Parse expiry
                             exp_parts = card_state["expiry"].replace("/", " ").split()
                             exp_month = exp_parts[0].zfill(2) if exp_parts else "12"
@@ -474,7 +474,7 @@ class Agent:
                         }
             if hasattr(self, '_last_quote'):
                 q = self._last_quote
-                card_total = q["total"] * 1.2
+                card_total = q["total"] * get_card_surcharge()
                 self._set_card_state(gid, {
                     "step": "awaiting_cpf",
                     "installments": 1,

@@ -107,6 +107,11 @@
             <label>Mín. Noites (alta temp.)</label>
             <input type="number" id="g_min_hs" value="2">
           </div>
+          <div class="admin-campo">
+            <label>Acréscimo Cartão (%)</label>
+            <input type="number" step="1" id="g_card" value="20">
+            <small style="color:#999;font-size:.7rem">Percentual extra no pagamento em cartão</small>
+          </div>
         </div>
       </div>
 
@@ -212,6 +217,7 @@
       document.getElementById('g_hs_months').value = (g.high_season_months || [1,2,7]).join(', ');
       document.getElementById('g_min_nights').value = g.min_nights_default || 1;
       document.getElementById('g_min_hs').value = g.min_nights_high_season || 2;
+      document.getElementById('g_card').value = Math.round((g.card_surcharge || 1.20) * 100 - 100);
 
       // Date overrides
       renderDateOverrides(data.date_overrides || []);
@@ -292,6 +298,7 @@
         high_season_months: document.getElementById('g_hs_months').value.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n)),
         min_nights_default: parseInt(document.getElementById('g_min_nights').value) || 1,
         min_nights_high_season: parseInt(document.getElementById('g_min_hs').value) || 2,
+        card_surcharge: (parseFloat(document.getElementById('g_card').value) || 20) / 100 + 1,
       };
 
       // Date overrides

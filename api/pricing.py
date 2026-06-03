@@ -45,6 +45,12 @@ def _load_overrides():
     return {}
 
 
+def get_card_surcharge() -> float:
+    """Returns the card payment surcharge multiplier (1.20 = 20% markup)."""
+    overrides = _load_overrides()
+    return float(overrides.get("general", {}).get("card_surcharge", 1.20))
+
+
 class PricingEngine:
     def __init__(self, property_obj, holiday_calendar, overrides=None):
         self.property = property_obj
