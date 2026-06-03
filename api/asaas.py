@@ -104,6 +104,7 @@ def create_payment(customer_id: str, value: float, due_date: str, description: s
             "address": holder_address or "Rua Principal",
         },
     }
+    data["remoteIp"] = "127.0.0.1"
     return _api("POST", "payments", data)
 
 
