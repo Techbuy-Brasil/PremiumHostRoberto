@@ -93,11 +93,11 @@ def create_payment(customer_id: str, value: float, due_date: str, description: s
         },
         "creditCardHolderInfo": {
             "name": holder_name,
-            "email": holder_email,
+            "email": holder_email or "fotosflatssalvador@gmail.com",
             "cpfCnpj": re.sub(r"\D", "", holder_cpf),
             "postalCode": re.sub(r"\D", "", holder_postal_code),
             "addressNumber": holder_address_number or "0",
-            "phone": re.sub(r"\D", "", holder_phone),
+            "phone": re.sub(r"\D", "", holder_phone) or "71999999999",
         },
     }
     return _api("POST", "payments", data)
