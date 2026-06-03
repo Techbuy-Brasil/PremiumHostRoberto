@@ -503,7 +503,7 @@ def _save_blocked_state():
 def admin_block(req: BlockRequest, request: Request = None):
     if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    if req.property_key not in cfg.get("properties", {}):
+    if req.property_key not in agent.pm.config.get("properties", {}):
         raise HTTPException(status_code=404, detail="Imovel nao encontrado")
     if req.property_key not in _admin_blocked:
         _admin_blocked[req.property_key] = set()
@@ -518,7 +518,7 @@ def admin_block(req: BlockRequest, request: Request = None):
 def admin_unblock(req: BlockRequest, request: Request = None):
     if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    if req.property_key not in cfg.get("properties", {}):
+    if req.property_key not in agent.pm.config.get("properties", {}):
         raise HTTPException(status_code=404, detail="Imovel nao encontrado")
     existing = _admin_blocked.get(req.property_key, set())
     for d in req.dates:
@@ -531,7 +531,7 @@ def admin_unblock(req: BlockRequest, request: Request = None):
 def admin_available(req: BlockRequest, request: Request = None):
     if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    if req.property_key not in cfg.get("properties", {}):
+    if req.property_key not in agent.pm.config.get("properties", {}):
         raise HTTPException(status_code=404, detail="Imovel nao encontrado")
     if req.property_key not in _admin_available:
         _admin_available[req.property_key] = set()
@@ -546,7 +546,7 @@ def admin_available(req: BlockRequest, request: Request = None):
 def admin_unavailable(req: BlockRequest, request: Request = None):
     if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
-    if req.property_key not in cfg.get("properties", {}):
+    if req.property_key not in agent.pm.config.get("properties", {}):
         raise HTTPException(status_code=404, detail="Imovel nao encontrado")
     existing = _admin_available.get(req.property_key, set())
     for d in req.dates:
@@ -712,8 +712,8 @@ def admin_get_precos(password: str = "", request: Request = None):
     prop_overrides = override.get("properties", {})
 
     properties_data = {}
-    for key in cfg.get("properties", {}):
-        prop = cfg["properties"][key]
+    for key in agent.pm.config.get("properties", {}):
+        prop = agent.pm.config["properties"][key]
         base = {
             "nome": prop.get("name", key),
             "base_price": prop.get("base_price", 0),
