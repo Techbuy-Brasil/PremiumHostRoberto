@@ -83,6 +83,7 @@ def create_payment(customer_id: str, value: float, due_date: str, description: s
         "dueDate": due_date,
         "description": description,
         "installmentCount": installments,
+        "installmentValue": round(value / installments, 2),
         "creditCard": {
             "holderName": card_holder_name,
             "number": re.sub(r"\D", "", card_number),
