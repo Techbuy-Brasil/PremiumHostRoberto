@@ -18,6 +18,7 @@ class Agent:
         self.store = ConversationStore()
         self.current_guest = None
         self.current_property = None
+        self._card_state = {}
 
     def _get_memory(self, guest_id):
         """Get remembered conversation context for this guest."""
@@ -98,12 +99,21 @@ class Agent:
         return bool(re.search(r"(?:chave|como.*pix|passa.*pix|qual.*pix|pix.*qual|pagar.*pix|fazer pix|pagamento.*pix)",
                     text, re.IGNORECASE))
 
+    def _detect_card_intent(self, text):
+        return bool(re.search(r"\b(cartao|cartão|credito|crédito|parcelado|parcela|dividir|card|debito|débito)\b",
+                    text, re.IGNORECASE))
+
     def identify_guest(self, guest_name, guest_id=None):
         if not guest_id:
             guest_id = guest_name.lower().replace(" ", "_")
         # Reset per-user state when guest changes
         if guest_id != self.current_guest:
             self.current_property = None
+            self._card_state.pop(guest_id, None)
+            # Also clean up old guest card state
+            for old_gid in list(self._card_state.keys()):
+                if old_gid != guest_id:
+                    self._card_state.pop(old_gid, None)
         self.current_guest = guest_id
         if guest_name:
             self.store.update_preferences(guest_id, {"name": guest_name, "last_contact": datetime.now().isoformat()})
@@ -340,6 +350,120 @@ class Agent:
 
         if self._detect_goodbye(text_stripped):
             return self.templates.goodbye()
+
+        # --- CARD PAYMENT FLOW (state machine) ---
+        card_state = self._card_state.get(gid)
+        if card_state:
+            state = card_state.get("step")
+            if state == "awaiting_cpf":
+                cpf = re.sub(r"\D", "", text_stripped)
+                if len(cpf) in (11, 14):
+                    card_state["cpf"] = cpf
+                    card_state["step"] = "awaiting_details"
+                    self._card_state[gid] = card_state
+                    return self.templates.card_ask_details()
+                return "CPF invalido! Digite apenas os numeros do CPF (11 digitos):"
+
+            elif state == "awaiting_details":
+                parts = [p.strip() for p in text_stripped.replace(";", ",").split(",")]
+                if len(parts) >= 4:
+                    card_state["holder"] = parts[0]
+                    card_state["number"] = re.sub(r"\D", "", parts[1])
+                    card_state["expiry"] = parts[2].strip()
+                    card_state["cvv"] = re.sub(r"\D", "", parts[3])
+                    card_state["step"] = "awaiting_postal"
+                    self._card_state[gid] = card_state
+                    return self.templates.card_ask_postal()
+                return "Nao entendi! Mande neste formato:\n\n**Nome do titular, Numero do cartao, Validade (mes/ano), CVV**\n\nExemplo: Joao Silva, 4111111111111111, 12/2028, 123"
+
+            elif state == "awaiting_postal":
+                parts = [p.strip() for p in text_stripped.replace(";", ",").split(",")]
+                if len(parts) >= 1:
+                    cep = re.sub(r"\D", "", parts[0])
+                    addr_num = re.sub(r"\D", "", parts[1]) if len(parts) > 1 else "0"
+                    if len(cep) == 8:
+                        card_state["postal"] = cep
+                        card_state["address_number"] = addr_num
+                        # Process payment via Asaas
+                        try:
+                            import asaas
+                            q = getattr(self, '_last_quote', None)
+                            if not q:
+                                del self._card_state[gid]
+                                return "Desculpe, perdi os dados da reserva. Pode comecar de novo? :)"
+                            card_total = q["total"] * 1.2
+                            # Parse expiry
+                            exp_parts = card_state["expiry"].replace("/", " ").split()
+                            exp_month = exp_parts[0].zfill(2) if exp_parts else "12"
+                            exp_year = exp_parts[1] if len(exp_parts) > 1 else str(datetime.now().year + 1)
+                            if len(exp_year) == 2:
+                                exp_year = "20" + exp_year
+                            # Create or find customer
+                            guest_data = self.store.get_guest(gid)
+                            prefs = guest_data.get("preferences", {})
+                            guest_name = prefs.get("name", card_state.get("holder", "Hospede"))
+                            guest_phone = prefs.get("phone", "")
+                            customer = asaas.find_customer_by_cpf(card_state["cpf"])
+                            if not customer:
+                                customer = asaas.create_customer(
+                                    name=guest_name,
+                                    email="",
+                                    cpf_cnpj=card_state["cpf"],
+                                    phone=guest_phone,
+                                    postal_code=cep,
+                                    address_number=addr_num,
+                                )
+                            if not customer or "id" not in customer:
+                                err = asaas.get_last_error()
+                                del self._card_state[gid]
+                                return self.templates.card_failed(err or "Erro ao criar cliente no Asaas")
+                            # Create payment
+                            payment = asaas.create_payment(
+                                customer_id=customer["id"],
+                                value=card_total,
+                                due_date=(datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d"),
+                                description=f"Reserva {q['property'].name} - {q['checkin'].strftime('%d/%m')} a {q['checkout'].strftime('%d/%m')}",
+                                installments=card_state.get("installments", 1),
+                                card_holder_name=card_state["holder"],
+                                card_number=card_state["number"],
+                                expiry_month=exp_month,
+                                expiry_year=exp_year,
+                                ccv=card_state["cvv"],
+                                holder_name=guest_name,
+                                holder_email="",
+                                holder_cpf=card_state["cpf"],
+                                holder_phone=guest_phone,
+                                holder_postal_code=cep,
+                                holder_address_number=addr_num,
+                            )
+                            del self._card_state[gid]
+                            if payment and payment.get("id"):
+                                if payment.get("status") == "CONFIRMED":
+                                    return self.templates.card_approved(payment["id"], card_total, card_state.get("installments", 1))
+                                elif payment.get("status") == "RECEIVED":
+                                    return self.templates.card_approved(payment["id"], card_total, card_state.get("installments", 1))
+                                else:
+                                    return self.templates.card_failed(f"Status: {payment.get('status', 'desconhecido')}")
+                            err = asaas.get_last_error()
+                            return self.templates.card_failed(err or "Erro ao processar pagamento")
+                        except Exception as e:
+                            if gid in self._card_state:
+                                del self._card_state[gid]
+                            print(f"Card payment error: {e}", flush=True)
+                            return self.templates.card_failed(str(e))
+                    return "CEP invalido! Digite o CEP com 8 digitos (ex: 40000000) e o numero separado por virgula."
+                return "Mande o CEP e numero do endereco separados por virgula (ex: 40000000, 123)"
+
+        # --- CARD INTENT DETECTION ---
+        if self._detect_card_intent(text_stripped) and hasattr(self, '_last_quote'):
+            q = self._last_quote
+            card_total = q["total"] * 1.2
+            self._card_state[gid] = {
+                "step": "awaiting_cpf",
+                "installments": 1,
+                "total": card_total,
+            }
+            return self.templates.card_ask_cpf(card_total)
 
         # --- PARSE MESSAGE ---
         info = self.parse_message(text_stripped, gid)

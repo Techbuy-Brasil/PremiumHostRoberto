@@ -5,7 +5,7 @@ import os
 import traceback
 import urllib.request
 from pathlib import Path
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -29,6 +29,39 @@ from supabase_db import (_api,
 from pix import gerar_pix_payload
 
 app = FastAPI(title="PremiumHost Roberto - API", version="1.0.0")
+
+ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD") or "phadmin2026"
+
+rate_limits = {}
+
+def check_rate_limit(ip: str) -> bool:
+    now = datetime.now()
+    window = 60
+    max_reqs = 30
+    key = f"{ip}:{now.strftime('%Y%m%d%H%M')}"
+    count = rate_limits.get(key, 0)
+    if count >= max_reqs:
+        return False
+    rate_limits[key] = count + 1
+    for k in list(rate_limits.keys()):
+        if k.split(":")[1] != now.strftime("%Y%m%d%H%M"):
+            del rate_limits[k]
+    return True
+
+def get_client_ip(request):
+    forwarded = request.headers.get("x-forwarded-for")
+    if forwarded:
+        return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+def verify_admin(password: str = "", request=None):
+    if password and password == ADMIN_PASSWORD:
+        return True
+    if request:
+        header_key = request.headers.get("x-admin-key", "")
+        if header_key == ADMIN_PASSWORD:
+            return True
+    return False
 
 # ── BACKUP HELPERS ──
 
@@ -198,9 +231,11 @@ def _cleanup_old_backups():
     except Exception:
         pass
 
+CORS_ORIGINS = os.environ.get("CORS_ORIGINS", "*")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=CORS_ORIGINS.split(","),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -337,7 +372,11 @@ class QuoteRequest(BaseModel):
 class BlockRequest(BaseModel):
     property_key: str
     dates: list[str]
-    password: str
+    password: str = ""
+
+    class Config:
+        # Allow population by field name for compatibility
+        protected_namespaces = ()
 
 
 @app.get("/api/health")
@@ -348,18 +387,22 @@ def health():
 # ── BACKUP ENDPOINTS ──
 
 @app.get("/api/admin/backups")
-def admin_list_backups(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_list_backups(password: str = "", request: Request = None):
+    ip = get_client_ip(request)
+    if not check_rate_limit(ip):
+        raise HTTPException(status_code=429, detail="Muitas requisicoes. Aguarde um minuto.")
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     _cleanup_old_backups()
     return JSONResponse(content=_list_backups())
 
 
 @app.post("/api/admin/backups/create")
-def admin_create_backup(label: str = "", password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_create_backup(label: str = "", password: str = "", request: Request = None):
+    ip = get_client_ip(request)
+    if not check_rate_limit(ip):
+        raise HTTPException(status_code=429, detail="Muitas requisicoes. Aguarde um minuto.")
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     lbl = label.strip() or "manual"
     result = _create_backup(lbl)
@@ -369,11 +412,8 @@ def admin_create_backup(label: str = "", password: str = ""):
 
 
 @app.get("/api/admin/backups/cron")
-def cron_backup():
-    """Triggered by Vercel CRON every 10 days."""
-    cfg = agent.pm.config
-    password = cfg.get("admin_password", "")
-    if not password:
+def cron_backup(request: Request = None):
+    if not verify_admin("", request):
         return JSONResponse(content={"error": "no password configured"}, status_code=500)
     result = _create_backup("automatico_10dias")
     if not result:
@@ -382,9 +422,8 @@ def cron_backup():
 
 
 @app.post("/api/admin/backups/restore/{backup_key}")
-def admin_restore_backup(backup_key: str, password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_restore_backup(backup_key: str, password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha invalida")
     try:
         label = _restore_backup(backup_key)
@@ -396,9 +435,8 @@ def admin_restore_backup(backup_key: str, password: str = ""):
 
 
 @app.post("/api/admin/backups/delete/{backup_key}")
-def admin_delete_backup(backup_key: str, password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_delete_backup(backup_key: str, password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     try:
         if supabase_configured():
@@ -461,9 +499,8 @@ def _save_blocked_state():
 
 
 @app.post("/api/admin/block")
-def admin_block(req: BlockRequest):
-    cfg = agent.pm.config
-    if req.password != cfg.get("admin_password", ""):
+def admin_block(req: BlockRequest, request: Request = None):
+    if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     if req.property_key not in cfg.get("properties", {}):
         raise HTTPException(status_code=404, detail="Imovel nao encontrado")
@@ -477,9 +514,8 @@ def admin_block(req: BlockRequest):
 
 
 @app.post("/api/admin/unblock")
-def admin_unblock(req: BlockRequest):
-    cfg = agent.pm.config
-    if req.password != cfg.get("admin_password", ""):
+def admin_unblock(req: BlockRequest, request: Request = None):
+    if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     if req.property_key not in cfg.get("properties", {}):
         raise HTTPException(status_code=404, detail="Imovel nao encontrado")
@@ -491,9 +527,8 @@ def admin_unblock(req: BlockRequest):
 
 
 @app.post("/api/admin/available")
-def admin_available(req: BlockRequest):
-    cfg = agent.pm.config
-    if req.password != cfg.get("admin_password", ""):
+def admin_available(req: BlockRequest, request: Request = None):
+    if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     if req.property_key not in cfg.get("properties", {}):
         raise HTTPException(status_code=404, detail="Imovel nao encontrado")
@@ -507,9 +542,8 @@ def admin_available(req: BlockRequest):
 
 
 @app.post("/api/admin/unavailable")
-def admin_unavailable(req: BlockRequest):
-    cfg = agent.pm.config
-    if req.password != cfg.get("admin_password", ""):
+def admin_unavailable(req: BlockRequest, request: Request = None):
+    if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     if req.property_key not in cfg.get("properties", {}):
         raise HTTPException(status_code=404, detail="Imovel nao encontrado")
@@ -521,9 +555,8 @@ def admin_unavailable(req: BlockRequest):
 
 
 @app.get("/api/admin/blocked")
-def admin_list_blocked(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_list_blocked(password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     result = {}
     for key, dates in _admin_blocked.items():
@@ -532,9 +565,8 @@ def admin_list_blocked(password: str = ""):
 
 
 @app.get("/api/admin/state")
-def admin_get_state(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_get_state(password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     return JSONResponse(content={
         "blocked": {k: sorted(v) for k, v in _admin_blocked.items()},
@@ -549,9 +581,8 @@ def get_photos(property_key: str):
 
 
 @app.get("/api/photos-debug")
-def photos_debug(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def photos_debug(password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     # test write
     test_ok = False
@@ -574,9 +605,8 @@ class PhotosUpdate(BaseModel):
 
 
 @app.put("/api/admin/photos/{property_key}")
-def admin_update_photos(property_key: str, req: PhotosUpdate, password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_update_photos(property_key: str, req: PhotosUpdate, password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     _admin_photos[property_key] = req.categories
     _create_backup("fotos_automatico")
@@ -666,13 +696,12 @@ class PrecosUpdate(BaseModel):
     general: dict
     properties: dict[str, dict]
     date_overrides: list[dict]
-    password: str
+    password: str = ""
 
 
 @app.get("/api/admin/precos")
-def admin_get_precos(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_get_precos(password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
 
     override = _load_precos_override()
@@ -702,9 +731,8 @@ def admin_get_precos(password: str = ""):
 
 
 @app.put("/api/admin/precos")
-def admin_update_precos(req: PrecosUpdate):
-    cfg = agent.pm.config
-    if req.password != cfg.get("admin_password", ""):
+def admin_update_precos(req: PrecosUpdate, request: Request = None):
+    if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
 
     _create_backup("precos_automatico")
@@ -773,7 +801,10 @@ def _enrich_qr_codes(text: str) -> str:
 
 
 @app.post("/api/chat")
-def chat(req: MessageRequest):
+def chat(req: MessageRequest, request: Request = None):
+    ip = get_client_ip(request)
+    if not check_rate_limit(ip):
+        raise HTTPException(status_code=429, detail="Muitas requisicoes. Aguarde um minuto.")
     guest_id = req.guest_id or req.guest_name or "anon"
     response = agent.respond(req.message, req.guest_name, guest_id)
     # Enrich response with QR codes
@@ -820,9 +851,8 @@ FAQ_TMP = "/tmp/faq_premiumhost.json"
 
 
 @app.get("/api/admin/faq")
-def admin_get_faq(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_get_faq(password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     # Try Supabase first
     if supabase_configured():
@@ -847,7 +877,9 @@ def admin_get_faq(password: str = ""):
                     "despedidas", "agradecimento", "pergunta_imovel", "need_info_intro", "need_info_outro",
                     "confirmar_reserva", "pix_pagamento", "pix_info", "alternativas_datas_intro",
                     "alternativas_datas_outro", "alternativas_imoveis_intro", "alternativas_imoveis_outro",
-                    "excesso_capacidade", "datas_invalidas", "menu_faq", "fallback"]
+                    "excesso_capacidade", "datas_invalidas", "menu_faq", "fallback",
+                    "card_ask_cpf", "card_ask_details", "card_ask_postal", "card_processing",
+                    "card_approved", "card_failed"]
                 for key in template_keys:
                     val = sys_msgs.get(key, "")
                     if val:
@@ -883,14 +915,13 @@ def admin_get_faq(password: str = ""):
 
 
 class FaqUpdateRequest(BaseModel):
-    password: str
+    password: str = ""
     data: dict
 
 
 @app.put("/api/admin/faq")
-def admin_update_faq(req: FaqUpdateRequest):
-    cfg = agent.pm.config
-    if req.password != cfg.get("admin_password", ""):
+def admin_update_faq(req: FaqUpdateRequest, request: Request = None):
+    if not verify_admin(req.password, request):
         raise HTTPException(status_code=403, detail="Senha incorreta")
     data = req.data
     _create_backup("faq_automatico")
@@ -912,7 +943,7 @@ def admin_update_faq(req: FaqUpdateRequest):
                     converted["variacoes"] = item["variacoes"]
                 faq_items.append(converted)
             upsert_faq_items(faq_items)
-            for key in ["saudacoes", "saudacoes_nome", "apresentacoes", "precos_disponivel", "precos_calculado", "precos_cta", "indisponivel", "indisponivel_alternativas", "despedidas", "agradecimento", "pergunta_imovel", "need_info_intro", "need_info_outro", "confirmar_reserva", "pix_pagamento", "pix_info", "alternativas_datas_intro", "alternativas_datas_outro", "alternativas_imoveis_intro", "alternativas_imoveis_outro", "excesso_capacidade", "datas_invalidas", "menu_faq", "fallback"]:
+            for key in ["saudacoes", "saudacoes_nome", "apresentacoes", "precos_disponivel", "precos_calculado", "precos_cta", "indisponivel", "indisponivel_alternativas", "despedidas", "agradecimento", "pergunta_imovel", "need_info_intro", "need_info_outro", "confirmar_reserva", "pix_pagamento", "pix_info", "alternativas_datas_intro", "alternativas_datas_outro", "alternativas_imoveis_intro", "alternativas_imoveis_outro", "excesso_capacidade", "datas_invalidas", "menu_faq", "fallback", "card_ask_cpf", "card_ask_details", "card_ask_postal", "card_processing", "card_approved", "card_failed"]:
                 values = data.get(key, [])
                 val = values[0] if isinstance(values, list) and values else values
                 if val:
@@ -976,9 +1007,8 @@ def landing_click(req: LandingClickRequest):
 
 
 @app.get("/api/admin/landing-stats")
-def admin_landing_stats(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_landing_stats(password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
     stats = {"today": {"btn_chat": 0, "btn_site": 0}}
     if supabase_configured():
@@ -991,9 +1021,8 @@ def admin_landing_stats(password: str = ""):
 
 
 @app.get("/api/admin/leads")
-def admin_leads(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_leads(password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
     leads = []
     if supabase_configured():
@@ -1014,9 +1043,8 @@ def admin_leads(password: str = ""):
 
 
 @app.get("/api/admin/check-email")
-def admin_check_email(password: str = ""):
-    cfg = agent.pm.config
-    if password != cfg.get("admin_password", ""):
+def admin_check_email(password: str = "", request: Request = None):
+    if not verify_admin(password, request):
         return JSONResponse(content={"error": "Senha invalida"}, status_code=403)
     try:
         import email_notify

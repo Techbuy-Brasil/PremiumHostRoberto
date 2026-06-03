@@ -167,7 +167,7 @@
       });
 
       // Render template messages section
-      const templateKeys = ['sem_imovel', 'menu_faq', 'fallback', 'saudacoes', 'saudacoes_nome', 'apresentacoes', 'precos_disponivel', 'precos_calculado', 'precos_cta', 'indisponivel', 'indisponivel_alternativas', 'despedidas', 'agradecimento', 'pergunta_imovel', 'need_info_intro', 'need_info_outro', 'confirmar_reserva', 'pix_pagamento', 'pix_info', 'alternativas_datas_intro', 'alternativas_datas_outro', 'alternativas_imoveis_intro', 'alternativas_imoveis_outro', 'excesso_capacidade', 'datas_invalidas'];
+      const templateKeys = ['sem_imovel', 'menu_faq', 'fallback', 'saudacoes', 'saudacoes_nome', 'apresentacoes', 'precos_disponivel', 'precos_calculado', 'precos_cta', 'indisponivel', 'indisponivel_alternativas', 'despedidas', 'agradecimento', 'pergunta_imovel', 'need_info_intro', 'need_info_outro', 'confirmar_reserva', 'pix_pagamento', 'pix_info', 'alternativas_datas_intro', 'alternativas_datas_outro', 'alternativas_imoveis_intro', 'alternativas_imoveis_outro', 'excesso_capacidade', 'datas_invalidas', 'card_ask_cpf', 'card_ask_details', 'card_ask_postal', 'card_processing', 'card_approved', 'card_failed'];
       const templateLabels = {
         'saudacoes': 'Saudação inicial (sem nome)',
         'saudacoes_nome': 'Saudação inicial (com nome do hóspede)',
@@ -194,6 +194,12 @@
         'alternativas_imoveis_outro': 'Sugerir outros imóveis — finalização',
         'excesso_capacidade': 'Capacidade excedida no imóvel',
         'datas_invalidas': 'Datas inválidas (check-out ≤ check-in)',
+        'card_ask_cpf': 'Cartão — solicitar CPF',
+        'card_ask_details': 'Cartão — solicitar dados do cartão',
+        'card_ask_postal': 'Cartão — solicitar CEP e endereço',
+        'card_processing': 'Cartão — processando pagamento',
+        'card_approved': 'Cartão — pagamento aprovado',
+        'card_failed': 'Cartão — pagamento recusado',
       };
       const tmplSection = document.createElement('div');
       tmplSection.style.marginTop = '32px';

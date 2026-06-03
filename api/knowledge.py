@@ -51,6 +51,8 @@ class KnowledgeBase:
                     "indisponivel": [], "indisponivel_alternativas": [], "despedidas": [],
                     "agradecimento": [], "need_info_intro": [], "need_info_outro": [],
                     "confirmar_reserva": [], "pix_pagamento": [], "pix_info": [],
+                    "card_ask_cpf": [], "card_ask_details": [], "card_ask_postal": [],
+                    "card_processing": [], "card_approved": [], "card_failed": [],
                     "alternativas_datas_intro": [], "alternativas_datas_outro": [],
                     "alternativas_imoveis_intro": [], "alternativas_imoveis_outro": [],
                     "excesso_capacidade": [], "datas_invalidas": [], "menu_faq": [],
@@ -93,6 +95,12 @@ class KnowledgeBase:
             "menu_faq": [sys_msgs.get("menu_faq", "")],
             "pergunta_imovel": [sys_msgs.get("pergunta_imovel", "")],
             "fallback": [sys_msgs.get("fallback", "")],
+            "card_ask_cpf": [sys_msgs.get("card_ask_cpf", "")],
+            "card_ask_details": [sys_msgs.get("card_ask_details", "")],
+            "card_ask_postal": [sys_msgs.get("card_ask_postal", "")],
+            "card_processing": [sys_msgs.get("card_processing", "")],
+            "card_approved": [sys_msgs.get("card_approved", "")],
+            "card_failed": [sys_msgs.get("card_failed", "")],
         }
 
     def _ensure_fresh(self):

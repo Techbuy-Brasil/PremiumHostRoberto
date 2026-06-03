@@ -235,5 +235,23 @@
   ],
   "datas_invalidas": [
     "A data de check-out precisa ser depois do check-in, hein! :)\n\nPode verificar e me mandar as datas certinhas?"
+  ],
+  "card_ask_cpf": [
+    "O valor com acréscimo de 20% fica **R$ {total:.0f}** (pode parcelar em até 6x).\n\nPara processar o pagamento, preciso do seu **CPF** (só números):"
+  ],
+  "card_ask_details": [
+    "Perfeito! Agora me envie os dados do cartão nesta ordem:\n\n1. **Nome do titular** (como está impresso no cartão)\n2. **Número do cartão** (16 dígitos)\n3. **Validade** (mês/ano, ex: 12/2028)\n4. **CVV** (3 dígitos)\n\nPode enviar tudo junto separando por vírgula :)"
+  ],
+  "card_ask_postal": [
+    "Quase lá! Qual seu **CEP** e **número do endereço**? (ex: 40000-000, 123)"
+  ],
+  "card_processing": [
+    "Processando pagamento... só um instante ⏳"
+  ],
+  "card_approved": [
+    "Pagamento aprovado! ✅\n\n**Resumo:**\nValor: R$ {value:.0f}\nParcelas: {installments}x\nID: {id}\n\nEm instantes você recebe o resumo com as instruções de check-in!"
+  ],
+  "card_failed": [
+    "Pagamento não aprovado 😕\n\nMotivo: {error}\n\nPode tentar novamente com outro cartão ou optar pelo PIX!"
   ]
 }

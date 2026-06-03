@@ -198,3 +198,42 @@ class ResponseTemplates:
             "Para pagamento via PIX:\n\n"
             "**Chave PIX:** `b1b74e94-2687-4ea1-831b-6351b97e7929`\n\n"
             "Me avisa quando fizer o pagamento que ja confirmo tudo! :)")
+
+    def card_ask_cpf(self, total_card):
+        return self._r("card_ask_cpf",
+            "O valor com acrescimo de 20% fica **R$ {total:.0f}** (pode parcelar em ate 6x).\n\n"
+            "Para processar o pagamento, preciso do seu **CPF** (so numeros):",
+            total=total_card)
+
+    def card_ask_details(self):
+        return self._r("card_ask_details",
+            "Perfeito! Agora me envie os dados do cartao nesta ordem:\n\n"
+            "1. **Nome do titular** (como esta impresso no cartao)\n"
+            "2. **Numero do cartao** (16 digitos)\n"
+            "3. **Validade** (mes/ano, ex: 12/2028)\n"
+            "4. **CVV** (3 digitos)\n\n"
+            "Pode enviar tudo junto separando por virgula :)")
+
+    def card_ask_postal(self):
+        return self._r("card_ask_postal",
+            "Quase la! Qual seu **CEP** e **numero do endereco**? (ex: 40000-000, 123)")
+
+    def card_processing(self):
+        return self._r("card_processing",
+            "Processando pagamento... só um instante ⏳")
+
+    def card_approved(self, payment_id, value, installments):
+        return self._r("card_approved",
+            "Pagamento aprovado! ✅\n\n"
+            "**Resumo:**\n"
+            "Valor: R$ {value:.0f}\n"
+            "Parcelas: {installments}x\n"
+            "ID: {id}\n\n"
+            "Em instantes voce recebe o resumo com as instrucoes de check-in!",
+            value=value, installments=installments, id=payment_id)
+
+    def card_failed(self, error):
+        return self._r("card_failed",
+            "Pagamento nao aprovado 😕\n\nMotivo: {error}\n\n"
+            "Pode tentar novamente com outro cartao ou optar pelo PIX!",
+            error=error)
