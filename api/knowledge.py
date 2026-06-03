@@ -175,7 +175,7 @@ class KnowledgeBase:
 
     def get_random(self, key, default=None):
         self._ensure_fresh()
-        items = self._data.get(key, [])
+        items = [i for i in self._data.get(key, []) if i]
         if not items:
             return default
         return random.choice(items)

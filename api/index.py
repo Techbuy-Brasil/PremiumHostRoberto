@@ -772,6 +772,8 @@ def _static_pix_brcode() -> str:
 
 def _enrich_qr_codes(text: str) -> str:
     """Append QR code images to text when WhatsApp number or PIX key is mentioned."""
+    if not text:
+        return text or ""
     import urllib.parse
     has_whatsapp = "99290-0979" in text or "(71) 99290-0979" in text or "992900979" in text
     has_pix = "b1b74e94-2687-4ea1-831b-6351b97e7929" in text
