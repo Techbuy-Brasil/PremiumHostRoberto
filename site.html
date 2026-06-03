@@ -374,16 +374,36 @@
       <!-- CARD SECTION -->
       <div id="cardSection" style="display:none">
         <p style="font-size:0.9rem;color:#555;margin-bottom:12px">
-          <strong>20% de acréscimo</strong> · Parcele em até 6x
+          Pagamento integral no cartão &middot; Parcele em at&eacute; <strong>6x</strong>
         </p>
         <div id="cardForm">
-          <input id="cardCpf" type="text" placeholder="CPF (só números)" style="width:100%;padding:10px;margin-bottom:8px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
+          <input id="cardCpf" type="text" placeholder="CPF (s&oacute; n&uacute;meros)" style="width:100%;padding:10px;margin-bottom:8px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
           <input id="cardHolder" type="text" placeholder="Nome do titular" style="width:100%;padding:10px;margin-bottom:8px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
-          <input id="cardNumber" type="text" placeholder="Número do cartão (16 dígitos)" maxlength="19" style="width:100%;padding:10px;margin-bottom:8px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
+          <input id="cardNumber" type="text" placeholder="N&uacute;mero do cart&atilde;o (16 d&iacute;gitos)" maxlength="19" style="width:100%;padding:10px;margin-bottom:8px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
           <div style="display:flex;gap:8px;margin-bottom:8px">
             <input id="cardExpiry" type="text" placeholder="Validade (MM/AA)" maxlength="5" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
             <input id="cardCvv" type="text" placeholder="CVV" maxlength="4" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
           </div>
+          <div style="display:flex;gap:8px;margin-bottom:8px">
+            <input id="cardCep" type="text" placeholder="CEP (8 d&iacute;gitos)" maxlength="9" style="flex:2;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
+            <input id="cardAddressNum" type="text" placeholder="N&ordm;" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
+          </div>
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+            <label style="font-size:0.85rem;color:#666;font-weight:500">Parcelas:</label>
+            <select id="cardInstallments" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem;background:#fff" onchange="atualizarParcelamento()">
+              <option value="1">&Agrave; vista</option>
+              <option value="2">2x</option>
+              <option value="3">3x</option>
+              <option value="4">4x</option>
+              <option value="5">5x</option>
+              <option value="6">6x</option>
+            </select>
+            <span id="cardInstallmentValue" style="font-size:0.85rem;color:#888;white-space:nowrap"></span>
+          </div>
+          <button id="btnCardPay" class="btn-reservar" style="width:100%;padding:14px;font-size:1rem" onclick="processarCardPayment()">Pagar no Cart&atilde;o</button>
+        </div>
+        <div id="cardResult" style="display:none;padding:12px;border-radius:6px;margin-top:8px"></div>
+      </div>
           <div style="display:flex;gap:8px;margin-bottom:12px">
             <input id="cardCep" type="text" placeholder="CEP (8 dígitos)" maxlength="9" style="flex:2;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
             <input id="cardAddressNum" type="text" placeholder="Nº" style="flex:1;padding:10px;border:1px solid #ddd;border-radius:6px;font-size:0.9rem">
@@ -1162,10 +1182,11 @@
           '<br>Entrada (50%): <strong style="color:#c8a96a">R$ ' + entrada.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong>' +
           '<br><br><small style="color:#888">Restante (50%): deverá ser pago até o dia do check-in</small>';
 
-        // Update card button text
+        // Update card button text (surcharge % calculated dynamically)
         var cardTotal = total * 1.2;
+        var surchargePct = Math.round((cardTotal / total - 1) * 100);
         var btnShowCard = document.getElementById('btnShowCard');
-        btnShowCard.textContent = 'Pagar com Cartão (R$ ' + cardTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + ' — 20% acréscimo)';
+        btnShowCard.textContent = 'Pagar com Cartão (R$ ' + cardTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + ')';
         btnShowCard.style.display = 'block';
 
         // Reset card section
@@ -1242,17 +1263,28 @@
         document.getElementById('pixSection').style.display = 'none';
         document.getElementById('btnShowCard').style.display = 'none';
         document.getElementById('cardSection').style.display = 'block';
-        // Update summary for card (total com acréscimo, sem 50% entrada)
+        // Reset installment selector
+        document.getElementById('cardInstallments').value = '1';
+        // Update summary for card (total + parcelamento)
         if (bookingInfo) {
           var cardTotal = bookingInfo.total * 1.2;
-          var installmentVal = (cardTotal / 6).toLocaleString('pt-BR', {minimumFractionDigits: 2});
+          var surchargePct = Math.round((cardTotal / bookingInfo.total - 1) * 100);
           document.getElementById('pixResumo').innerHTML =
             '<strong>' + bookingInfo.propName + '</strong><br>' +
             bookingInfo.checkin + ' a ' + bookingInfo.checkout + ' · ' + bookingInfo.hospedes + ' hóspede' + (bookingInfo.hospedes > 1 ? 's' : '') +
             '<br><br>Valor total: <strong>R$ ' + bookingInfo.total.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong>' +
-            '<br>Total no cartão: <strong style="color:#c8a96a">R$ ' + cardTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong> <span style="font-size:0.8rem;color:#888">(20% acréscimo)</span>' +
-            '<br><small style="color:#888">Parcele em até 6x de R$ ' + installmentVal + '</small>';
+            '<br>Total no cartão: <strong style="color:#c8a96a">R$ ' + cardTotal.toLocaleString('pt-BR', {minimumFractionDigits: 2}) + '</strong>';
+          atualizarParcelamento();
         }
+      }
+
+      function atualizarParcelamento() {
+        if (!bookingInfo) return;
+        var cardTotal = bookingInfo.total * 1.2;
+        var parcelas = parseInt(document.getElementById('cardInstallments').value) || 1;
+        var valorParcela = cardTotal / parcelas;
+        document.getElementById('cardInstallmentValue').textContent =
+          parcelas + 'x de R$ ' + valorParcela.toLocaleString('pt-BR', {minimumFractionDigits: 2});
       }
 
       function processarCardPayment() {
@@ -1264,6 +1296,7 @@
         var cvv = document.getElementById('cardCvv').value.replace(/\D/g, '');
         var cep = document.getElementById('cardCep').value.replace(/\D/g, '');
         var addrNum = document.getElementById('cardAddressNum').value.replace(/\D/g, '') || '0';
+        var installments = parseInt(document.getElementById('cardInstallments').value) || 1;
 
         // Validation
         if (cpf.length !== 11) { alert('CPF inválido! Digite 11 números.'); return; }
@@ -1289,6 +1322,7 @@
             checkout: bookingInfo.checkout,
             guests: bookingInfo.hospedes,
             total: bookingInfo.total,
+            installments: installments,
             cpf: cpf,
             holder_name: holder,
             card_number: number,

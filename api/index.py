@@ -998,6 +998,7 @@ class CardPayRequest(BaseModel):
     checkout: str = ""
     guests: int = 1
     total: float
+    installments: int = 1
     cpf: str
     holder_name: str
     card_number: str
@@ -1040,7 +1041,7 @@ def card_pay(req: CardPayRequest):
         value=card_total,
         due_date=due,
         description=desc,
-        installments=1,
+        installments=req.installments,
         card_holder_name=req.holder_name,
         card_number=re.sub(r"\D", "", req.card_number),
         expiry_month=req.expiry_month.zfill(2),
