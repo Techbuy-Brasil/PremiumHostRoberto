@@ -481,9 +481,8 @@ class Agent:
                     "total": card_total,
                 })
                 return self.templates.card_ask_cpf(card_total)
-            else:
-                # No quote found — ask user to request one first
-                return self.templates.ask_checkin()
+            # No quote found — ask user to request one first
+            return "Para pagar no cartão, preciso antes fazer uma cotação. Me informe o imóvel, check-in, check-out e número de hóspedes!"
 
         # --- PARSE MESSAGE ---
         info = self.parse_message(text_stripped, gid)
