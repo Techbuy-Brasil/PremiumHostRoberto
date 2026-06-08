@@ -87,6 +87,7 @@
       </div>
 
       <div id="stats" class="stats"></div>
+      <div id="visitasReport"></div>
       <div id="lista"></div>
 
     </div>
@@ -168,6 +169,11 @@
     }
 
     function carregar() {
+      // Buscar relatório de visitas
+      var visitPromise = fetch(API + '/api/admin/visits/report?password=' + encodeURIComponent(password) + '&days=30&_=' + Date.now())
+        .then(function(r) { return r.json(); })
+        .catch(function() { return { today: 0, daily: [] }; });
+
       fetch(API + '/api/admin/leads?password=' + encodeURIComponent(password) + '&_=' + Date.now())
         .then(function(r) { return r.json(); })
         .then(function(data) {
@@ -186,28 +192,49 @@
           var consultas = leads.filter(function(l) { return l.status === 'consultou_preco'; }).length;
           var abandonos = leads.filter(function(l) { return l.status === 'abandonou_reserva' || l.status === 'faltou_datas' || l.status === 'faltou_contato'; }).length;
 
-          // Buscar estatísticas de cliques na landing page
-          fetch(API + '/api/admin/landing-stats?password=' + encodeURIComponent(password) + '&_=' + Date.now())
-            .then(function(r) { return r.json(); })
-            .then(function(clickData) {
-              var clickStats = clickData.stats || { today: { btn_chat: 0, btn_site: 0 } };
-              var todayStats = clickStats.today || { btn_chat: 0, btn_site: 0 };
+          // Buscar estatísticas de cliques na landing page e visitas
+          Promise.all([
+            fetch(API + '/api/admin/landing-stats?password=' + encodeURIComponent(password) + '&_=' + Date.now()).then(function(r) { return r.json(); }).catch(function() { return { stats: { today: { btn_chat: 0, btn_site: 0 } } }; }),
+            visitPromise
+          ]).then(function(results) {
+            var clickData = results[0];
+            var visitData = results[1];
+            var clickStats = clickData.stats || { today: { btn_chat: 0, btn_site: 0 } };
+            var todayStats = clickStats.today || { btn_chat: 0, btn_site: 0 };
+            var visitToday = visitData.today || 0;
+            var visitDaily = visitData.daily || [];
 
-              statsEl.innerHTML =
-                '<div class="stat-box"><div class="num">' + total + '</div><div class="label">Total leads</div></div>' +
-                '<div class="stat-box"><div class="num total-card">' + reservas + '</div><div class="label">Confirmaram dados</div></div>' +
-                '<div class="stat-box"><div class="num">' + consultas + '</div><div class="label">Consultaram preço</div></div>' +
-                '<div class="stat-box"><div class="num">' + abandonos + '</div><div class="label">Abandonaram</div></div>' +
-                '<div class="stat-box" style="background: #f0f7ff; border: 2px solid #0066cc;"><div class="num" style="color: #0066cc;">' + todayStats.btn_chat + '</div><div class="label">Cliques - Chat (hoje)</div></div>' +
-                '<div class="stat-box" style="background: #fff9e6; border: 2px solid #cc9900;"><div class="num" style="color: #cc9900;">' + todayStats.btn_site + '</div><div class="label">Cliques - Site (hoje)</div></div>';
-            })
-            .catch(function() {
-              statsEl.innerHTML =
-                '<div class="stat-box"><div class="num">' + total + '</div><div class="label">Total leads</div></div>' +
-                '<div class="stat-box"><div class="num total-card">' + reservas + '</div><div class="label">Confirmaram dados</div></div>' +
-                '<div class="stat-box"><div class="num">' + consultas + '</div><div class="label">Consultaram preço</div></div>' +
-                '<div class="stat-box"><div class="num">' + abandonos + '</div><div class="label">Abandonaram</div></div>';
-            });
+            statsEl.innerHTML =
+              '<div class="stat-box"><div class="num">' + total + '</div><div class="label">Total leads</div></div>' +
+              '<div class="stat-box"><div class="num total-card">' + reservas + '</div><div class="label">Confirmaram dados</div></div>' +
+              '<div class="stat-box"><div class="num">' + consultas + '</div><div class="label">Consultaram preço</div></div>' +
+              '<div class="stat-box"><div class="num">' + abandonos + '</div><div class="label">Abandonaram</div></div>' +
+              '<div class="stat-box" style="background: #f0f7ff; border: 2px solid #0066cc;"><div class="num" style="color: #0066cc;">' + todayStats.btn_chat + '</div><div class="label">Cliques Chat (hoje)</div></div>' +
+              '<div class="stat-box" style="background: #fff9e6; border: 2px solid #cc9900;"><div class="num" style="color: #cc9900;">' + todayStats.btn_site + '</div><div class="label">Cliques Site (hoje)</div></div>' +
+              '<div class="stat-box" style="background: #e8f5e9; border: 2px solid #2e7d32;"><div class="num" style="color: #2e7d32;">' + visitToday + '</div><div class="label">Visitas (hoje)</div></div>';
+
+            // Tabela de visitas dos últimos 30 dias
+            var reportEl = document.getElementById('visitasReport');
+            if (visitDaily.length) {
+              var rows = '';
+              visitDaily.forEach(function(d) {
+                rows += '<tr><td>' + d.date + '</td><td style="text-align:right;font-weight:600">' + d.count + '</td></tr>';
+              });
+              reportEl.innerHTML =
+                '<div class="card" style="margin-top:24px">' +
+                '<h3 style="margin:0 0 12px 0;font-size:.95rem;color:#1a1a2e">Visitas ao site — últimos 30 dias</h3>' +
+                '<table style="width:100%;border-collapse:collapse;font-size:.82rem">' +
+                '<thead><tr style="background:#f5f3f0"><th style="padding:6px 10px;text-align:left">Data</th><th style="padding:6px 10px;text-align:right">Visitas</th></tr></thead>' +
+                '<tbody>' + rows + '</tbody></table></div>';
+            }
+          })
+          .catch(function() {
+            statsEl.innerHTML =
+              '<div class="stat-box"><div class="num">' + total + '</div><div class="label">Total leads</div></div>' +
+              '<div class="stat-box"><div class="num total-card">' + reservas + '</div><div class="label">Confirmaram dados</div></div>' +
+              '<div class="stat-box"><div class="num">' + consultas + '</div><div class="label">Consultaram preço</div></div>' +
+              '<div class="stat-box"><div class="num">' + abandonos + '</div><div class="label">Abandonaram</div></div>';
+          });
 
           var html = '<div style="font-size:.78rem;color:#888;margin-bottom:12px">' + leads.length + ' lead(s) encontrado(s).</div>';
           leads.forEach(function(l) {

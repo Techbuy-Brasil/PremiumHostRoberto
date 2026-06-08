@@ -277,3 +277,46 @@ def get_landing_clicks_today() -> dict:
                 pass
     
     return stats
+
+
+# ── PAGE VISITS TRACKING ──
+
+def log_page_visit(page: str = "site-completo"):
+    """Log a page visit. Stored in system_messages with _visit_ prefix."""
+    from datetime import datetime
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    key = f"_visit_{ts}_{id(datetime)}_{page}"
+    _api("POST", "system_messages", {"key": key, "value": json.dumps({
+        "page": page, "created_at": datetime.now().isoformat()
+    })})
+
+
+def get_visit_report(days: int = 30) -> dict:
+    """Return daily visit counts for the last N days.
+    Returns { "today": N, "daily": [{"date": "YYYY-MM-DD", "count": N}, ...] }
+    """
+    from datetime import datetime, timedelta
+    rows = _api("GET", "system_messages") or []
+    
+    today = datetime.now().strftime("%Y%m%d")
+    cutoff = (datetime.now() - timedelta(days=days)).strftime("%Y%m%d")
+    
+    today_count = 0
+    daily = {}  # "YYYY-MM-DD" -> count
+    
+    for row in rows:
+        key = row.get("key", "")
+        if key.startswith("_visit_"):
+            parts = key.split("_")
+            if len(parts) >= 3:
+                date_str = parts[2]  # YYYYMMDD
+                if date_str >= cutoff:
+                    if date_str == today:
+                        today_count += 1
+                    iso = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+                    daily[iso] = daily.get(iso, 0) + 1
+    
+    sorted_dates = sorted(daily.keys(), reverse=True)
+    daily_list = [{"date": d, "count": daily[d]} for d in sorted_dates]
+    
+    return {"today": today_count, "daily": daily_list}

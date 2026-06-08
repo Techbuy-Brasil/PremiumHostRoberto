@@ -870,6 +870,13 @@
         localStorage.setItem('ph_guest_id', guestId);
       }
 
+      // Rastrear visita à página
+      fetch(API_URL + '/api/track/visit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ page: 'site-completo' })
+      }).catch(function() {});
+
       function toggleChat() {
         widget.classList.toggle('open');
         if (widget.classList.contains('open')) {

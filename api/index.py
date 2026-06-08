@@ -1107,6 +1107,31 @@ def admin_landing_stats(password: str = "", request: Request = None):
     return JSONResponse(content={"stats": stats})
 
 
+@app.post("/api/track/visit")
+def track_visit(page: str = "site-completo"):
+    if supabase_configured():
+        try:
+            from supabase_db import log_page_visit
+            log_page_visit(page)
+        except Exception:
+            pass
+    return JSONResponse(content={"ok": True})
+
+
+@app.get("/api/admin/visits/report")
+def admin_visits_report(days: int = 30, password: str = "", request: Request = None):
+    if not verify_admin(password, request):
+        raise HTTPException(status_code=403, detail="Senha invalida")
+    if not supabase_configured():
+        return JSONResponse(content={"today": 0, "daily": []})
+    try:
+        from supabase_db import get_visit_report
+        report = get_visit_report(days)
+        return JSONResponse(content=report)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/api/admin/leads")
 def admin_leads(password: str = "", request: Request = None):
     if not verify_admin(password, request):
