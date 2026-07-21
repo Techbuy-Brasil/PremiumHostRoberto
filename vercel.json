@@ -6,11 +6,15 @@
       "use": "@vercel/python"
     },
     {
-      "src": "*.{html,css,js,json,png,jpg,jpeg,svg,gif,ico,webp}",
+      "src": "*.{html,css,js,json,xml,png,jpg,jpeg,svg,gif,ico,webp}",
       "use": "@vercel/static"
     }
   ],
   "routes": [
+    {
+      "src": "/sitemap.xml",
+      "dest": "/sitemap.xml"
+    },
     {
       "src": "/api/(.*)",
       "dest": "api/index.py"
